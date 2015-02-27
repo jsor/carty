@@ -5,6 +5,7 @@ node_js:
     - '0.11'
 
 install:
+    - npm install
     - npm install coveralls
     - npm install mocha-lcov-reporter
 
