@@ -1,6 +1,9 @@
 Carty
 =====
 
+[![Build Status](https://travis-ci.org/jsor/carty.svg?branch=master)](https://travis-ci.org/jsor/carty)
+[![Coverage Status](https://coveralls.io/repos/jsor/carty/badge.svg)](https://coveralls.io/r/jsor/carty)
+
 A lightweight and simple to use shopping cart.
 
 If you need to be compatible with IE8, use the
