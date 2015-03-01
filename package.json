@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "main": "dist/carty.js",
   "dependencies": {
-    "extend": "~2.0"
+    "lodash": "~3.3"
   },
   "devDependencies": {
     "chai": "~2.1",
