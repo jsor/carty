@@ -1,6 +1,6 @@
 var assert = require('chai').assert;
 var sinon = require('sinon');
-var localStorage = require('../../lib/store/localStorage');
+var localStorage = require('../../store/localStorage');
 
 describe("storage/localStorage()", function() {
     var mockLocalStorageData = null, mockLocalStorage = {

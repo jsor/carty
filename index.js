@@ -1,1 +1,1 @@
-module.exports = require('./lib/carty');
+module.exports = require('./carty');

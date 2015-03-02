@@ -3,7 +3,6 @@
   "title": "Carty",
   "description": "A lightweight and simple to use shopping cart.",
   "version": "0.1.0",
-  "main": "dist/carty.js",
   "dependencies": {
     "lodash": "~3.3"
   },

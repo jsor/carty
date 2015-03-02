@@ -5,7 +5,7 @@ var isString = require('lodash/lang/isString');
 var isUndefined = require('lodash/lang/isUndefined');
 var isFunction = require('lodash/lang/isFunction');
 var isObject = require('lodash/lang/isObject');
-var emitter = require('./emitter');
+var emitter = require('./util/emitter');
 
 var hasOwn = Object.prototype.hasOwnProperty;
 
