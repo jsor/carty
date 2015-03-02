@@ -94,7 +94,7 @@ function createItem(attr) {
 
     item.equals = function(otherItem) {
         try {
-            return createItem(otherItem).id() === this.id();
+            return createItem(otherItem).id() === item.id();
         } catch (e) {
             return false;
         }
@@ -149,8 +149,8 @@ function createCart(options) {
 
     cart.each = function(callback, context) {
         _items.every(function(item, index) {
-            return false !== callback.call(context, item, index, this);
-        }, this);
+            return false !== callback.call(context, item, index, cart);
+        });
 
         return cart;
     };
