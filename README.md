@@ -12,11 +12,11 @@ Browser Support and Polyfills
 Carty doesn't ship with any polyfills. You may use polyfills for the following
 features (if you have to support IE8 for example):
 
-* Array.prototype.every
-* Array.prototype.map
-* Function.prototype.bind
+* `Array.prototype.every`
+* `Array.prototype.map`
+* `Function.prototype.bind`
 
-Checkout [es5-shim](https://github.com/es-shims/es5-shim) which provides the
+You can use [es5-shim](https://github.com/es-shims/es5-shim) which provides the
 required polyfills.
 
 If you use the localStorage store adapter, you may polyfill JSON with
