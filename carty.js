@@ -157,7 +157,7 @@ function createCart(options) {
 
     cart.each = function(callback, context) {
         _items.every(function(item, index) {
-            return !!callback.call(context, item, index, this);
+            return false !== callback.call(context, item, index, this);
         }, this);
 
         return cart;
@@ -286,13 +286,13 @@ function createCart(options) {
     function remove(attr) {
         var existing = has(attr);
 
-        if (existing) {
-            _items.splice(existing.index, 1);
-            save();
-            return existing.item;
+        if (!existing) {
+            return null;
         }
 
-        return null;
+        _items.splice(existing.index, 1);
+        save();
+        return existing.item;
     }
 
     load();

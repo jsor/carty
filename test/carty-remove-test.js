@@ -21,7 +21,7 @@ describe("carty().remove", function() {
         assert.isFalse(instance.has({id: 'Item'}));
     });
 
-    it("silently ignores invalid item", function() {
+    it("ignores unknown item", function() {
         instance.on('remove', function(item) {
             assert.strictEqual('Foo', item);
         });
@@ -31,6 +31,16 @@ describe("carty().remove", function() {
         });
 
         instance.remove('Foo');
+    });
+
+    it("silently ignores invalid item", function(done) {
+        instance.remove({});
+        instance.remove({foo: 'bar'});
+        instance.remove([]);
+        instance.remove(null);
+        instance.remove(undefined);
+
+        done();
     });
 
     it("emits remove event", function() {

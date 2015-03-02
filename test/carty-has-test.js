@@ -25,6 +25,14 @@ describe("carty().has", function() {
         assert.isFalse(instance.has('Missing'));
     });
 
+    it("returns false for invalid item", function() {
+        assert.isFalse(instance.has({}));
+        assert.isFalse(instance.has({foo: 'bar'}));
+        assert.isFalse(instance.has([]));
+        assert.isFalse(instance.has(null));
+        assert.isFalse(instance.has(undefined));
+    });
+
     it("ignores quantity", function() {
         instance.add({id: 'Item with quantity', quantity: 1});
         assert(instance.has({id: 'Item with quantity', quantity: 2}));

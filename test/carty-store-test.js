@@ -56,9 +56,12 @@ describe("carty()", function() {
     });
 
     it("loads items from store", function() {
-        mock.expects('load').once();
+        mock.expects('load').once().callsArgWith(0, [{id: 'id'}]);
 
-        carty({store: store});
+        var instance = carty({store: store});
+
+        assert.strictEqual(1, instance.size());
+        assert.strictEqual(1, instance().length);
 
         mock.verify();
     });
