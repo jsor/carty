@@ -13,12 +13,16 @@ var isUndefined = isTypeOf.bind(null, typeof undefined);
 var isFunction = isTypeOf.bind(null, typeof isTypeOf);
 var isObject = isTypeOf.bind(null, typeof {});
 
-function getFloat(value, context, args) {
+function getValue(value, context, args) {
     if (isFunction(value)) {
-        value = value.apply(context, args);
+        value = value.apply(context, args || []);
     }
 
-    return toFloat(value);
+    return value;
+}
+
+function getFloat(value, context, args) {
+    return toFloat(getValue(value, context, args));
 }
 
 function getOption(options, key) {
@@ -38,10 +42,7 @@ var _defaultOptions = {
 
 var _defaultAttributes = {
     quantity: 1,
-    price: 0,
-    currency: null,
-    shipping: null,
-    tax: null
+    price: 0
 };
 
 function createItem(attr) {
@@ -72,11 +73,11 @@ function createItem(attr) {
     };
 
     item.quantity = function() {
-        return _attr.quantity;
+        return toFloat(_attr.quantity);
     };
 
     item.price = function() {
-        return _attr.price;
+        return toFloat(_attr.price);
     };
 
     item.currency = function() {
@@ -84,11 +85,11 @@ function createItem(attr) {
     };
 
     item.shipping = function() {
-        return _attr.shipping;
+        return toFloat(_attr.shipping);
     };
 
     item.tax = function() {
-        return _attr.tax;
+        return toFloat(_attr.tax);
     };
 
     item.equals = function(otherItem) {
@@ -160,13 +161,13 @@ function createCart(options) {
 
     cart.quantity = function () {
         return cart().reduce(function (previous, item) {
-            return previous + toFloat(item.quantity());
+            return previous + item.quantity();
         }, 0);
     };
 
     cart.total = function () {
         return cart().reduce(function (previous, item) {
-            return previous + (getFloat(item.price(), cart, [item]) * toFloat(item.quantity()));
+            return previous + (item.price() * item.quantity());
         }, 0);
     };
 
@@ -176,7 +177,7 @@ function createCart(options) {
         }
 
         return cart().reduce(function (previous, item) {
-            return previous + getFloat(item.shipping(), cart, [item]);
+            return previous + item.shipping();
         }, getFloat(_options.shipping, cart));
     };
 
@@ -186,7 +187,7 @@ function createCart(options) {
         }
 
         return cart().reduce(function (previous, item) {
-            return previous + getFloat(item.tax(), cart, [item]);
+            return previous + item.tax();
         }, getFloat(_options.tax, cart));
     };
 
@@ -200,8 +201,8 @@ function createCart(options) {
         }
 
         return _store.load(function(items) {
-            _items = items.map(function(attr, index) {
-                return createItem(attr, index);
+            _items = items.map(function(attr) {
+                return createItem(attr);
             });
         });
     }
