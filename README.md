@@ -28,7 +28,7 @@ Running the Tests
 ### Node
 
     $ npm install
-    $ npm test
+    $ make test
 
 License
 -------
