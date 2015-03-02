@@ -3,8 +3,6 @@
 var extend = require('extend');
 var emitter = require('./util/emitter');
 
-var hasOwn = Object.prototype.hasOwnProperty;
-
 function isTypeOf(type, item) {
     return typeof item === type;
 }
