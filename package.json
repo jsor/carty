@@ -4,7 +4,7 @@
   "description": "A lightweight and simple to use shopping cart.",
   "version": "0.1.0",
   "dependencies": {
-    "lodash": "~3.3"
+    "extend": "~2.0"
   },
   "devDependencies": {
     "chai": "~2.1",

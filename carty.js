@@ -1,13 +1,18 @@
 'use strict';
 
-var assign = require('lodash/object/assign');
-var isString = require('lodash/lang/isString');
-var isUndefined = require('lodash/lang/isUndefined');
-var isFunction = require('lodash/lang/isFunction');
-var isObject = require('lodash/lang/isObject');
+var extend = require('extend');
 var emitter = require('./util/emitter');
 
 var hasOwn = Object.prototype.hasOwnProperty;
+
+function isTypeOf(type, item) {
+    return typeof item === type;
+}
+
+var isString = isTypeOf.bind(null, typeof "");
+var isUndefined = isTypeOf.bind(null, typeof undefined);
+var isFunction = isTypeOf.bind(null, typeof isTypeOf);
+var isObject = isTypeOf.bind(null, typeof {});
 
 function toFloat(value) {
     return parseFloat(value) || 0;
@@ -23,7 +28,7 @@ function getFloat(value, context, args) {
 
 function getOption(options, key) {
     if (arguments.length === 1) {
-        return assign({}, options);
+        return extend({}, options);
     }
 
     return key && !isUndefined(options[key]) ? options[key] : null;
@@ -57,10 +62,10 @@ function createItem(attr) {
         throw 'Item must be a string or an object with at least an id or label attribute.';
     }
 
-    var _attr = assign({}, _defaultAttributes, attr || {});
+    var _attr = extend({}, _defaultAttributes, attr);
 
     function item() {
-        return assign({}, _attr);
+        return extend({}, _attr);
     }
 
     item.id = function() {
@@ -121,7 +126,7 @@ function createItem(attr) {
 }
 
 function createCart(options) {
-    var _options = assign({}, _defaultOptions, options || {});
+    var _options = extend({}, _defaultOptions, options);
     var _store = _options.store;
 
     var _items = load();
@@ -168,7 +173,7 @@ function createCart(options) {
         ;
 
         if (existing) {
-            var newAttr = assign({}, existing.item(), item(), {
+            var newAttr = extend({}, existing.item(), item(), {
                 quantity: existing.item.quantity() + item.quantity()
             });
 
