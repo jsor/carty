@@ -3,8 +3,7 @@
 
 var extend = require('extend');
 var emitter = require('./util/emitter');
-
-var hasOwn = Object.prototype.hasOwnProperty;
+var toFloat = require('./util/toFloat');
 
 function isTypeOf(type, item) {
     return typeof item === type;
@@ -15,16 +14,16 @@ var isUndefined = isTypeOf.bind(null, typeof undefined);
 var isFunction = isTypeOf.bind(null, typeof isTypeOf);
 var isObject = isTypeOf.bind(null, typeof {});
 
-function toFloat(value) {
-    return parseFloat(value) || 0;
+function getValue(value, context, args) {
+    if (isFunction(value)) {
+        value = value.apply(context, args || []);
+    }
+
+    return value;
 }
 
 function getFloat(value, context, args) {
-    if (isFunction(value)) {
-        value = value.apply(context, args);
-    }
-
-    return toFloat(value);
+    return toFloat(getValue(value, context, args));
 }
 
 function getOption(options, key) {
@@ -44,10 +43,7 @@ var _defaultOptions = {
 
 var _defaultAttributes = {
     quantity: 1,
-    price: 0,
-    currency: null,
-    shipping: null,
-    tax: null
+    price: 0
 };
 
 function createItem(attr) {
@@ -78,11 +74,11 @@ function createItem(attr) {
     };
 
     item.quantity = function() {
-        return _attr.quantity;
+        return toFloat(_attr.quantity);
     };
 
     item.price = function() {
-        return _attr.price;
+        return toFloat(_attr.price);
     };
 
     item.currency = function() {
@@ -90,16 +86,16 @@ function createItem(attr) {
     };
 
     item.shipping = function() {
-        return _attr.shipping;
+        return toFloat(_attr.shipping);
     };
 
     item.tax = function() {
-        return _attr.tax;
+        return toFloat(_attr.tax);
     };
 
     item.equals = function(otherItem) {
         try {
-            return createItem(otherItem).id() === this.id();
+            return createItem(otherItem).id() === item.id();
         } catch (e) {
             return false;
         }
@@ -135,17 +131,13 @@ function createCart(options) {
     };
 
     cart.add = function(item) {
-        if (emit('add', item)) {
-            emit('added', add(item));
-        }
+        add(item);
 
         return cart;
     };
 
     cart.remove = function(item) {
-        if (emit('remove', item)) {
-            emit('removed', remove(item));
-        }
+        remove(item);
 
         return cart;
     };
@@ -158,21 +150,21 @@ function createCart(options) {
 
     cart.each = function(callback, context) {
         _items.every(function(item, index) {
-            return false !== callback.call(context, item, index, this);
-        }, this);
+            return false !== callback.call(context, item, index, cart);
+        });
 
         return cart;
     };
 
     cart.quantity = function () {
         return cart().reduce(function (previous, item) {
-            return previous + toFloat(item.quantity());
+            return previous + item.quantity();
         }, 0);
     };
 
     cart.total = function () {
         return cart().reduce(function (previous, item) {
-            return previous + (getFloat(item.price(), cart, [item]) * toFloat(item.quantity()));
+            return previous + (item.price() * item.quantity());
         }, 0);
     };
 
@@ -182,7 +174,7 @@ function createCart(options) {
         }
 
         return cart().reduce(function (previous, item) {
-            return previous + getFloat(item.shipping(), cart, [item]);
+            return previous + item.shipping();
         }, getFloat(_options.shipping, cart));
     };
 
@@ -192,7 +184,7 @@ function createCart(options) {
         }
 
         return cart().reduce(function (previous, item) {
-            return previous + getFloat(item.tax(), cart, [item]);
+            return previous + item.tax();
         }, getFloat(_options.tax, cart));
     };
 
@@ -206,8 +198,8 @@ function createCart(options) {
         }
 
         return _store.load(function(items) {
-            _items = items.map(function(attr, index) {
-                return createItem(attr, index);
+            _items = items.map(function(attr) {
+                return createItem(attr);
             });
         });
     }
@@ -265,35 +257,47 @@ function createCart(options) {
     }
 
     function add(attr) {
-        var item = createItem(attr),
-            existing = has(item)
-        ;
+        var item = createItem(attr);
+
+        if (!emit('add', item)) {
+            return;
+        }
+
+        var existing = has(item);
 
         if (existing) {
-            var newAttr = extend({}, existing.item(), item(), {
+            item = createItem(extend({}, existing.item(), item(), {
                 quantity: existing.item.quantity() + item.quantity()
-            });
+            }));
+        }
 
-            _items[existing.index] = createItem(newAttr);
+        if (item.quantity() <= 0) {
+            remove(item);
+            return;
+        }
+
+        if (existing) {
+            _items[existing.index] = item;
         } else {
             _items.push(item);
         }
 
         save();
 
-        return item;
+        emit('added', item);
     }
 
     function remove(attr) {
         var existing = has(attr);
 
-        if (!existing) {
-            return null;
+        if (!existing || !emit('remove', existing.item)) {
+            return;
         }
 
         _items.splice(existing.index, 1);
         save();
-        return existing.item;
+
+        emit('removed', existing.item);
     }
 
     load();
@@ -310,7 +314,7 @@ carty.option = getOption.bind(carty, _defaultOptions);
 
 module.exports = carty;
 
-},{"./util/emitter":3,"extend":2}],2:[function(require,module,exports){
+},{"./util/emitter":3,"./util/toFloat":4,"extend":2}],2:[function(require,module,exports){
 var hasOwn = Object.prototype.hasOwnProperty;
 var toString = Object.prototype.toString;
 var undefined;
@@ -461,6 +465,37 @@ module.exports = function emitter(object) {
 
         return passed;
     };
+};
+
+},{}],4:[function(require,module,exports){
+module.exports = function toFloat(value, decimal) {
+    var float = parseFloat(value);
+
+    if (isFinite(float)) {
+        return float;
+    }
+
+    var string = '' + value;
+
+    if (!decimal) {
+        var dotPos = string.indexOf('.'),
+            commaPos = string.indexOf(',');
+
+        decimal = '.';
+
+        if (dotPos > -1 && commaPos > -1 && commaPos > dotPos) {
+            decimal = ',';
+        }
+    }
+
+    var regex = new RegExp("[^0-9-" + decimal + "]", ["g"]);
+
+    return parseFloat(
+        string
+            .replace(/\(([^-]+)\)/, "-$1") // replace bracketed values with negatives
+            .replace(regex, '') // strip out any cruft
+            .replace(decimal, '.') // make sure decimal point is standard
+    ) || 0;
 };
 
 },{}]},{},[1])(1)
