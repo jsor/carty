@@ -56,6 +56,30 @@ describe("carty().add", function() {
         assert.isTrue(item.equals(function() { return attr; }));
     });
 
+    it("uses id as label if label undefined", function() {
+        var attr = {
+            id: 'id'
+        };
+
+        instance.add(attr);
+
+        var item = instance()[0];
+
+        assert.strictEqual(item.label(), 'id');
+    });
+
+    it("uses label as id if id undefined", function() {
+        var attr = {
+            label: 'label'
+        };
+
+        instance.add(attr);
+
+        var item = instance()[0];
+
+        assert.strictEqual(item.id(), 'label');
+    });
+
     it("updates quantity for existing item", function() {
         instance.add({id: 'Item'});
         instance.add({id: 'Item', quantity: 2});
@@ -108,6 +132,30 @@ describe("carty().add", function() {
         assert.throw(function() {
             instance.add({foo: 'bar'});
         }.bind(this), undefined, 'Item must be a string or an object with at least an id or label attribute.');
+    });
+
+    it("compares item", function() {
+        var attr = {
+            label: 'label',
+            foo: 'bar'
+        };
+
+        instance.add(attr);
+
+        var item = instance()[0];
+
+        assert(item.equals({label: 'label', foo: 'bar'}));
+        assert(item.equals({label: 'label'}));
+        assert(item.equals({id: 'label', foo: 'bar'}));
+        assert(item.equals({id: 'label'}));
+        assert(item.equals({id: 'label', label: 'bar'}));
+        assert(item.equals(item));
+
+        assert.isFalse(item.equals({label: 'foo'}));
+        assert.isFalse(item.equals({foo: 'bar'}));
+        assert.isFalse(item.equals({}));
+        assert.isFalse(item.equals(null));
+        assert.isFalse(item.equals(undefined));
     });
 
     it("emits add event", function() {

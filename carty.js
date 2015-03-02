@@ -97,29 +97,11 @@ function createItem(attr) {
     };
 
     item.equals = function(otherItem) {
-        if (!isObject(otherItem) && !isFunction(otherItem)) {
+        try {
+            return createItem(otherItem).id() === this.id();
+        } catch (e) {
             return false;
         }
-
-        otherItem = createItem(otherItem);
-
-        if (otherItem.id() && this.id() === otherItem.id()) {
-            return true;
-        }
-
-        var name, otherAttr = otherItem();
-
-        for (name in _attr) {
-            if ('quantity' === name || !hasOwn.call(_attr, name)) {
-                continue;
-            }
-
-            if (isUndefined(otherAttr[name]) || otherAttr[name] !== _attr[name]) {
-                return false;
-            }
-        }
-
-        return true;
     };
 
     return item;
