@@ -3,10 +3,10 @@ var sinon = require('sinon');
 var localStorage = require('../../store/localStorage');
 
 describe("storage/localStorage()", function() {
-    var mockLocalStorageData = null, mockLocalStorage = {
-        setItem: function (data) { mockLocalStorageData = data },
-        getItem: function () { return mockLocalStorageData; },
-        removeItem: function () { mockLocalStorageData = null }
+    var mockLocalStorage = {
+        setItem: function (data, done) { },
+        getItem: function (done) { },
+        removeItem: function (done) { }
     }, mock;
 
     beforeEach(function() {
@@ -25,24 +25,28 @@ describe("storage/localStorage()", function() {
         assert.isFalse(storage.enabled());
     });
 
-    it("saves data", function() {
+    it("saves data", function(done) {
         mock.expects('setItem').once();
 
         var storage = localStorage(null, mockLocalStorage);
 
-        storage.save(['Item']);
-
-        mock.verify();
+        storage.save(['Item'], function() {
+            mock.verify();
+            done();
+        });
     });
 
-    it("loads data", function() {
-        mock.expects('getItem').once().returns('[]');
+    it("loads data", function(done) {
+        mock.expects('getItem').once().returns('["test"]');
 
         var storage = localStorage(null, mockLocalStorage);
 
-        storage.load();
-
-        mock.verify();
+        storage.load(function(data) {
+            assert.isArray(data);
+            assert.deepEqual(data, ['test']);
+            mock.verify();
+            done();
+        });
     });
 
     it("loads invalid data", function() {
@@ -50,7 +54,7 @@ describe("storage/localStorage()", function() {
 
         var storage = localStorage(null, mockLocalStorage);
 
-        storage.load();
+        storage.load(function() {});
 
         mock.verify();
     });
@@ -60,18 +64,19 @@ describe("storage/localStorage()", function() {
 
         var storage = localStorage(null, mockLocalStorage);
 
-        storage.load();
+        storage.load(function() {});
 
         mock.verify();
     });
 
-    it("clears store", function() {
+    it("clears store", function(done) {
         mock.expects('removeItem').once();
 
         var storage = localStorage(null, mockLocalStorage);
 
-        storage.clear();
-
-        mock.verify();
+        storage.clear(function() {
+            mock.verify();
+            done();
+        });
     });
 });

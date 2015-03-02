@@ -4,9 +4,10 @@ var carty = typeof window !== 'undefined' ? window.carty : require('../');
 
 describe("carty()", function() {
     var store = {
-        save: function () {},
-        load: function () { return [] },
-        clear: function () {}
+        enabled: function() { return true; },
+        save: function (data, done) { done(); },
+        load: function (done) { return done([]) },
+        clear: function (done) { done(); }
     }, mock;
 
     beforeEach(function() {
@@ -24,8 +25,38 @@ describe("carty()", function() {
         mock.verify();
     });
 
+    it("emits save event", function(done) {
+        var instance = carty({store: store});
+
+        instance.on('save', function() {
+            done();
+        });
+
+        instance.add('Item');
+    });
+
+    it("emits saved event", function(done) {
+        var instance = carty({store: store});
+
+        instance.on('saved', function() {
+            done();
+        });
+
+        instance.add('Item');
+    });
+
+    it("emits saved event without store", function(done) {
+        var instance = carty();
+
+        instance.on('saved', function() {
+            done();
+        });
+
+        instance.add('Item');
+    });
+
     it("loads items from store", function() {
-        mock.expects('load').once().returns([]);
+        mock.expects('load').once();
 
         carty({store: store});
 
@@ -38,5 +69,35 @@ describe("carty()", function() {
         carty({store: store}).clear();
 
         mock.verify();
+    });
+
+    it("emits clear event", function(done) {
+        var instance = carty({store: store});
+
+        instance.on('clear', function() {
+            done();
+        });
+
+        instance.clear();
+    });
+
+    it("emits cleared event", function(done) {
+        var instance = carty({store: store});
+
+        instance.on('cleared', function() {
+            done();
+        });
+
+        instance.clear();
+    });
+
+    it("emits cleared event without store", function(done) {
+        var instance = carty();
+
+        instance.on('cleared', function() {
+            done();
+        });
+
+        instance.clear();
     });
 });
