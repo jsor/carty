@@ -1,5 +1,9 @@
 REPORTER = spec
 
+dist:
+	@NODE_ENV=prod ./node_modules/.bin/browserify carty.js -o dist/carty.js -s carty
+	@NODE_ENV=prod ./node_modules/.bin/browserify store/localStorage.js -o dist/carty.store.localstorage.js -s carty.store.localStorage
+
 test:
 	@NODE_ENV=test ./node_modules/.bin/mocha -b --reporter $(REPORTER) --recursive
 
@@ -13,4 +17,4 @@ travis:
 	./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec --recursive && \
 		cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
 
-.PHONY: test test-cov travis
+.PHONY: dist test test-cov travis

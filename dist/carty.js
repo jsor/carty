@@ -1,0 +1,465 @@
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.carty = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+'use strict';
+
+var extend = require('extend');
+var emitter = require('./util/emitter');
+
+var hasOwn = Object.prototype.hasOwnProperty;
+
+function isTypeOf(type, item) {
+    return typeof item === type;
+}
+
+var isString = isTypeOf.bind(null, typeof "");
+var isUndefined = isTypeOf.bind(null, typeof undefined);
+var isFunction = isTypeOf.bind(null, typeof isTypeOf);
+var isObject = isTypeOf.bind(null, typeof {});
+
+function toFloat(value) {
+    return parseFloat(value) || 0;
+}
+
+function getFloat(value, context, args) {
+    if (isFunction(value)) {
+        value = value.apply(context, args);
+    }
+
+    return toFloat(value);
+}
+
+function getOption(options, key) {
+    if (arguments.length === 1) {
+        return extend({}, options);
+    }
+
+    return key && !isUndefined(options[key]) ? options[key] : null;
+}
+
+var _defaultOptions = {
+    store: null,
+    currency: 'USD',
+    shipping: null,
+    tax: null
+};
+
+var _defaultAttributes = {
+    quantity: 1,
+    price: 0,
+    currency: null,
+    shipping: null,
+    tax: null
+};
+
+function createItem(attr) {
+    if (isFunction(attr)) {
+        attr = attr();
+    }
+
+    if (isString(attr)) {
+        attr = {id: attr};
+    }
+
+    if (!isObject(attr) || (!attr.label && !attr.id)) {
+        throw 'Item must be a string or an object with at least an id or label attribute.';
+    }
+
+    var _attr = extend({}, _defaultAttributes, attr);
+
+    function item() {
+        return extend({}, _attr);
+    }
+
+    item.id = function() {
+        return _attr.id || _attr.label;
+    };
+
+    item.label = function() {
+        return _attr.label || _attr.id;
+    };
+
+    item.quantity = function() {
+        return _attr.quantity;
+    };
+
+    item.price = function() {
+        return _attr.price;
+    };
+
+    item.currency = function() {
+        return _attr.currency;
+    };
+
+    item.shipping = function() {
+        return _attr.shipping;
+    };
+
+    item.tax = function() {
+        return _attr.tax;
+    };
+
+    item.equals = function(otherItem) {
+        if (!isObject(otherItem) && !isFunction(otherItem)) {
+            return false;
+        }
+
+        otherItem = createItem(otherItem);
+
+        if (otherItem.id() && this.id() === otherItem.id()) {
+            return true;
+        }
+
+        var name, otherAttr = otherItem();
+
+        for (name in _attr) {
+            if ('quantity' === name || !hasOwn.call(_attr, name)) {
+                continue;
+            }
+
+            if (isUndefined(otherAttr[name]) || otherAttr[name] !== _attr[name]) {
+                return false;
+            }
+        }
+
+        return true;
+    };
+
+    return item;
+}
+
+function createCart(options) {
+    var _options = extend({}, _defaultOptions, options);
+    var _store = _options.store;
+
+    var _items = load();
+
+    function load() {
+        if (!_store) {
+            return [];
+        }
+
+        return _store.load().map(function(attr, index) {
+            return createItem(attr, index);
+        });
+    }
+
+    function save() {
+        _store && _store.save(_items.map(function(item) {
+            return item();
+        }));
+    }
+
+    function has(attr) {
+        var checkItem, found = false;
+
+        try {
+            checkItem = createItem(attr);
+        } catch (e) {
+            return false;
+        }
+
+        _items.every(function(item, index) {
+            if (checkItem.equals(item)) {
+                found = {item: item, index: index};
+            }
+
+            return !found;
+        });
+
+        return found;
+    }
+
+    function add(attr) {
+        var item = createItem(attr),
+            existing = has(item)
+        ;
+
+        if (existing) {
+            var newAttr = extend({}, existing.item(), item(), {
+                quantity: existing.item.quantity() + item.quantity()
+            });
+
+            _items[existing.index] = createItem(newAttr);
+        } else {
+            _items.push(item);
+        }
+
+        save();
+
+        return item;
+    }
+
+    function remove(attr) {
+        var existing = has(attr);
+
+        if (existing) {
+            _items.splice(existing.index, 1);
+            save();
+            return existing.item;
+        }
+
+        return null;
+    }
+
+    function clear() {
+        _items.length = 0;
+        _store && _store.clear();
+
+    }
+
+    function cart() {
+        return _items.slice(0);
+    }
+
+    var emit = emitter(cart);
+
+    cart.option = getOption.bind(cart, _options);
+
+    cart.size = function() {
+        return _items.length;
+    };
+
+    cart.has = function(item) {
+        return !!has(item);
+    };
+
+    cart.get = function(item) {
+        var found = has(item);
+        return !found ? null : found.item;
+    };
+
+    cart.add = function(item) {
+        if (emit('add', item)) {
+            emit('added', add(item));
+        }
+
+        return cart;
+    };
+
+    cart.remove = function(item) {
+        if (emit('remove', item)) {
+            emit('removed', remove(item));
+        }
+
+        return cart;
+    };
+
+    cart.clear = function() {
+        if (emit('clear')) {
+            clear();
+            emit('cleared');
+        }
+
+        return cart;
+    };
+
+    cart.each = function(callback, context) {
+        _items.every(function(item, index) {
+            return !!callback.call(context, item, index, this);
+        }, this);
+
+        return cart;
+    };
+
+    cart.quantity = function () {
+        return cart().reduce(function (previous, item) {
+            return previous + toFloat(item.quantity());
+        }, 0);
+    };
+
+    cart.total = function () {
+        return cart().reduce(function (previous, item) {
+            return previous + (getFloat(item.price(), cart, [item]) * toFloat(item.quantity()));
+        }, 0);
+    };
+
+    cart.shipping = function () {
+        if (!cart.size()) {
+            return 0;
+        }
+
+        return cart().reduce(function (previous, item) {
+            return previous + getFloat(item.shipping(), cart, [item]);
+        }, getFloat(_options.shipping, cart));
+    };
+
+    cart.tax = function () {
+        if (!cart.size()) {
+            return 0;
+        }
+
+        return cart().reduce(function (previous, item) {
+            return previous + getFloat(item.tax(), cart, [item]);
+        }, getFloat(_options.tax, cart));
+    };
+
+    cart.grandTotal = function () {
+        return cart.total() + cart.tax() + cart.shipping();
+    };
+
+    return cart;
+}
+
+function carty(options) {
+    return createCart(options);
+}
+
+carty.version = '@VERSION';
+carty.option = getOption.bind(carty, _defaultOptions);
+
+module.exports = carty;
+
+},{"./util/emitter":3,"extend":2}],2:[function(require,module,exports){
+var hasOwn = Object.prototype.hasOwnProperty;
+var toString = Object.prototype.toString;
+var undefined;
+
+var isPlainObject = function isPlainObject(obj) {
+	'use strict';
+	if (!obj || toString.call(obj) !== '[object Object]') {
+		return false;
+	}
+
+	var has_own_constructor = hasOwn.call(obj, 'constructor');
+	var has_is_property_of_method = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
+	// Not own constructor property must be Object
+	if (obj.constructor && !has_own_constructor && !has_is_property_of_method) {
+		return false;
+	}
+
+	// Own properties are enumerated firstly, so to speed up,
+	// if last one is own, then all properties are own.
+	var key;
+	for (key in obj) {}
+
+	return key === undefined || hasOwn.call(obj, key);
+};
+
+module.exports = function extend() {
+	'use strict';
+	var options, name, src, copy, copyIsArray, clone,
+		target = arguments[0],
+		i = 1,
+		length = arguments.length,
+		deep = false;
+
+	// Handle a deep copy situation
+	if (typeof target === 'boolean') {
+		deep = target;
+		target = arguments[1] || {};
+		// skip the boolean and the target
+		i = 2;
+	} else if ((typeof target !== 'object' && typeof target !== 'function') || target == null) {
+		target = {};
+	}
+
+	for (; i < length; ++i) {
+		options = arguments[i];
+		// Only deal with non-null/undefined values
+		if (options != null) {
+			// Extend the base object
+			for (name in options) {
+				src = target[name];
+				copy = options[name];
+
+				// Prevent never-ending loop
+				if (target === copy) {
+					continue;
+				}
+
+				// Recurse if we're merging plain objects or arrays
+				if (deep && copy && (isPlainObject(copy) || (copyIsArray = Array.isArray(copy)))) {
+					if (copyIsArray) {
+						copyIsArray = false;
+						clone = src && Array.isArray(src) ? src : [];
+					} else {
+						clone = src && isPlainObject(src) ? src : {};
+					}
+
+					// Never move original objects, clone them
+					target[name] = extend(deep, clone, copy);
+
+				// Don't bring in undefined values
+				} else if (copy !== undefined) {
+					target[name] = copy;
+				}
+			}
+		}
+	}
+
+	// Return the modified object
+	return target;
+};
+
+
+},{}],3:[function(require,module,exports){
+'use strict';
+
+// Adapted from component-emitter
+module.exports = function emitter(object) {
+    var _callbacks = {};
+
+    object.on = function(event, fn) {
+        (_callbacks['$' + event] = _callbacks['$' + event] || [])
+            .push(fn);
+
+        return object;
+    };
+
+    object.once = function(event, fn) {
+        function on() {
+            object.off(event, on);
+            fn.apply(object, arguments);
+        }
+
+        on.fn = fn;
+        object.on(event, on);
+
+        return object;
+    };
+
+    object.off = function(event, fn) {
+        if (0 == arguments.length) {
+            _callbacks = {};
+            return object;
+        }
+
+        var callbacks = _callbacks['$' + event];
+        if (!callbacks) return object;
+
+        if (1 == arguments.length) {
+            delete _callbacks['$' + event];
+            return object;
+        }
+
+        var cb;
+        for (var i = 0; i < callbacks.length; i++) {
+            cb = callbacks[i];
+            if (cb === fn || cb.fn === fn) {
+                callbacks.splice(i, 1);
+                break;
+            }
+        }
+        return object;
+    };
+
+    return function emit(event) {
+        var args = [].slice.call(arguments, 1),
+            callbacks = _callbacks['$' + event],
+            passed = true
+        ;
+
+        if (callbacks) {
+            callbacks = callbacks.slice(0);
+            for (var i = 0, len = callbacks.length; i < len; ++i) {
+                if (!callbacks[i].apply(object, args)) {
+                    passed = false;
+                }
+            }
+        }
+
+        return passed;
+    };
+};
+
+},{}]},{},[1])(1)
+});
