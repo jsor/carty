@@ -130,17 +130,13 @@ function createCart(options) {
     };
 
     cart.add = function(item) {
-        if (emit('add', item)) {
-            emit('added', add(item));
-        }
+        add(item);
 
         return cart;
     };
 
     cart.remove = function(item) {
-        if (emit('remove', item)) {
-            emit('removed', remove(item));
-        }
+        remove(item);
 
         return cart;
     };
@@ -260,35 +256,47 @@ function createCart(options) {
     }
 
     function add(attr) {
-        var item = createItem(attr),
-            existing = has(item)
-        ;
+        var item = createItem(attr);
+
+        if (!emit('add', item)) {
+            return;
+        }
+
+        var existing = has(item);
 
         if (existing) {
-            var newAttr = extend({}, existing.item(), item(), {
+            item = createItem(extend({}, existing.item(), item(), {
                 quantity: existing.item.quantity() + item.quantity()
-            });
+            }));
+        }
 
-            _items[existing.index] = createItem(newAttr);
+        if (item.quantity() <= 0) {
+            remove(item);
+            return;
+        }
+
+        if (existing) {
+            _items[existing.index] = item;
         } else {
             _items.push(item);
         }
 
         save();
 
-        return item;
+        emit('added', item);
     }
 
     function remove(attr) {
         var existing = has(attr);
 
-        if (!existing) {
-            return null;
+        if (!existing || !emit('remove', existing.item)) {
+            return;
         }
 
         _items.splice(existing.index, 1);
         save();
-        return existing.item;
+
+        emit('removed', existing.item);
     }
 
     load();

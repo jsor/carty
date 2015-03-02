@@ -134,6 +134,16 @@ describe("carty().add", function() {
         }.bind(this), undefined, 'Item must be a string or an object with at least an id or label attribute.');
     });
 
+    it("removes item if quantity lower 0", function() {
+        instance.add({id: 'Item'});
+
+        assert.strictEqual(1, instance.size());
+
+        instance.add({id: 'Item', quantity: -1});
+
+        assert.strictEqual(0, instance.size());
+    });
+
     it("compares item", function() {
         var attr = {
             label: 'label',
@@ -160,7 +170,7 @@ describe("carty().add", function() {
 
     it("emits add event", function() {
         instance.on('add', function(it) {
-            assert.strictEqual(it, 'Item');
+            assert.strictEqual(it.id(), 'Item');
         });
 
         instance.add('Item');
