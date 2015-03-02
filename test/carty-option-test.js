@@ -15,20 +15,20 @@ describe("carty().has", function() {
     });
 
     it("returns options", function() {
-        assert.strictEqual('bar', instance.option('foo'));
-        assert.strictEqual('baz', instance.option('bar'));
+        assert.strictEqual(instance.option('foo'), 'bar');
+        assert.strictEqual(instance.option('bar'), 'baz');
 
         assert.propertyVal(instance.option('obj'), 'prop', 'value');
     });
 
     it("returns null for undefined option", function() {
-        assert.strictEqual(null, instance.option('undefined'));
+        assert.strictEqual(instance.option('undefined'), null);
     });
 
     it("returns copies for objects", function() {
-        assert.notStrictEqual({
+        assert.notStrictEqual(instance.option('obj'), {
             prop: 'value'
-        }, instance.option('obj'));
+        });
     });
 
     it("returns all options", function() {

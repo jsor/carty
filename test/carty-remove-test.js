@@ -35,7 +35,7 @@ describe("carty().remove", function() {
 
     it("emits remove event", function() {
         instance.on('remove', function(it) {
-            assert.strictEqual('Item', it);
+            assert.strictEqual(it, 'Item');
         });
 
         instance.remove('Item');
@@ -48,12 +48,12 @@ describe("carty().remove", function() {
 
         instance.remove('Item');
 
-        assert.strictEqual(1, instance.size());
+        assert.strictEqual(instance.size(), 1);
     });
 
     it("emits removed event", function() {
         instance.on('removed', function(it) {
-            assert.strictEqual('Item', it.id());
+            assert.strictEqual(it.id(), 'Item');
         });
 
         instance.remove('Item');

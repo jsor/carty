@@ -13,16 +13,16 @@ describe("carty().clear", function() {
     it("removes all items", function() {
         instance.clear();
 
-        assert.strictEqual(0, instance.size());
+        assert.strictEqual(instance.size(), 0);
 
         var count = 0;
         instance.each(function() {
             count++;
         });
 
-        assert.strictEqual(0, count);
+        assert.strictEqual(count, 0);
 
-        assert.strictEqual(0, instance().length);
+        assert.strictEqual(instance().length, 0);
     });
 
     it("emits clear event", function() {
@@ -40,7 +40,7 @@ describe("carty().clear", function() {
 
         instance.clear();
 
-        assert.strictEqual(2, instance.size());
+        assert.strictEqual(instance.size(), 2);
     });
 
     it("emits cleared event", function() {

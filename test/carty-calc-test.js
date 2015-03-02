@@ -13,19 +13,19 @@ describe("carty().quantity", function() {
         instance.add({id: 'Item', quantity: 2});
         instance.add({id: 'Item2', quantity: 10});
 
-        assert.strictEqual(13, instance.quantity());
+        assert.strictEqual(instance.quantity(), 13);
     });
 
     it("calculates quantity with non-float values", function() {
         instance.add({id: 'Item2', quantity: "10"});
 
-        assert.strictEqual(10, instance.quantity());
+        assert.strictEqual(instance.quantity(), 10);
     });
 
     it("ignores invalid values", function() {
         instance.add({id: 'Item', quantity: {}});
 
-        assert.strictEqual(0, instance.quantity());
+        assert.strictEqual(instance.quantity(), 0);
     });
 });
 
@@ -40,14 +40,14 @@ describe("carty().total", function() {
         instance.add({id: 'Item', quantity: 2, price: 10});
         instance.add({id: 'Item2', quantity: 10, price: .5});
 
-        assert.strictEqual((2 * 10) + (10 * .5), instance.total());
+        assert.strictEqual(instance.total(), (2 * 10) + (10 * .5));
     });
 
     it("calculates total with mixed values", function() {
         instance.add({id: 'Item', quantity: 2, price: function() { return 10 }});
         instance.add({id: 'Item2', quantity: "10", price: ".5"});
 
-        assert.strictEqual((2 * 10) + (10 * .5), instance.total());
+        assert.strictEqual(instance.total(), (2 * 10) + (10 * .5));
     });
 });
 
@@ -59,7 +59,7 @@ describe("carty().shipping", function() {
             shipping: 10
         });
 
-        assert.strictEqual(0, instance.shipping());
+        assert.strictEqual(instance.shipping(), 0);
     });
 
     it("calculates shipping from global option", function() {
@@ -69,7 +69,7 @@ describe("carty().shipping", function() {
 
         instance.add('Item');
 
-        assert.strictEqual(10, instance.shipping());
+        assert.strictEqual(instance.shipping(), 10);
     });
 
     it("calculates shipping from global option with function", function() {
@@ -79,7 +79,7 @@ describe("carty().shipping", function() {
 
         instance.add('Item');
 
-        assert.strictEqual(10, instance.shipping());
+        assert.strictEqual(instance.shipping(), 10);
     });
 
     it("calculates shipping from global option with string", function() {
@@ -89,7 +89,7 @@ describe("carty().shipping", function() {
 
         instance.add('Item');
 
-        assert.strictEqual(.5, instance.shipping());
+        assert.strictEqual(instance.shipping(), .5);
     });
 
     it("calculates shipping with item shippings", function() {
@@ -99,7 +99,7 @@ describe("carty().shipping", function() {
 
         instance.add({id: 'Item', shipping: 10});
 
-        assert.strictEqual(20, instance.shipping());
+        assert.strictEqual(instance.shipping(), 20);
     });
 
     it("calculates shipping with mixed item shippings", function() {
@@ -111,7 +111,7 @@ describe("carty().shipping", function() {
         instance.add({id: 'Item2', shipping: "10"});
         instance.add({id: 'Item3', shipping: function() { return 10 }});
 
-        assert.strictEqual(40, instance.shipping());
+        assert.strictEqual(instance.shipping(), 40);
     });
 });
 
@@ -123,7 +123,7 @@ describe("carty().tax", function() {
             tax: 10
         });
 
-        assert.strictEqual(0, instance.tax());
+        assert.strictEqual(instance.tax(), 0);
     });
 
     it("calculates tax from global option", function() {
@@ -133,7 +133,7 @@ describe("carty().tax", function() {
 
         instance.add('Item');
 
-        assert.strictEqual(10, instance.tax());
+        assert.strictEqual(instance.tax(), 10);
     });
 
     it("calculates tax from global option with function", function() {
@@ -143,7 +143,7 @@ describe("carty().tax", function() {
 
         instance.add('Item');
 
-        assert.strictEqual(10, instance.tax());
+        assert.strictEqual(instance.tax(), 10);
     });
 
     it("calculates tax from global option with string", function() {
@@ -153,7 +153,7 @@ describe("carty().tax", function() {
 
         instance.add('Item');
 
-        assert.strictEqual(.5, instance.tax());
+        assert.strictEqual(instance.tax(), .5);
     });
 
     it("calculates tax with item taxes", function() {
@@ -163,7 +163,7 @@ describe("carty().tax", function() {
 
         instance.add({id: 'Item', tax: 10});
 
-        assert.strictEqual(20, instance.tax());
+        assert.strictEqual(instance.tax(), 20);
     });
 
     it("calculates tax with mixed item taxes", function() {
@@ -175,7 +175,7 @@ describe("carty().tax", function() {
         instance.add({id: 'Item2', tax: "10"});
         instance.add({id: 'Item3', tax: function() { return 10 }});
 
-        assert.strictEqual(40, instance.tax());
+        assert.strictEqual(instance.tax(), 40);
     });
 });
 
@@ -192,6 +192,6 @@ describe("carty().grandTotal", function() {
         instance.add({id: 'Item2', tax: "10"});
         instance.add({id: 'Item3', tax: function() { return 10 }});
 
-        assert.strictEqual(50, instance.grandTotal());
+        assert.strictEqual(instance.grandTotal(), 50);
     });
 });

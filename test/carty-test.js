@@ -14,7 +14,7 @@ describe("carty()", function() {
         instance.add('Item');
         instance.add('Item2');
 
-        assert.strictEqual(2, store.get().length);
+        assert.strictEqual(store.get().length, 2);
     });
 
     it("loads items from store", function() {
@@ -25,7 +25,7 @@ describe("carty()", function() {
         instance.add('Item2');
 
         var newInstance = carty({store: store});
-        assert.strictEqual(2, newInstance.size());
+        assert.strictEqual(newInstance.size(), 2);
     });
 
     it("clears store", function() {
@@ -35,10 +35,10 @@ describe("carty()", function() {
         instance.add('Item');
         instance.add('Item2');
 
-        assert.strictEqual(2, store.get().length);
+        assert.strictEqual(store.get().length, 2);
 
         instance.clear();
 
-        assert.strictEqual(0, store.get().length);
+        assert.strictEqual(store.get().length, 0);
     });
 });
