@@ -308,7 +308,6 @@ function carty(options) {
     return createCart(options);
 }
 
-carty.version = '@VERSION';
 carty.option = getOption.bind(carty, _defaultOptions);
 
 module.exports = carty;
