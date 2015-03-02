@@ -2,6 +2,7 @@
 
 var extend = require('extend');
 var emitter = require('./util/emitter');
+var toFloat = require('./util/toFloat');
 
 function isTypeOf(type, item) {
     return typeof item === type;
@@ -11,10 +12,6 @@ var isString = isTypeOf.bind(null, typeof "");
 var isUndefined = isTypeOf.bind(null, typeof undefined);
 var isFunction = isTypeOf.bind(null, typeof isTypeOf);
 var isObject = isTypeOf.bind(null, typeof {});
-
-function toFloat(value) {
-    return parseFloat(value) || 0;
-}
 
 function getFloat(value, context, args) {
     if (isFunction(value)) {
