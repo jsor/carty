@@ -19,6 +19,12 @@ describe("storage/localStorage()", function() {
         assert(storage.enabled());
     });
 
+    it("is not enabled", function() {
+        var storage = localStorage();
+
+        assert.isFalse(storage.enabled());
+    });
+
     it("saves data", function() {
         mock.expects('setItem').once();
 
