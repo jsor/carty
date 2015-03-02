@@ -6,8 +6,21 @@ Carty
 
 A lightweight and simple to use shopping cart.
 
-If you need to be compatible with IE8, use the
-[es5-shim](https://github.com/es-shims/es5-shim).
+Browser Support and Polyfills
+-----------------------------
+
+Carty doesn't ship with any polyfills. You may use polyfills for the following
+features (if you have to support IE8 for example):
+
+* Array.prototype.every
+* Array.prototype.map
+* Function.prototype.bind
+
+Checkout [es5-shim](https://github.com/es-shims/es5-shim) which provides the
+required polyfills.
+
+If you use the localStorage store adapter, you may polyfill JSON with
+[json2](https://github.com/douglascrockford/JSON-js).
 
 Running the Tests
 -----------------
@@ -16,7 +29,6 @@ Running the Tests
 
     $ npm install
     $ npm test
-
 
 License
 -------
