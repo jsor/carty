@@ -10,18 +10,23 @@ module.exports = (function(window, JSON) {
             enabled: function() {
                 return !!localStorage;
             },
-            save: function(data) {
+            save: function(data, done) {
                 localStorage.setItem(namespace, JSON.stringify(data));
+                done();
             },
-            load: function() {
+            load: function(done) {
+                var data = [];
+
                 try {
-                    return JSON.parse(localStorage.getItem(namespace));
+                    data = JSON.parse(localStorage.getItem(namespace));
                 } catch (e) {
-                    return [];
                 }
+
+                done(data);
             },
-            clear: function() {
+            clear: function(done) {
                 localStorage.removeItem(namespace);
+                done();
             }
         };
     };

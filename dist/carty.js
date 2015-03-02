@@ -98,29 +98,11 @@ function createItem(attr) {
     };
 
     item.equals = function(otherItem) {
-        if (!isObject(otherItem) && !isFunction(otherItem)) {
+        try {
+            return createItem(otherItem).id() === this.id();
+        } catch (e) {
             return false;
         }
-
-        otherItem = createItem(otherItem);
-
-        if (otherItem.id() && this.id() === otherItem.id()) {
-            return true;
-        }
-
-        var name, otherAttr = otherItem();
-
-        for (name in _attr) {
-            if ('quantity' === name || !hasOwn.call(_attr, name)) {
-                continue;
-            }
-
-            if (isUndefined(otherAttr[name]) || otherAttr[name] !== _attr[name]) {
-                return false;
-            }
-        }
-
-        return true;
     };
 
     return item;
@@ -129,23 +111,137 @@ function createItem(attr) {
 function createCart(options) {
     var _options = extend({}, _defaultOptions, options);
     var _store = _options.store;
+    var _items = [];
 
-    var _items = load();
+    function cart() {
+        return _items.slice(0);
+    }
 
-    function load() {
-        if (!_store) {
-            return [];
+    var emit = emitter(cart);
+
+    cart.option = getOption.bind(cart, _options);
+
+    cart.size = function() {
+        return _items.length;
+    };
+
+    cart.has = function(item) {
+        return !!has(item);
+    };
+
+    cart.get = function(item) {
+        var found = has(item);
+        return !found ? null : found.item;
+    };
+
+    cart.add = function(item) {
+        if (emit('add', item)) {
+            emit('added', add(item));
         }
 
-        return _store.load().map(function(attr, index) {
-            return createItem(attr, index);
+        return cart;
+    };
+
+    cart.remove = function(item) {
+        if (emit('remove', item)) {
+            emit('removed', remove(item));
+        }
+
+        return cart;
+    };
+
+    cart.clear = function() {
+        clear();
+
+        return cart;
+    };
+
+    cart.each = function(callback, context) {
+        _items.every(function(item, index) {
+            return false !== callback.call(context, item, index, this);
+        }, this);
+
+        return cart;
+    };
+
+    cart.quantity = function () {
+        return cart().reduce(function (previous, item) {
+            return previous + toFloat(item.quantity());
+        }, 0);
+    };
+
+    cart.total = function () {
+        return cart().reduce(function (previous, item) {
+            return previous + (getFloat(item.price(), cart, [item]) * toFloat(item.quantity()));
+        }, 0);
+    };
+
+    cart.shipping = function () {
+        if (!cart.size()) {
+            return 0;
+        }
+
+        return cart().reduce(function (previous, item) {
+            return previous + getFloat(item.shipping(), cart, [item]);
+        }, getFloat(_options.shipping, cart));
+    };
+
+    cart.tax = function () {
+        if (!cart.size()) {
+            return 0;
+        }
+
+        return cart().reduce(function (previous, item) {
+            return previous + getFloat(item.tax(), cart, [item]);
+        }, getFloat(_options.tax, cart));
+    };
+
+    cart.grandTotal = function () {
+        return cart.total() + cart.tax() + cart.shipping();
+    };
+
+    function load() {
+        if (!_store || !_store.enabled()) {
+            return;
+        }
+
+        return _store.load(function(items) {
+            _items = items.map(function(attr, index) {
+                return createItem(attr, index);
+            });
         });
     }
 
     function save() {
-        _store && _store.save(_items.map(function(item) {
+        if (!emit('save')) {
+            return;
+        }
+
+        if (!_store || !_store.enabled()) {
+            return emit('saved');;
+        }
+
+        _store.save(_items.map(function(item) {
             return item();
-        }));
+        }), function() {
+            emit('saved');
+        });
+    }
+
+    function clear() {
+        if (!emit('clear')) {
+            return;
+        }
+
+        _items.length = 0;
+
+        if (!_store || !_store.enabled()) {
+            return emit('cleared');
+        }
+
+        _store.clear(function() {
+            emit('cleared');
+        });
     }
 
     function has(attr) {
@@ -191,110 +287,16 @@ function createCart(options) {
     function remove(attr) {
         var existing = has(attr);
 
-        if (existing) {
-            _items.splice(existing.index, 1);
-            save();
-            return existing.item;
+        if (!existing) {
+            return null;
         }
 
-        return null;
+        _items.splice(existing.index, 1);
+        save();
+        return existing.item;
     }
 
-    function clear() {
-        _items.length = 0;
-        _store && _store.clear();
-
-    }
-
-    function cart() {
-        return _items.slice(0);
-    }
-
-    var emit = emitter(cart);
-
-    cart.option = getOption.bind(cart, _options);
-
-    cart.size = function() {
-        return _items.length;
-    };
-
-    cart.has = function(item) {
-        return !!has(item);
-    };
-
-    cart.get = function(item) {
-        var found = has(item);
-        return !found ? null : found.item;
-    };
-
-    cart.add = function(item) {
-        if (emit('add', item)) {
-            emit('added', add(item));
-        }
-
-        return cart;
-    };
-
-    cart.remove = function(item) {
-        if (emit('remove', item)) {
-            emit('removed', remove(item));
-        }
-
-        return cart;
-    };
-
-    cart.clear = function() {
-        if (emit('clear')) {
-            clear();
-            emit('cleared');
-        }
-
-        return cart;
-    };
-
-    cart.each = function(callback, context) {
-        _items.every(function(item, index) {
-            return !!callback.call(context, item, index, this);
-        }, this);
-
-        return cart;
-    };
-
-    cart.quantity = function () {
-        return cart().reduce(function (previous, item) {
-            return previous + toFloat(item.quantity());
-        }, 0);
-    };
-
-    cart.total = function () {
-        return cart().reduce(function (previous, item) {
-            return previous + (getFloat(item.price(), cart, [item]) * toFloat(item.quantity()));
-        }, 0);
-    };
-
-    cart.shipping = function () {
-        if (!cart.size()) {
-            return 0;
-        }
-
-        return cart().reduce(function (previous, item) {
-            return previous + getFloat(item.shipping(), cart, [item]);
-        }, getFloat(_options.shipping, cart));
-    };
-
-    cart.tax = function () {
-        if (!cart.size()) {
-            return 0;
-        }
-
-        return cart().reduce(function (previous, item) {
-            return previous + getFloat(item.tax(), cart, [item]);
-        }, getFloat(_options.tax, cart));
-    };
-
-    cart.grandTotal = function () {
-        return cart.total() + cart.tax() + cart.shipping();
-    };
+    load();
 
     return cart;
 }
