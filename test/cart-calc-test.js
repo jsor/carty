@@ -1,11 +1,11 @@
 var assert = require('chai').assert;
-var carty = typeof window !== 'undefined' ? window.carty : require('../');
+var cart = typeof window !== 'undefined' ? window.carty : require('../cart');
 
-describe("carty().quantity", function() {
+describe("cart().quantity", function() {
     var instance;
 
     beforeEach(function() {
-        instance = carty();
+        instance = cart();
     });
 
     it("calculates quantity", function() {
@@ -29,11 +29,11 @@ describe("carty().quantity", function() {
     });
 });
 
-describe("carty().total", function() {
+describe("cart().total", function() {
     var instance;
 
     beforeEach(function() {
-        instance = carty();
+        instance = cart();
     });
 
     it("calculates total", function() {
@@ -51,11 +51,11 @@ describe("carty().total", function() {
     });
 });
 
-describe("carty().shipping", function() {
+describe("cart().shipping", function() {
     var instance;
 
     it("calculates no shipping for empty cart", function() {
-        instance = carty({
+        instance = cart({
             shipping: 10
         });
 
@@ -63,7 +63,7 @@ describe("carty().shipping", function() {
     });
 
     it("calculates shipping from global option", function() {
-        instance = carty({
+        instance = cart({
             shipping: 10
         });
 
@@ -73,7 +73,7 @@ describe("carty().shipping", function() {
     });
 
     it("calculates shipping from global option with function", function() {
-        instance = carty({
+        instance = cart({
             shipping: function() { return 10; }
         });
 
@@ -83,7 +83,7 @@ describe("carty().shipping", function() {
     });
 
     it("calculates shipping from global option with string", function() {
-        instance = carty({
+        instance = cart({
             shipping: ".5"
         });
 
@@ -93,7 +93,7 @@ describe("carty().shipping", function() {
     });
 
     it("calculates shipping with item shippings", function() {
-        instance = carty({
+        instance = cart({
             shipping: 10
         });
 
@@ -103,7 +103,7 @@ describe("carty().shipping", function() {
     });
 
     it("calculates shipping with mixed item shippings", function() {
-        instance = carty({
+        instance = cart({
             shipping: 10
         });
 
@@ -115,11 +115,11 @@ describe("carty().shipping", function() {
     });
 });
 
-describe("carty().tax", function() {
+describe("cart().tax", function() {
     var instance;
 
     it("calculates no tax for empty cart", function() {
-        instance = carty({
+        instance = cart({
             tax: 10
         });
 
@@ -127,7 +127,7 @@ describe("carty().tax", function() {
     });
 
     it("calculates tax from global option", function() {
-        instance = carty({
+        instance = cart({
             tax: 10
         });
 
@@ -137,7 +137,7 @@ describe("carty().tax", function() {
     });
 
     it("calculates tax from global option with function", function() {
-        instance = carty({
+        instance = cart({
             tax: function() { return 10; }
         });
 
@@ -147,7 +147,7 @@ describe("carty().tax", function() {
     });
 
     it("calculates tax from global option with string", function() {
-        instance = carty({
+        instance = cart({
             tax: ".5"
         });
 
@@ -157,7 +157,7 @@ describe("carty().tax", function() {
     });
 
     it("calculates tax with item taxes", function() {
-        instance = carty({
+        instance = cart({
             tax: 10
         });
 
@@ -167,7 +167,7 @@ describe("carty().tax", function() {
     });
 
     it("calculates tax with mixed item taxes", function() {
-        instance = carty({
+        instance = cart({
             tax: 10
         });
 
@@ -179,11 +179,11 @@ describe("carty().tax", function() {
     });
 });
 
-describe("carty().grandTotal", function() {
+describe("cart().grandTotal", function() {
     var instance;
 
     it("calculates grandTotal", function() {
-        instance = carty({
+        instance = cart({
             tax: 10,
             shipping: 10
         });

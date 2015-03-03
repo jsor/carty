@@ -1,11 +1,11 @@
 var assert = require('chai').assert;
-var carty = typeof window !== 'undefined' ? window.carty : require('../');
+var cart = typeof window !== 'undefined' ? window.carty : require('../cart');
 
-describe("carty().get", function() {
+describe("cart().get", function() {
     var instance;
 
     beforeEach(function() {
-        instance = carty();
+        instance = cart();
         instance.add({id: 'Item'});
     });
 

@@ -3,9 +3,9 @@
 var extend = require('extend');
 var emitter = require('./util/emitter');
 var toFloat = require('./util/toFloat');
-var getType = require('./util/getType');
 var getOption = require('./util/getOption');
 var getValue = require('./util/getValue');
+var createItem = require('./item');
 
 var _defaultOptions = {
     store: null,
@@ -13,69 +13,6 @@ var _defaultOptions = {
     shipping: null,
     tax: null
 };
-
-var _defaultAttributes = {
-    quantity: 1,
-    price: 0
-};
-
-function createItem(attr) {
-    if (getType(attr) === 'function') {
-        attr = attr();
-    }
-
-    if (getType(attr) === 'string') {
-        attr = {id: attr};
-    }
-
-    if (!attr.id) {
-        throw 'Item must be a string or an object with at least an id attribute.';
-    }
-
-    var _attr = extend({}, _defaultAttributes, attr);
-
-    function item() {
-        return extend({}, _attr);
-    }
-
-    item.id = function() {
-        return _attr.id;
-    };
-
-    item.label = function() {
-        return _attr.label || _attr.id;
-    };
-
-    item.quantity = function() {
-        return toFloat(_attr.quantity);
-    };
-
-    item.price = function() {
-        return toFloat(_attr.price);
-    };
-
-    item.currency = function() {
-        return _attr.currency;
-    };
-
-    item.shipping = function() {
-        return toFloat(_attr.shipping);
-    };
-
-    item.tax = function() {
-        return toFloat(_attr.tax);
-    };
-
-    item.equals = function(otherItem) {
-        try {
-            return createItem(otherItem).id() === item.id();
-        } catch (e) {
-            return false;
-        }
-    };
-
-    return item;
-}
 
 function createCart(options) {
     var _options = extend({}, _defaultOptions, options);
@@ -277,11 +214,6 @@ function createCart(options) {
     return cart;
 }
 
-function carty(options) {
-    return createCart(options);
-}
+createCart.option = getOption.bind(createCart, _defaultOptions);
 
-carty.option = getOption.bind(carty, _defaultOptions);
-carty.item = createItem;
-
-module.exports = carty;
+module.exports = createCart;

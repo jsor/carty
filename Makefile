@@ -1,7 +1,7 @@
 REPORTER = spec
 
 dist:
-	@NODE_ENV=prod ./node_modules/.bin/browserify carty.js -o dist/carty.js -s carty
+	@NODE_ENV=prod ./node_modules/.bin/browserify index.js -o dist/carty.js -s carty
 	@NODE_ENV=prod ./node_modules/.bin/browserify store/localStorage.js -o dist/carty.store.localstorage.js -s carty.store.localStorage
 
 test:
