@@ -307,5 +307,6 @@ function carty(options) {
 }
 
 carty.option = getOption.bind(carty, _defaultOptions);
+carty.item = createItem;
 
 module.exports = carty;
