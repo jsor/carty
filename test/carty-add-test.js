@@ -68,18 +68,6 @@ describe("carty().add", function() {
         assert.strictEqual(item.label(), 'id');
     });
 
-    it("uses label as id if id undefined", function() {
-        var attr = {
-            label: 'label'
-        };
-
-        instance.add(attr);
-
-        var item = instance()[0];
-
-        assert.strictEqual(item.id(), 'label');
-    });
-
     it("updates quantity for existing item", function() {
         instance.add({id: 'Item'});
         instance.add({id: 'Item', quantity: 2});
@@ -125,13 +113,13 @@ describe("carty().add", function() {
     it("does not add an empty item", function() {
         assert.throw(function() {
             instance.add({});
-        }.bind(this), undefined, 'Item must be a string or an object with at least an id or label attribute.');
+        }.bind(this), undefined, 'Item must be a string or an object with at least an id attribute.');
     });
 
     it("does not add an item without id and name attribute", function() {
         assert.throw(function() {
             instance.add({foo: 'bar'});
-        }.bind(this), undefined, 'Item must be a string or an object with at least an id or label attribute.');
+        }.bind(this), undefined, 'Item must be a string or an object with at least an id attribute.');
     });
 
     it("removes item if quantity lower 0", function() {
@@ -146,7 +134,7 @@ describe("carty().add", function() {
 
     it("compares item", function() {
         var attr = {
-            label: 'label',
+            id: 'label',
             foo: 'bar'
         };
 
@@ -154,8 +142,6 @@ describe("carty().add", function() {
 
         var item = instance()[0];
 
-        assert(item.equals({label: 'label', foo: 'bar'}));
-        assert(item.equals({label: 'label'}));
         assert(item.equals({id: 'label', foo: 'bar'}));
         assert(item.equals({id: 'label'}));
         assert(item.equals({id: 'label', label: 'bar'}));

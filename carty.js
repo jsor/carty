@@ -54,8 +54,8 @@ function createItem(attr) {
         attr = {id: attr};
     }
 
-    if (!isObject(attr) || (!attr.label && !attr.id)) {
-        throw 'Item must be a string or an object with at least an id or label attribute.';
+    if (!isObject(attr) || !attr.id) {
+        throw 'Item must be a string or an object with at least an id attribute.';
     }
 
     var _attr = extend({}, _defaultAttributes, attr);
@@ -65,7 +65,7 @@ function createItem(attr) {
     }
 
     item.id = function() {
-        return _attr.id || _attr.label;
+        return _attr.id;
     };
 
     item.label = function() {
