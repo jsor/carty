@@ -11,7 +11,6 @@ function isTypeOf(type, item) {
 var isString = isTypeOf.bind(null, typeof "");
 var isUndefined = isTypeOf.bind(null, typeof undefined);
 var isFunction = isTypeOf.bind(null, typeof isTypeOf);
-var isObject = isTypeOf.bind(null, typeof {});
 
 function getValue(value, context, args) {
     if (isFunction(value)) {
@@ -54,7 +53,7 @@ function createItem(attr) {
         attr = {id: attr};
     }
 
-    if (!isObject(attr) || !attr.id) {
+    if (!attr.id) {
         throw 'Item must be a string or an object with at least an id attribute.';
     }
 
