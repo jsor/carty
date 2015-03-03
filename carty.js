@@ -3,17 +3,10 @@
 var extend = require('extend');
 var emitter = require('./util/emitter');
 var toFloat = require('./util/toFloat');
-
-function isTypeOf(type, item) {
-    return typeof item === type;
-}
-
-var isString = isTypeOf.bind(null, typeof "");
-var isUndefined = isTypeOf.bind(null, typeof undefined);
-var isFunction = isTypeOf.bind(null, typeof isTypeOf);
+var type = require('./util/type');
 
 function getValue(value, context, args) {
-    if (isFunction(value)) {
+    if (type(value) === 'function') {
         value = value.apply(context, args || []);
     }
 
@@ -29,7 +22,7 @@ function getOption(options, key) {
         return extend({}, options);
     }
 
-    return key && !isUndefined(options[key]) ? options[key] : null;
+    return key && type(options[key]) !== 'undefined' ? options[key] : null;
 }
 
 var _defaultOptions = {
@@ -45,11 +38,11 @@ var _defaultAttributes = {
 };
 
 function createItem(attr) {
-    if (isFunction(attr)) {
+    if (type(attr) === 'function') {
         attr = attr();
     }
 
-    if (isString(attr)) {
+    if (type(attr) === 'string') {
         attr = {id: attr};
     }
 
