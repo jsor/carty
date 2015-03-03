@@ -271,8 +271,7 @@ function createCart(options) {
         }
 
         if (item.quantity() <= 0) {
-            remove(item);
-            return;
+            return remove(item);
         }
 
         if (existing) {
