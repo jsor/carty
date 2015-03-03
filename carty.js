@@ -154,39 +154,39 @@ function createCart(options) {
         return cart;
     };
 
-    cart.quantity = function () {
-        return cart().reduce(function (previous, item) {
+    cart.quantity = function() {
+        return cart().reduce(function(previous, item) {
             return previous + item.quantity();
         }, 0);
     };
 
-    cart.total = function () {
-        return cart().reduce(function (previous, item) {
+    cart.total = function() {
+        return cart().reduce(function(previous, item) {
             return previous + (item.price() * item.quantity());
         }, 0);
     };
 
-    cart.shipping = function () {
+    cart.shipping = function() {
         if (!cart.size()) {
             return 0;
         }
 
-        return cart().reduce(function (previous, item) {
+        return cart().reduce(function(previous, item) {
             return previous + item.shipping();
         }, getFloat(_options.shipping, cart));
     };
 
-    cart.tax = function () {
+    cart.tax = function() {
         if (!cart.size()) {
             return 0;
         }
 
-        return cart().reduce(function (previous, item) {
+        return cart().reduce(function(previous, item) {
             return previous + item.tax();
         }, getFloat(_options.tax, cart));
     };
 
-    cart.grandTotal = function () {
+    cart.grandTotal = function() {
         return cart.total() + cart.tax() + cart.shipping();
     };
 
@@ -208,7 +208,7 @@ function createCart(options) {
         }
 
         if (!_store || !_store.enabled()) {
-            return emit('saved');;
+            return emit('saved');
         }
 
         _store.save(_items.map(function(item) {
