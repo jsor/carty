@@ -3,6 +3,8 @@ REPORTER = spec
 dist:
 	@NODE_ENV=prod ./node_modules/.bin/browserify index.js -o dist/carty.js -s carty
 	@NODE_ENV=prod ./node_modules/.bin/browserify store/localStorage.js -o dist/carty.store.localstorage.js -s carty.store.localStorage
+	@NODE_ENV=prod ./node_modules/.bin/uglify -s dist/carty.js -o dist/carty.min.js
+	@NODE_ENV=prod ./node_modules/.bin/uglify -s dist/carty.store.localstorage.js -o dist/carty.store.localstorage.min.js
 
 test:
 	@NODE_ENV=test ./node_modules/.bin/mocha -b --reporter $(REPORTER) --recursive

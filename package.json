@@ -11,7 +11,8 @@
     "chai": "~2.1",
     "istanbul": "~0.3.6",
     "mocha": "~2.1",
-    "sinon": "~1.12"
+    "sinon": "~1.12",
+    "uglify": "~0.1.1"
   },
   "scripts": {
     "test": "make test",
