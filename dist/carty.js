@@ -4,18 +4,10 @@
 var extend = require('extend');
 var emitter = require('./util/emitter');
 var toFloat = require('./util/toFloat');
-
-function isTypeOf(type, item) {
-    return typeof item === type;
-}
-
-var isString = isTypeOf.bind(null, typeof "");
-var isUndefined = isTypeOf.bind(null, typeof undefined);
-var isFunction = isTypeOf.bind(null, typeof isTypeOf);
-var isObject = isTypeOf.bind(null, typeof {});
+var type = require('./util/type');
 
 function getValue(value, context, args) {
-    if (isFunction(value)) {
+    if (type(value) === 'function') {
         value = value.apply(context, args || []);
     }
 
@@ -31,7 +23,7 @@ function getOption(options, key) {
         return extend({}, options);
     }
 
-    return key && !isUndefined(options[key]) ? options[key] : null;
+    return key && type(options[key]) !== 'undefined' ? options[key] : null;
 }
 
 var _defaultOptions = {
@@ -47,16 +39,16 @@ var _defaultAttributes = {
 };
 
 function createItem(attr) {
-    if (isFunction(attr)) {
+    if (type(attr) === 'function') {
         attr = attr();
     }
 
-    if (isString(attr)) {
+    if (type(attr) === 'string') {
         attr = {id: attr};
     }
 
-    if (!isObject(attr) || (!attr.label && !attr.id)) {
-        throw 'Item must be a string or an object with at least an id or label attribute.';
+    if (!attr.id) {
+        throw 'Item must be a string or an object with at least an id attribute.';
     }
 
     var _attr = extend({}, _defaultAttributes, attr);
@@ -66,7 +58,7 @@ function createItem(attr) {
     }
 
     item.id = function() {
-        return _attr.id || _attr.label;
+        return _attr.id;
     };
 
     item.label = function() {
@@ -156,39 +148,39 @@ function createCart(options) {
         return cart;
     };
 
-    cart.quantity = function () {
-        return cart().reduce(function (previous, item) {
+    cart.quantity = function() {
+        return cart().reduce(function(previous, item) {
             return previous + item.quantity();
         }, 0);
     };
 
-    cart.total = function () {
-        return cart().reduce(function (previous, item) {
+    cart.total = function() {
+        return cart().reduce(function(previous, item) {
             return previous + (item.price() * item.quantity());
         }, 0);
     };
 
-    cart.shipping = function () {
+    cart.shipping = function() {
         if (!cart.size()) {
             return 0;
         }
 
-        return cart().reduce(function (previous, item) {
+        return cart().reduce(function(previous, item) {
             return previous + item.shipping();
         }, getFloat(_options.shipping, cart));
     };
 
-    cart.tax = function () {
+    cart.tax = function() {
         if (!cart.size()) {
             return 0;
         }
 
-        return cart().reduce(function (previous, item) {
+        return cart().reduce(function(previous, item) {
             return previous + item.tax();
         }, getFloat(_options.tax, cart));
     };
 
-    cart.grandTotal = function () {
+    cart.grandTotal = function() {
         return cart.total() + cart.tax() + cart.shipping();
     };
 
@@ -210,7 +202,7 @@ function createCart(options) {
         }
 
         if (!_store || !_store.enabled()) {
-            return emit('saved');;
+            return emit('saved');
         }
 
         _store.save(_items.map(function(item) {
@@ -272,8 +264,7 @@ function createCart(options) {
         }
 
         if (item.quantity() <= 0) {
-            remove(item);
-            return;
+            return remove(item);
         }
 
         if (existing) {
@@ -309,12 +300,12 @@ function carty(options) {
     return createCart(options);
 }
 
-carty.version = '@VERSION';
 carty.option = getOption.bind(carty, _defaultOptions);
+carty.item = createItem;
 
 module.exports = carty;
 
-},{"./util/emitter":3,"./util/toFloat":4,"extend":2}],2:[function(require,module,exports){
+},{"./util/emitter":3,"./util/toFloat":4,"./util/type":5,"extend":2}],2:[function(require,module,exports){
 var hasOwn = Object.prototype.hasOwnProperty;
 var toString = Object.prototype.toString;
 var undefined;
@@ -496,6 +487,39 @@ module.exports = function toFloat(value, decimal) {
             .replace(regex, '') // strip out any cruft
             .replace(decimal, '.') // make sure decimal point is standard
     ) || 0;
+};
+
+},{}],5:[function(require,module,exports){
+var natives = {
+    '[object Arguments]': 'arguments',
+    '[object Array]': 'array',
+    '[object Date]': 'date',
+    '[object Function]': 'function',
+    '[object Number]': 'number',
+    '[object RegExp]': 'regexp',
+    '[object String]': 'string'
+};
+
+module.exports = function type(obj) {
+    var str = Object.prototype.toString.call(obj);
+
+    if (natives[str]) {
+        return natives[str];
+    }
+
+    if (obj === null) {
+        return 'null';
+    }
+
+    if (obj === undefined) {
+        return 'undefined';
+    }
+
+    if (obj === Object(obj)) {
+        return 'object';
+    }
+
+    return typeof obj;
 };
 
 },{}]},{},[1])(1)
