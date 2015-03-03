@@ -3,10 +3,10 @@
 var extend = require('extend');
 var emitter = require('./util/emitter');
 var toFloat = require('./util/toFloat');
-var type = require('./util/type');
+var getType = require('./util/getType');
 
 function getValue(value, context, args) {
-    if (type(value) === 'function') {
+    if (getType(value) === 'function') {
         value = value.apply(context, args || []);
     }
 
@@ -22,7 +22,7 @@ function getOption(options, key) {
         return extend({}, options);
     }
 
-    return key && type(options[key]) !== 'undefined' ? options[key] : null;
+    return key && getType(options[key]) !== 'undefined' ? options[key] : null;
 }
 
 var _defaultOptions = {
@@ -38,11 +38,11 @@ var _defaultAttributes = {
 };
 
 function createItem(attr) {
-    if (type(attr) === 'function') {
+    if (getType(attr) === 'function') {
         attr = attr();
     }
 
-    if (type(attr) === 'string') {
+    if (getType(attr) === 'string') {
         attr = {id: attr};
     }
 

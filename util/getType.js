@@ -8,7 +8,7 @@ var natives = {
     '[object String]': 'string'
 };
 
-module.exports = function type(obj) {
+module.exports = function getType(obj) {
     var str = Object.prototype.toString.call(obj);
 
     if (natives[str]) {
