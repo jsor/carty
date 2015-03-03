@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
 var carty = typeof window !== 'undefined' ? window.carty : require('../');
 
-describe("carty().has", function() {
+describe("carty().option", function() {
     var instance, options = {
         foo: 'bar',
         bar: 'baz',
@@ -37,5 +37,11 @@ describe("carty().has", function() {
         assert.propertyVal(opts, 'foo', 'bar');
         assert.propertyVal(opts, 'bar', 'baz');
         assert.deepPropertyVal(opts, 'obj.prop', 'value');
+    });
+
+    it("is immutable", function() {
+        instance.option('foo', 'newBar');
+
+        assert.strictEqual(instance.option('foo'), 'bar');
     });
 });
