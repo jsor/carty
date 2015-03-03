@@ -4,6 +4,7 @@ var extend = require('extend');
 var emitter = require('./util/emitter');
 var toFloat = require('./util/toFloat');
 var getType = require('./util/getType');
+var getOption = require('./util/getOption');
 
 function getValue(value, context, args) {
     if (getType(value) === 'function') {
@@ -15,14 +16,6 @@ function getValue(value, context, args) {
 
 function getFloat(value, context, args) {
     return toFloat(getValue(value, context, args));
-}
-
-function getOption(options, key) {
-    if (arguments.length === 1) {
-        return extend({}, options);
-    }
-
-    return key && getType(options[key]) !== 'undefined' ? options[key] : null;
 }
 
 var _defaultOptions = {
