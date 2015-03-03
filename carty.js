@@ -5,18 +5,7 @@ var emitter = require('./util/emitter');
 var toFloat = require('./util/toFloat');
 var getType = require('./util/getType');
 var getOption = require('./util/getOption');
-
-function getValue(value, context, args) {
-    if (getType(value) === 'function') {
-        value = value.apply(context, args || []);
-    }
-
-    return value;
-}
-
-function getFloat(value, context, args) {
-    return toFloat(getValue(value, context, args));
-}
+var getValue = require('./util/getValue');
 
 var _defaultOptions = {
     store: null,
@@ -159,7 +148,7 @@ function createCart(options) {
 
         return cart().reduce(function(previous, item) {
             return previous + item.shipping();
-        }, getFloat(_options.shipping, cart));
+        }, toFloat(getValue(_options.shipping, cart)));
     };
 
     cart.tax = function() {
@@ -169,7 +158,7 @@ function createCart(options) {
 
         return cart().reduce(function(previous, item) {
             return previous + item.tax();
-        }, getFloat(_options.tax, cart));
+        }, toFloat(getValue(_options.tax, cart)));
     };
 
     cart.grandTotal = function() {
