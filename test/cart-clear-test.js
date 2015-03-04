@@ -62,7 +62,6 @@ describe("cart().clear", function() {
     it("emits clearfailed event", function(done) {
         instance = cart({
             store: {
-                enabled: function() { return true; },
                 load: function() { return []; },
                 clear: function() { return Promise.reject('error'); }
             }

@@ -147,7 +147,6 @@ describe("cart().add", function() {
     it("emits addfailed event", function(done) {
         instance = cart({
             store: {
-                enabled: function() { return true; },
                 load: function() { return []; },
                 add: function() { return Promise.reject('error'); }
             }

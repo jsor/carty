@@ -7,7 +7,6 @@ describe("cart()._options.store", function() {
 
     beforeEach(function() {
         store = {
-            enabled: function() { return true; },
             load: function () { return [{id: 'Existing Item'}]; },
             add: function (item, items) { },
             remove: function (item, items) { },

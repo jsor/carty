@@ -14,16 +14,16 @@ describe("storage/localStorage()", function() {
         mock = sinon.mock(mockLocalStorage)
     });
 
-    it("is enabled", function() {
-        var storage = localStorage(null, mockLocalStorage);
-
-        assert.isTrue(storage.enabled());
-    });
-
-    it("is not enabled", function() {
+    it("works with window.localStorage not available", function() {
+        global.window = {};
         var storage = localStorage();
 
-        assert.isFalse(storage.enabled());
+        assert.isArray(storage.load());
+        storage.add(null, function() { return [createItem('Item')]; });
+        storage.remove(null, function() { return [createItem('Item')]; });
+        storage.clear();
+
+        delete global.window;
     });
 
     it("adds data", function() {

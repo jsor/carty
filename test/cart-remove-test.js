@@ -83,7 +83,6 @@ describe("cart().remove", function() {
     it("emits removefailed event", function(done) {
         instance = cart({
             store: {
-                enabled: function() { return true; },
                 load: function() { return [{id: 'Item'}]; },
                 remove: function() { return Promise.reject('error'); }
             }
