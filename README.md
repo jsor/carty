@@ -10,8 +10,8 @@ Browser Support and Polyfills
 -----------------------------
 
 Carty makes use of ES5 and ES6 features but doesn't ship itself with any
-polyfills. Use the following list to include polyfills for browsers and/or node
-versions.
+polyfills. Make sure to include polyfills if your targeted environments don't
+support the required features.
 
 ### ES5
 
@@ -29,7 +29,7 @@ required polyfills.
 
 You may use ES6 polyfills for the following features:
 
-* [Promises](http://kangax.github.io/compat-table/es6/#Promise).
+* [`Promise`](http://kangax.github.io/compat-table/es6/#Promise)
 
 [ES6 Promises](http://people.mozilla.org/%7Ejorendorff/es6-draft.html#sec-promise-constructor)
 are supported in Node since version 0.11.13.
