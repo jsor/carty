@@ -6,27 +6,29 @@ module.exports = (function(window, JSON) {
         namespace = namespace || 'carty';
         localStorage = localStorage || window.localStorage;
 
+        function save(item, cart) {
+            var data = cart().map(function(item) {
+                return item();
+            });
+
+            localStorage.setItem(namespace, JSON.stringify(data));
+        }
+
         return {
             enabled: function() {
                 return !!localStorage;
             },
-            save: function(data, done) {
-                localStorage.setItem(namespace, JSON.stringify(data));
-                done();
-            },
-            load: function(done) {
-                var data = [];
-
+            load: function() {
                 try {
-                    data = JSON.parse(localStorage.getItem(namespace));
+                    return JSON.parse(localStorage.getItem(namespace));
                 } catch (e) {
+                    return []
                 }
-
-                done(data);
             },
-            clear: function(done) {
+            add: save,
+            remove: save,
+            clear: function() {
                 localStorage.removeItem(namespace);
-                done();
             }
         };
     };

@@ -19,12 +19,23 @@ function createCart(options) {
     var _options = extend({}, _defaultOptions, options);
     var _store = _options.store;
     var _items = [];
+    var _ready = load();
 
     function cart() {
         return _items.slice(0);
     }
 
     var emit = emitter(cart);
+
+    cart.ready = function(success) {
+        ready(success);
+        return cart;
+    };
+
+    cart.error = function(error) {
+        ready(null, error);
+        return cart;
+    };
 
     cart.option = getOption.bind(cart, _options);
 
@@ -42,19 +53,19 @@ function createCart(options) {
     };
 
     cart.add = function(item) {
-        add(item);
+        ready(add.bind(cart, item));
 
         return cart;
     };
 
     cart.remove = function(item) {
-        remove(item);
+        ready(remove.bind(cart, item));
 
         return cart;
     };
 
     cart.clear = function() {
-        clear();
+        ready(clear);
 
         return cart;
     };
@@ -103,47 +114,29 @@ function createCart(options) {
         return cart.total() + cart.tax() + cart.shipping();
     };
 
-    function load() {
-        if (!_store || !_store.enabled()) {
+    function ready(success, error) {
+        if (!success && !error) {
             return;
         }
 
-        return _store.load(function(items) {
+        _ready = _ready.then(success ? function() {
+            return success(cart);
+        } : null, error ? function(e) {
+            return error(e, cart);
+        } : null);
+    }
+
+    function load() {
+        var ret = [];
+
+        if (_store && _store.enabled()) {
+            ret = _store.load();
+        }
+
+        return Promise.resolve(ret).then(function(items) {
             _items = items.map(function(attr) {
                 return createItem(attr);
             });
-        });
-    }
-
-    function save() {
-        if (!emit('save')) {
-            return;
-        }
-
-        if (!_store || !_store.enabled()) {
-            return emit('saved');
-        }
-
-        _store.save(_items.map(function(item) {
-            return item();
-        }), function() {
-            emit('saved');
-        });
-    }
-
-    function clear() {
-        if (!emit('clear')) {
-            return;
-        }
-
-        _items.length = 0;
-
-        if (!_store || !_store.enabled()) {
-            return emit('cleared');
-        }
-
-        _store.clear(function() {
-            emit('cleared');
         });
     }
 
@@ -171,7 +164,7 @@ function createCart(options) {
         var item = createItem(attr);
 
         if (!emit('add', item)) {
-            return;
+            return Promise.resolve();
         }
 
         var existing = has(item);
@@ -192,25 +185,66 @@ function createCart(options) {
             _items.push(item);
         }
 
-        save();
+        var promise = Promise.resolve();
 
-        emit('added', item);
+        if (_store && _store.enabled()) {
+            promise = promise.then(function() {
+                return _store.add(item, cart);
+            });
+        }
+
+        return promise
+            .then(emit.bind(cart, 'added', item), function(e) {
+                emit('addfailed', e, item);
+                return Promise.reject(e);
+            });
     }
 
     function remove(attr) {
         var existing = has(attr);
 
         if (!existing || !emit('remove', existing.item)) {
-            return;
+            return Promise.resolve();
         }
 
         _items.splice(existing.index, 1);
-        save();
 
-        emit('removed', existing.item);
+        var promise = Promise.resolve();
+
+        if (_store && _store.enabled()) {
+            promise = promise.then(function() {
+                return _store.remove(existing.item, cart);
+            });
+        }
+
+        return promise
+            .then(emit.bind(cart, 'removed', existing.item), function(e) {
+                emit('removefailed', e, existing.item);
+                return Promise.reject(e);
+            });
     }
 
-    load();
+    function clear() {
+        if (!emit('clear')) {
+            return Promise.resolve();
+        }
+
+        _items.length = 0;
+
+        var promise = Promise.resolve();
+
+        if (_store && _store.enabled()) {
+            promise = promise.then(function() {
+                return _store.clear();
+            });
+        }
+
+        return promise
+            .then(emit.bind(cart, 'cleared'), function(e) {
+                emit('clearfailed', e);
+                return Promise.reject(e);
+            });
+    }
 
     return cart;
 }
