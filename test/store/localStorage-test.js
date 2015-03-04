@@ -1,6 +1,7 @@
 var assert = require('chai').assert;
 var sinon = require('sinon');
 var localStorage = require('../../store/localStorage');
+var createItem = typeof window !== 'undefined' ? window.carty.item : require('../../item');
 
 describe("storage/localStorage()", function() {
     var mockLocalStorage = {
@@ -30,7 +31,7 @@ describe("storage/localStorage()", function() {
 
         var storage = localStorage(null, mockLocalStorage);
 
-        storage.add(null, function() { return []; });
+        storage.add(null, function() { return [createItem('Item')]; });
 
         mock.verify();
     });
@@ -40,7 +41,7 @@ describe("storage/localStorage()", function() {
 
         var storage = localStorage(null, mockLocalStorage);
 
-        storage.remove(null, function() { return []; });
+        storage.remove(null, function() { return [createItem('Item')]; });
 
         mock.verify();
     });
