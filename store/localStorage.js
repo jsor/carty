@@ -9,23 +9,18 @@ module.exports = (function(window, JSON) {
             enabled: function() {
                 return !!localStorage;
             },
-            save: function(data, done) {
+            save: function(data) {
                 localStorage.setItem(namespace, JSON.stringify(data));
-                done();
             },
-            load: function(done) {
-                var data = [];
-
+            load: function() {
                 try {
-                    data = JSON.parse(localStorage.getItem(namespace));
+                    return JSON.parse(localStorage.getItem(namespace));
                 } catch (e) {
+                    return []
                 }
-
-                done(data);
             },
-            clear: function(done) {
+            clear: function() {
                 localStorage.removeItem(namespace);
-                done();
             }
         };
     };

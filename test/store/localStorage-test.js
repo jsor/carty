@@ -16,7 +16,7 @@ describe("storage/localStorage()", function() {
     it("is enabled", function() {
         var storage = localStorage(null, mockLocalStorage);
 
-        assert(storage.enabled());
+        assert.isTrue(storage.enabled());
     });
 
     it("is not enabled", function() {
@@ -25,28 +25,27 @@ describe("storage/localStorage()", function() {
         assert.isFalse(storage.enabled());
     });
 
-    it("saves data", function(done) {
+    it("saves data", function() {
         mock.expects('setItem').once();
 
         var storage = localStorage(null, mockLocalStorage);
 
-        storage.save(['Item'], function() {
-            mock.verify();
-            done();
-        });
+        storage.save(['Item']);
+
+        mock.verify();
     });
 
-    it("loads data", function(done) {
+    it("loads data", function() {
         mock.expects('getItem').once().returns('["test"]');
 
         var storage = localStorage(null, mockLocalStorage);
 
-        storage.load(function(data) {
-            assert.isArray(data);
-            assert.deepEqual(data, ['test']);
-            mock.verify();
-            done();
-        });
+        var data = storage.load();
+
+        assert.isArray(data);
+        assert.deepEqual(data, ['test']);
+
+        mock.verify();
     });
 
     it("loads invalid data", function() {
@@ -54,7 +53,7 @@ describe("storage/localStorage()", function() {
 
         var storage = localStorage(null, mockLocalStorage);
 
-        storage.load(function() {});
+        storage.load();
 
         mock.verify();
     });
@@ -69,14 +68,13 @@ describe("storage/localStorage()", function() {
         mock.verify();
     });
 
-    it("clears store", function(done) {
+    it("clears store", function() {
         mock.expects('removeItem').once();
 
         var storage = localStorage(null, mockLocalStorage);
 
-        storage.clear(function() {
-            mock.verify();
-            done();
-        });
+        storage.clear();
+
+        mock.verify();
     });
 });

@@ -66,10 +66,10 @@ describe("item()", function() {
 
         var item = createItem(props);
 
-        assert(item.equals({id: 'label', foo: 'bar'}));
-        assert(item.equals({id: 'label'}));
-        assert(item.equals({id: 'label', label: 'bar'}));
-        assert(item.equals(item));
+        assert.isTrue(item.equals({id: 'label', foo: 'bar'}));
+        assert.isTrue(item.equals({id: 'label'}));
+        assert.isTrue(item.equals({id: 'label', label: 'bar'}));
+        assert.isTrue(item.equals(item));
 
         assert.isFalse(item.equals({label: 'foo'}));
         assert.isFalse(item.equals({foo: 'bar'}));

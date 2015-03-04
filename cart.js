@@ -18,12 +18,23 @@ function createCart(options) {
     var _options = extend({}, _defaultOptions, options);
     var _store = _options.store;
     var _items = [];
+    var _ready = load();
 
     function cart() {
         return _items.slice(0);
     }
 
     var emit = emitter(cart);
+
+    cart.ready = function(success) {
+        ready(success);
+        return cart;
+    };
+
+    cart.error = function(error) {
+        ready(null, error);
+        return cart;
+    };
 
     cart.option = getOption.bind(cart, _options);
 
@@ -41,19 +52,19 @@ function createCart(options) {
     };
 
     cart.add = function(item) {
-        add(item);
+        ready(add.bind(cart, item));
 
         return cart;
     };
 
     cart.remove = function(item) {
-        remove(item);
+        ready(remove.bind(cart, item));
 
         return cart;
     };
 
     cart.clear = function() {
-        clear();
+        ready(clear);
 
         return cart;
     };
@@ -102,12 +113,26 @@ function createCart(options) {
         return cart.total() + cart.tax() + cart.shipping();
     };
 
-    function load() {
-        if (!_store || !_store.enabled()) {
+    function ready(success, error) {
+        if (!success && !error) {
             return;
         }
 
-        return _store.load(function(items) {
+        _ready = _ready.then(success ? function() {
+            return success(cart);
+        } : null, error ? function(e) {
+            return error(e, cart);
+        } : null);
+    }
+
+    function load() {
+        var ret = [];
+
+        if (_store && _store.enabled()) {
+            ret = _store.load();
+        }
+
+        return Promise.resolve(ret).then(function(items) {
             _items = items.map(function(attr) {
                 return createItem(attr);
             });
@@ -116,34 +141,42 @@ function createCart(options) {
 
     function save() {
         if (!emit('save')) {
-            return;
+            return Promise.resolve();
         }
 
-        if (!_store || !_store.enabled()) {
-            return emit('saved');
+        var ret;
+
+        if (_store && _store.enabled()) {
+            ret = _store.save(_items.map(function(item) {
+                return item();
+            }));
         }
 
-        _store.save(_items.map(function(item) {
-            return item();
-        }), function() {
-            emit('saved');
-        });
+        return Promise.resolve(ret)
+            .then(emit.bind(cart, 'saved'), function(e) {
+                emit('savefailed', e);
+                return Promise.reject(e);
+            });
     }
 
     function clear() {
         if (!emit('clear')) {
-            return;
+            return Promise.resolve();
         }
 
         _items.length = 0;
 
-        if (!_store || !_store.enabled()) {
-            return emit('cleared');
+        var ret;
+
+        if (_store && _store.enabled()) {
+            ret = _store.clear();
         }
 
-        _store.clear(function() {
-            emit('cleared');
-        });
+        return Promise.resolve(ret)
+            .then(emit.bind(cart, 'cleared'), function(e) {
+                emit('clearfailed', e);
+                return Promise.reject(e);
+            });
     }
 
     function has(attr) {
@@ -191,9 +224,7 @@ function createCart(options) {
             _items.push(item);
         }
 
-        save();
-
-        emit('added', item);
+        return save().then(emit.bind(cart, 'added', item));
     }
 
     function remove(attr) {
@@ -204,12 +235,9 @@ function createCart(options) {
         }
 
         _items.splice(existing.index, 1);
-        save();
 
-        emit('removed', existing.item);
+        return save().then(emit.bind(cart, 'removed', existing.item));
     }
-
-    load();
 
     return cart;
 }

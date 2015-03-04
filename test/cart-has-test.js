@@ -9,32 +9,62 @@ describe("cart().has", function() {
         instance.add({id: 'Item'});
     });
 
-    it("returns true for existing item", function() {
-        assert(instance.has({id: 'Item'}));
+    it("returns true for existing item", function(done) {
+        instance
+            .ready(function() {
+                assert.isTrue(instance.has({id: 'Item'}));
+                done();
+            })
+        ;
     });
 
-    it("returns true for existing item passed as string", function() {
-        assert(instance.has('Item'));
+    it("returns true for existing item passed as string", function(done) {
+        instance
+            .ready(function() {
+                assert.isTrue(instance.has('Item'));
+                done();
+            })
+        ;
     });
 
-    it("returns false for missing item", function() {
-        assert.isFalse(instance.has({id: 'Missing'}));
+    it("returns false for missing item", function(done) {
+        instance
+            .ready(function() {
+                assert.isFalse(instance.has({id: 'Missing'}));
+                done();
+            })
+        ;
     });
 
-    it("returns false for missing item passed as string", function() {
-        assert.isFalse(instance.has('Missing'));
+    it("returns false for missing item passed as string", function(done) {
+        instance
+            .ready(function() {
+                assert.isFalse(instance.has('Missing'));
+                done();
+            })
+        ;
     });
 
-    it("returns false for invalid item", function() {
-        assert.isFalse(instance.has({}));
-        assert.isFalse(instance.has({foo: 'bar'}));
-        assert.isFalse(instance.has([]));
-        assert.isFalse(instance.has(null));
-        assert.isFalse(instance.has(undefined));
+    it("returns false for invalid item", function(done) {
+        instance
+            .ready(function() {
+                assert.isFalse(instance.has({}));
+                assert.isFalse(instance.has({foo: 'bar'}));
+                assert.isFalse(instance.has([]));
+                assert.isFalse(instance.has(null));
+                assert.isFalse(instance.has(undefined));
+                done();
+            })
+        ;
     });
 
-    it("ignores quantity", function() {
-        instance.add({id: 'Item with quantity', quantity: 1});
-        assert(instance.has({id: 'Item with quantity', quantity: 2}));
+    it("ignores quantity", function(done) {
+        instance
+            .add({id: 'Item with quantity', quantity: 1})
+            .ready(function() {
+                assert.isTrue(instance.has({id: 'Item with quantity', quantity: 2}));
+                done();
+            })
+        ;
     });
 });

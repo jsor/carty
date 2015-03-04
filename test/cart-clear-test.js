@@ -10,42 +10,50 @@ describe("cart().clear", function() {
         instance.add({id: 'Item2'});
     });
 
-    it("removes all items", function() {
-        instance.clear();
+    it("removes all items", function(done) {
+        instance
+            .clear()
+            .ready(function() {
+                assert.strictEqual(instance.size(), 0);
 
-        assert.strictEqual(instance.size(), 0);
+                var count = 0;
+                instance.each(function() {
+                    count++;
+                });
 
-        var count = 0;
-        instance.each(function() {
-            count++;
-        });
+                assert.strictEqual(count, 0);
 
-        assert.strictEqual(count, 0);
-
-        assert.strictEqual(instance().length, 0);
+                assert.strictEqual(instance().length, 0);
+                done();
+            })
+        ;
     });
 
-    it("emits clear event", function() {
+    it("emits clear event", function(done) {
         instance.on('clear', function() {
-            assert(true);
+            done();
         });
 
         instance.clear();
     });
 
-    it("aborts if clear event listener returns false", function() {
+    it("aborts if clear event listener returns false", function(done) {
         instance.on('clear', function() {
             return false;
         });
 
-        instance.clear();
-
-        assert.strictEqual(instance.size(), 2);
+        instance
+            .clear()
+            .ready(function() {
+                assert.strictEqual(instance.size(), 2);
+                done();
+            })
+        ;
     });
 
-    it("emits cleared event", function() {
+    it("emits cleared event", function(done) {
         instance.on('cleared', function() {
-            assert(true);
+            done();
         });
 
         instance.clear();

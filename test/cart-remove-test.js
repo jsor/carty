@@ -43,29 +43,40 @@ describe("cart().remove", function() {
         done();
     });
 
-    it("emits remove event", function() {
+    it("emits remove event", function(done) {
         instance.on('remove', function(it) {
             assert.strictEqual(it.id(), 'Item');
+            done();
         });
 
-        instance.remove('Item');
+        instance
+            .remove('Item')
+        ;
     });
 
-    it("aborts if remove event listener returns false", function() {
+    it("aborts if remove event listener returns false", function(done) {
         instance.on('remove', function() {
             return false;
         });
 
-        instance.remove('Item');
+        instance
+            .remove('Item')
+            .ready(function() {
+                assert.strictEqual(instance.size(), 1);
+                done();
+            })
+        ;
 
-        assert.strictEqual(instance.size(), 1);
     });
 
-    it("emits removed event", function() {
+    it("emits removed event", function(done) {
         instance.on('removed', function(it) {
             assert.strictEqual(it.id(), 'Item');
+            done();
         });
 
-        instance.remove('Item');
+        instance
+            .remove('Item')
+        ;
     });
 });
