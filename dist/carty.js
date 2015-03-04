@@ -3,9 +3,9 @@
 
 var extend = require('extend');
 var emitter = require('./util/emitter');
-var toFloat = require('./util/toFloat');
-var getOption = require('./util/getOption');
-var getValue = require('./util/getValue');
+var number = require('./util/number');
+var property = require('./util/property');
+var value = require('./util/value');
 var createItem = require('./item');
 
 var resolve = Promise.resolve.bind(Promise);
@@ -40,7 +40,7 @@ function createCart(options) {
         return cart;
     };
 
-    cart.option = getOption.bind(cart, _options);
+    cart.option = property.bind(cart, _options);
 
     cart.size = function() {
         return _items.length;
@@ -100,7 +100,7 @@ function createCart(options) {
 
         return cart().reduce(function(previous, item) {
             return previous + item.shipping();
-        }, toFloat(getValue(_options.shipping, cart)));
+        }, number(value(_options.shipping, cart)));
     };
 
     cart.tax = function() {
@@ -110,7 +110,7 @@ function createCart(options) {
 
         return cart().reduce(function(previous, item) {
             return previous + item.tax();
-        }, toFloat(getValue(_options.tax, cart)));
+        }, number(value(_options.tax, cart)));
     };
 
     cart.grandTotal = function() {
@@ -174,7 +174,7 @@ function createCart(options) {
             }));
         }
 
-        if (item.quantity() <= 0) {
+        if (item.quantity() < 1) {
             return remove(item);
         }
 
@@ -227,11 +227,11 @@ function createCart(options) {
     return cart;
 }
 
-createCart.option = getOption.bind(createCart, _defaultOptions);
+createCart.option = property.bind(createCart, _defaultOptions);
 
 module.exports = createCart;
 
-},{"./item":3,"./util/emitter":5,"./util/getOption":6,"./util/getValue":8,"./util/toFloat":9,"extend":4}],2:[function(require,module,exports){
+},{"./item":3,"./util/emitter":5,"./util/number":6,"./util/property":7,"./util/value":9,"extend":4}],2:[function(require,module,exports){
 var createCart = require('./cart');
 var createItem = require('./item');
 
@@ -243,60 +243,59 @@ module.exports = carty;
 
 },{"./cart":1,"./item":3}],3:[function(require,module,exports){
 var extend = require('extend');
-var toFloat = require('./util/toFloat');
-var getType = require('./util/getType');
-var getOption = require('./util/getOption');
+var number = require('./util/number');
+var type = require('./util/type');
 
-var _defaultOptions = {
+var _defaultAttributes = {
     quantity: 1,
     price: 0
 };
 
-function createItem(options) {
-    if (getType(options) === 'function') {
-        options = options();
+function createItem(attributes) {
+    if (type(attributes) === 'function') {
+        attributes = attributes();
     }
 
-    if (getType(options) === 'string') {
-        options = {id: options};
+    if (type(attributes) === 'string') {
+        attributes = {id: attributes};
     }
 
-    if (!options.id) {
+    if (!attributes.id) {
         throw 'Item must be a string or an object with at least an id property.';
     }
 
-    var _options = extend({}, _defaultOptions, options);
+    var _attributes = extend({}, _defaultAttributes, attributes);
 
     function item() {
-        return extend({}, _options);
+        return extend({}, _attributes);
     }
 
     item.id = function() {
-        return _options.id;
+        return _attributes.id;
     };
 
     item.label = function() {
-        return _options.label || _options.id;
+        return _attributes.label || _attributes.id;
     };
 
     item.quantity = function() {
-        return toFloat(_options.quantity);
+        return number(_attributes.quantity);
     };
 
     item.price = function() {
-        return toFloat(_options.price);
+        return number(_attributes.price);
     };
 
     item.currency = function() {
-        return _options.currency;
+        return _attributes.currency;
     };
 
     item.shipping = function() {
-        return toFloat(_options.shipping);
+        return number(_attributes.shipping);
     };
 
     item.tax = function() {
-        return toFloat(_options.tax);
+        return number(_attributes.tax);
     };
 
     item.equals = function(otherItem) {
@@ -310,11 +309,9 @@ function createItem(options) {
     return item;
 }
 
-createItem.option = getOption.bind(createItem, _defaultOptions);
-
 module.exports = createItem;
 
-},{"./util/getOption":6,"./util/getType":7,"./util/toFloat":9,"extend":4}],4:[function(require,module,exports){
+},{"./util/number":6,"./util/type":8,"extend":4}],4:[function(require,module,exports){
 var hasOwn = Object.prototype.hasOwnProperty;
 var toString = Object.prototype.toString;
 var undefined;
@@ -468,63 +465,7 @@ module.exports = function emitter(object) {
 };
 
 },{}],6:[function(require,module,exports){
-var extend = require('extend');
-var getType = require('./getType');
-
-module.exports = function getOption(options, key) {
-    if (arguments.length === 1) {
-        return extend(true, {}, options);
-    }
-
-    return key && getType(options[key]) !== 'undefined' ? options[key] : null;
-};
-
-},{"./getType":7,"extend":4}],7:[function(require,module,exports){
-var natives = {
-    '[object Arguments]': 'arguments',
-    '[object Array]': 'array',
-    '[object Date]': 'date',
-    '[object Function]': 'function',
-    '[object Number]': 'number',
-    '[object RegExp]': 'regexp',
-    '[object String]': 'string'
-};
-
-module.exports = function getType(obj) {
-    var str = Object.prototype.toString.call(obj);
-
-    if (natives[str]) {
-        return natives[str];
-    }
-
-    if (obj === null) {
-        return 'null';
-    }
-
-    if (obj === undefined) {
-        return 'undefined';
-    }
-
-    if (obj === Object(obj)) {
-        return 'object';
-    }
-
-    return typeof obj;
-};
-
-},{}],8:[function(require,module,exports){
-var getType = require('./getType');
-
-module.exports = function getValue(value, context, args) {
-    if (getType(value) === 'function') {
-        return value.apply(context, args || []);
-    }
-
-    return value;
-};
-
-},{"./getType":7}],9:[function(require,module,exports){
-module.exports = function toFloat(value, decimal) {
+module.exports = function number(value, decimal) {
     var float = parseFloat(value);
 
     if (isFinite(float)) {
@@ -554,5 +495,61 @@ module.exports = function toFloat(value, decimal) {
     ) || 0;
 };
 
-},{}]},{},[2])(2)
+},{}],7:[function(require,module,exports){
+var extend = require('extend');
+var type = require('./type');
+
+module.exports = function property(options, key) {
+    if (arguments.length === 1) {
+        return extend(true, {}, options);
+    }
+
+    return key && type(options[key]) !== 'undefined' ? options[key] : null;
+};
+
+},{"./type":8,"extend":4}],8:[function(require,module,exports){
+var natives = {
+    '[object Arguments]': 'arguments',
+    '[object Array]': 'array',
+    '[object Date]': 'date',
+    '[object Function]': 'function',
+    '[object Number]': 'number',
+    '[object RegExp]': 'regexp',
+    '[object String]': 'string'
+};
+
+module.exports = function type(obj) {
+    var str = Object.prototype.toString.call(obj);
+
+    if (natives[str]) {
+        return natives[str];
+    }
+
+    if (obj === null) {
+        return 'null';
+    }
+
+    if (obj === undefined) {
+        return 'undefined';
+    }
+
+    if (obj === Object(obj)) {
+        return 'object';
+    }
+
+    return typeof obj;
+};
+
+},{}],9:[function(require,module,exports){
+var type = require('./type');
+
+module.exports = function value(value, context, args) {
+    if (type(value) === 'function') {
+        return value.apply(context, args || []);
+    }
+
+    return value;
+};
+
+},{"./type":8}]},{},[2])(2)
 });
