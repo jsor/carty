@@ -3,19 +3,36 @@ var sinon = require('sinon');
 var cart = typeof window !== 'undefined' ? window.carty : require('../cart');
 
 describe("cart()._options.store", function() {
-    var store = {
-        enabled: function() { return true; },
-        save: function (data) { },
-        load: function () { return []; },
-        clear: function () {}
-    }, mock;
+    var store, mock;
 
     beforeEach(function() {
+        store = {
+            enabled: function() { return true; },
+            load: function () { return [{id: 'Existing Item'}]; },
+            add: function (item, items) { },
+            remove: function (item, items) { },
+            clear: function () {}
+        };
+
         mock = sinon.mock(store)
     });
 
-    it("saves items to store", function(done) {
-        mock.expects('save').twice();
+    it("loads items from store", function(done) {
+        mock.expects('load').once().returns([{id: 'id'}]);
+
+        cart({store: store})
+            .ready(function(instance) {
+                assert.strictEqual(1, instance.size());
+                assert.strictEqual(1, instance().length);
+
+                mock.verify();
+
+                done();
+            });
+    });
+
+    it("adds items to store", function(done) {
+        mock.expects('add').twice();
 
         cart({store: store})
             .add('Item')
@@ -27,8 +44,8 @@ describe("cart()._options.store", function() {
         ;
     });
 
-    it("propagates save error", function(done) {
-        mock.expects('save').once().returns(Promise.reject('error'));
+    it("propagates add error", function(done) {
+        mock.expects('add').once().returns(Promise.reject('error'));
 
         cart({store: store})
             .add('Item')
@@ -54,66 +71,71 @@ describe("cart()._options.store", function() {
         ;
     });
 
-    it("emits save event", function(done) {
-        var instance = cart({store: store});
-
-        instance.on('save', function() {
-            done();
-        });
-
-        instance.add('Item');
-    });
-
-    it("emits saved event", function(done) {
-        var instance = cart({store: store});
-
-        instance.on('saved', function() {
-            done();
-        });
-
-        instance.add('Item');
-    });
-
-    it("emits saved event without store", function(done) {
-        var instance = cart();
-
-        instance.on('saved', function() {
-            done();
-        });
-
-        instance.add('Item');
-    });
-
-
-    it("emits savefailed event", function(done) {
-        instance = cart({
-            store: {
-                enabled: function() { return true; },
-                load: function() { return []; },
-                save: function() { return Promise.reject('error'); }
-            }
-        });
-
-        instance.on('savefailed', function(error) {
-            assert.strictEqual(error, 'error')
-            done();
-        });
-
-        instance.add('Item');
-    });
-
-    it("loads items from store", function(done) {
-        mock.expects('load').once().returns([{id: 'id'}]);
+    it("removes items from store", function(done) {
+        mock.expects('remove').once();
 
         cart({store: store})
-            .ready(function(instance) {
-                assert.strictEqual(1, instance.size());
-                assert.strictEqual(1, instance().length);
-
+            .remove('Existing Item')
+            .ready(function() {
                 mock.verify();
-
                 done();
-            });
+            })
+        ;
+    });
+
+    it("propagates remove error returned as Promise", function(done) {
+        mock.expects('remove').once().returns(Promise.reject('error'));
+
+        cart({store: store})
+            .remove('Existing Item')
+            .error(function(error) {
+                assert.strictEqual(error, 'error');
+
+                return Promise.reject(error);
+            })
+            .error(function(error) {
+                assert.strictEqual(error, 'error');
+            })
+            .ready(function(error) {
+                assert.notStrictEqual(error, 'error');
+                mock.verify();
+                done();
+            })
+            .error(function() {
+                process.nextTick(function() {
+                    assert.fail();
+                    done();
+                }, 10);
+            })
+        ;
+    });
+
+    it("propagates thrown remove error", function(done) {
+        var exception = new Error('error');
+        mock.expects('remove').once().throws(exception);
+
+        cart({store: store})
+            .remove('Existing Item')
+            .error(function(error) {
+                assert.strictEqual(error, exception);
+
+                return Promise.reject(error);
+            })
+            .error(function(error) {
+                assert.strictEqual(error, exception);
+            })
+            .ready(function(error) {
+                assert.notStrictEqual(error, exception);
+                mock.verify();
+                done();
+            })
+            .error(function() {
+                process.nextTick(function() {
+                    assert.fail();
+                    done();
+                }, 10);
+            })
+        ;
     });
 
     it("clears store", function(done) {
@@ -126,52 +148,5 @@ describe("cart()._options.store", function() {
 
                 done();
             });
-    });
-
-    it("emits clear event", function(done) {
-        var instance = cart({store: store});
-
-        instance.on('clear', function() {
-            done();
-        });
-
-        instance.clear();
-    });
-
-    it("emits cleared event", function(done) {
-        var instance = cart({store: store});
-
-        instance.on('cleared', function() {
-            done();
-        });
-
-        instance.clear();
-    });
-
-    it("emits cleared event without store", function(done) {
-        var instance = cart();
-
-        instance.on('cleared', function() {
-            done();
-        });
-
-        instance.clear();
-    });
-
-    it("emits clearfailed event", function(done) {
-        var instance = cart({
-            store: {
-                enabled: function() { return true; },
-                load: function() { return []; },
-                clear: function() { return Promise.reject('error'); }
-            }
-        });
-
-        instance.on('clearfailed', function(error) {
-            assert.strictEqual(error, 'error')
-            done();
-        });
-
-        instance.clear();
     });
 });

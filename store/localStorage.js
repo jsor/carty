@@ -5,12 +5,17 @@ module.exports = (function(window, JSON) {
         namespace = namespace || 'carty';
         localStorage = localStorage || window.localStorage;
 
+        function save(item, cart) {
+            var data = cart().map(function(item) {
+                return item();
+            });
+
+            localStorage.setItem(namespace, JSON.stringify(data));
+        }
+
         return {
             enabled: function() {
                 return !!localStorage;
-            },
-            save: function(data) {
-                localStorage.setItem(namespace, JSON.stringify(data));
             },
             load: function() {
                 try {
@@ -19,6 +24,8 @@ module.exports = (function(window, JSON) {
                     return []
                 }
             },
+            add: save,
+            remove: save,
             clear: function() {
                 localStorage.removeItem(namespace);
             }

@@ -58,4 +58,21 @@ describe("cart().clear", function() {
 
         instance.clear();
     });
+
+    it("emits clearfailed event", function(done) {
+        instance = cart({
+            store: {
+                enabled: function() { return true; },
+                load: function() { return []; },
+                clear: function() { return Promise.reject('error'); }
+            }
+        });
+
+        instance.on('clearfailed', function(error) {
+            assert.strictEqual(error, 'error')
+            done();
+        });
+
+        instance.clear();
+    });
 });

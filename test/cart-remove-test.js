@@ -79,4 +79,23 @@ describe("cart().remove", function() {
             .remove('Item')
         ;
     });
+
+    it("emits removefailed event", function(done) {
+        instance = cart({
+            store: {
+                enabled: function() { return true; },
+                load: function() { return [{id: 'Item'}]; },
+                remove: function() { return Promise.reject('error'); }
+            }
+        });
+
+        instance.on('removefailed', function(error) {
+            assert.strictEqual(error, 'error');
+            done();
+        });
+
+        instance
+            .remove('Item')
+        ;
+    });
 });

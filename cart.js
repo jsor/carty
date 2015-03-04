@@ -139,46 +139,6 @@ function createCart(options) {
         });
     }
 
-    function save() {
-        if (!emit('save')) {
-            return Promise.resolve();
-        }
-
-        var ret;
-
-        if (_store && _store.enabled()) {
-            ret = _store.save(_items.map(function(item) {
-                return item();
-            }));
-        }
-
-        return Promise.resolve(ret)
-            .then(emit.bind(cart, 'saved'), function(e) {
-                emit('savefailed', e);
-                return Promise.reject(e);
-            });
-    }
-
-    function clear() {
-        if (!emit('clear')) {
-            return Promise.resolve();
-        }
-
-        _items.length = 0;
-
-        var ret;
-
-        if (_store && _store.enabled()) {
-            ret = _store.clear();
-        }
-
-        return Promise.resolve(ret)
-            .then(emit.bind(cart, 'cleared'), function(e) {
-                emit('clearfailed', e);
-                return Promise.reject(e);
-            });
-    }
-
     function has(attr) {
         var checkItem, found = false;
 
@@ -203,7 +163,7 @@ function createCart(options) {
         var item = createItem(attr);
 
         if (!emit('add', item)) {
-            return;
+            return Promise.resolve();
         }
 
         var existing = has(item);
@@ -224,19 +184,65 @@ function createCart(options) {
             _items.push(item);
         }
 
-        return save().then(emit.bind(cart, 'added', item));
+        var promise = Promise.resolve();
+
+        if (_store && _store.enabled()) {
+            promise = promise.then(function() {
+                return _store.add(item, cart);
+            });
+        }
+
+        return promise
+            .then(emit.bind(cart, 'added', item), function(e) {
+                emit('addfailed', e, item);
+                return Promise.reject(e);
+            });
     }
 
     function remove(attr) {
         var existing = has(attr);
 
         if (!existing || !emit('remove', existing.item)) {
-            return;
+            return Promise.resolve();
         }
 
         _items.splice(existing.index, 1);
 
-        return save().then(emit.bind(cart, 'removed', existing.item));
+        var promise = Promise.resolve();
+
+        if (_store && _store.enabled()) {
+            promise = promise.then(function() {
+                return _store.remove(existing.item, cart);
+            });
+        }
+
+        return promise
+            .then(emit.bind(cart, 'removed', existing.item), function(e) {
+                emit('removefailed', e, existing.item);
+                return Promise.reject(e);
+            });
+    }
+
+    function clear() {
+        if (!emit('clear')) {
+            return Promise.resolve();
+        }
+
+        _items.length = 0;
+
+        var promise = Promise.resolve();
+
+        if (_store && _store.enabled()) {
+            promise = promise.then(function() {
+                return _store.clear();
+            });
+        }
+
+        return promise
+            .then(emit.bind(cart, 'cleared'), function(e) {
+                emit('clearfailed', e);
+                return Promise.reject(e);
+            });
     }
 
     return cart;

@@ -25,12 +25,22 @@ describe("storage/localStorage()", function() {
         assert.isFalse(storage.enabled());
     });
 
-    it("saves data", function() {
+    it("adds data", function() {
         mock.expects('setItem').once();
 
         var storage = localStorage(null, mockLocalStorage);
 
-        storage.save(['Item']);
+        storage.add(null, function() { return []; });
+
+        mock.verify();
+    });
+
+    it("removes data", function() {
+        mock.expects('setItem').once();
+
+        var storage = localStorage(null, mockLocalStorage);
+
+        storage.remove(null, function() { return []; });
 
         mock.verify();
     });
