@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
 var cart = typeof window !== 'undefined' ? window.carty : require('../cart');
 
-describe("cart().clear", function() {
+describe("cart().clear()", function() {
     var instance;
 
     beforeEach(function() {

@@ -1,4 +1,4 @@
-module.exports = function toFloat(value, decimal) {
+module.exports = function number(value, decimal) {
     var float = parseFloat(value);
 
     if (isFinite(float)) {

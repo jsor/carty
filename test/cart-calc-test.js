@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
 var cart = typeof window !== 'undefined' ? window.carty : require('../cart');
 
-describe("cart().quantity", function() {
+describe("cart().quantity()", function() {
     var instance;
 
     beforeEach(function() {
@@ -40,7 +40,7 @@ describe("cart().quantity", function() {
     });
 });
 
-describe("cart().total", function() {
+describe("cart().total()", function() {
     var instance;
 
     beforeEach(function() {
@@ -70,7 +70,7 @@ describe("cart().total", function() {
     });
 });
 
-describe("cart().shipping", function() {
+describe("cart().shipping()", function() {
     var instance;
 
     it("calculates no shipping for empty cart", function() {
@@ -153,7 +153,7 @@ describe("cart().shipping", function() {
     });
 });
 
-describe("cart().tax", function() {
+describe("cart().tax()", function() {
     var instance;
 
     it("calculates no tax for empty cart", function() {
@@ -236,7 +236,7 @@ describe("cart().tax", function() {
     });
 });
 
-describe("cart().grandTotal", function() {
+describe("cart().grandTotal()", function() {
     var instance;
 
     it("calculates grandTotal", function(done) {

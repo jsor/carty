@@ -1,58 +1,57 @@
 var extend = require('extend');
-var toFloat = require('./util/toFloat');
-var getType = require('./util/getType');
-var getOption = require('./util/getOption');
+var number = require('./util/number');
+var type = require('./util/type');
 
-var _defaultOptions = {
+var _defaultAttributes = {
     quantity: 1,
     price: 0
 };
 
-function createItem(options) {
-    if (getType(options) === 'function') {
-        options = options();
+function createItem(attributes) {
+    if (type(attributes) === 'function') {
+        attributes = attributes();
     }
 
-    if (getType(options) === 'string') {
-        options = {id: options};
+    if (type(attributes) === 'string') {
+        attributes = {id: attributes};
     }
 
-    if (!options.id) {
+    if (!attributes.id) {
         throw 'Item must be a string or an object with at least an id property.';
     }
 
-    var _options = extend({}, _defaultOptions, options);
+    var _attributes = extend({}, _defaultAttributes, attributes);
 
     function item() {
-        return extend({}, _options);
+        return extend({}, _attributes);
     }
 
     item.id = function() {
-        return _options.id;
+        return _attributes.id;
     };
 
     item.label = function() {
-        return _options.label || _options.id;
+        return _attributes.label || _attributes.id;
     };
 
     item.quantity = function() {
-        return toFloat(_options.quantity);
+        return number(_attributes.quantity);
     };
 
     item.price = function() {
-        return toFloat(_options.price);
+        return number(_attributes.price);
     };
 
     item.currency = function() {
-        return _options.currency;
+        return _attributes.currency;
     };
 
     item.shipping = function() {
-        return toFloat(_options.shipping);
+        return number(_attributes.shipping);
     };
 
     item.tax = function() {
-        return toFloat(_options.tax);
+        return number(_attributes.tax);
     };
 
     item.equals = function(otherItem) {
@@ -65,7 +64,5 @@ function createItem(options) {
 
     return item;
 }
-
-createItem.option = getOption.bind(createItem, _defaultOptions);
 
 module.exports = createItem;

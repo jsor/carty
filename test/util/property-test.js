@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
-var getOption = require('../../util/getOption');
+var property = require('../../util/property');
 
-describe("util/getOption()", function() {
+describe("util/property()", function() {
     var option, options = {
         foo: 'bar',
         bar: 'baz',
@@ -11,17 +11,17 @@ describe("util/getOption()", function() {
     };
 
     beforeEach(function() {
-        option = getOption.bind(null, options);
+        option = property.bind(null, options);
     });
 
-    it("returns options", function() {
+    it("returns properties", function() {
         assert.strictEqual(option('foo'), 'bar');
         assert.strictEqual(option('bar'), 'baz');
 
         assert.propertyVal(option('obj'), 'prop', 'value');
     });
 
-    it("returns null for undefined option", function() {
+    it("returns null for undefined property", function() {
         assert.strictEqual(option('undefined'), null);
     });
 
@@ -29,7 +29,7 @@ describe("util/getOption()", function() {
         assert.notStrictEqual(option().obj, options.obj);
     });
 
-    it("returns all options", function() {
+    it("returns all properties", function() {
         var opts = option();
 
         assert.propertyVal(opts, 'foo', 'bar');

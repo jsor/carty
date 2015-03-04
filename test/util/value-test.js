@@ -1,8 +1,8 @@
 var assert = require('chai').assert;
-var getValue = require('../../util/getValue');
+var value = require('../../util/value');
 
-describe("util/getValue()", function() {
-    var value = 'foo', func = function() {
+describe("util/value()", function() {
+    var val = 'foo', func = function() {
         return 'foo';
     }, funcWithContext = function() {
         return this;
@@ -11,19 +11,19 @@ describe("util/getValue()", function() {
     };
 
     it("gets value", function() {
-        assert.strictEqual(getValue(value), 'foo');
+        assert.strictEqual(value(val), 'foo');
     });
 
     it("gets via callback value", function() {
-        assert.strictEqual(getValue(func), 'foo');
+        assert.strictEqual(value(func), 'foo');
     });
 
     it("gets via callback value with context", function() {
         var context = {};
-        assert.strictEqual(getValue(funcWithContext, context), context);
+        assert.strictEqual(value(funcWithContext, context), context);
     });
 
     it("gets via callback value with arguments", function() {
-        assert.strictEqual(getValue(funcWithArgs, null, ['foo']), 'foo');
+        assert.strictEqual(value(funcWithArgs, null, ['foo']), 'foo');
     });
 });

@@ -2,9 +2,9 @@
 
 var extend = require('extend');
 var emitter = require('./util/emitter');
-var toFloat = require('./util/toFloat');
-var getOption = require('./util/getOption');
-var getValue = require('./util/getValue');
+var number = require('./util/number');
+var property = require('./util/property');
+var value = require('./util/value');
 var createItem = require('./item');
 
 var resolve = Promise.resolve.bind(Promise);
@@ -39,7 +39,7 @@ function createCart(options) {
         return cart;
     };
 
-    cart.option = getOption.bind(cart, _options);
+    cart.option = property.bind(cart, _options);
 
     cart.size = function() {
         return _items.length;
@@ -99,7 +99,7 @@ function createCart(options) {
 
         return cart().reduce(function(previous, item) {
             return previous + item.shipping();
-        }, toFloat(getValue(_options.shipping, cart)));
+        }, number(value(_options.shipping, cart)));
     };
 
     cart.tax = function() {
@@ -109,7 +109,7 @@ function createCart(options) {
 
         return cart().reduce(function(previous, item) {
             return previous + item.tax();
-        }, toFloat(getValue(_options.tax, cart)));
+        }, number(value(_options.tax, cart)));
     };
 
     cart.grandTotal = function() {
@@ -173,7 +173,7 @@ function createCart(options) {
             }));
         }
 
-        if (item.quantity() <= 0) {
+        if (item.quantity() < 1) {
             return remove(item);
         }
 
@@ -226,6 +226,6 @@ function createCart(options) {
     return cart;
 }
 
-createCart.option = getOption.bind(createCart, _defaultOptions);
+createCart.option = property.bind(createCart, _defaultOptions);
 
 module.exports = createCart;

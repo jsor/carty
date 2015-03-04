@@ -1,4 +1,5 @@
 var should = require('chai').should();
+var assert = require('chai').assert;
 var emitter = require('../../util/emitter');
 
 // Adapted from component-emitter
@@ -8,6 +9,26 @@ describe("util/emitter()", function() {
     beforeEach(function() {
         obj = {};
         emit = emitter(obj);
+    });
+
+    it("object does not expose the emit() method", function() {
+        assert.isUndefined(obj.emit);
+    });
+
+    describe('emit()', function() {
+        it('returns false if a listener returns false', function() {
+            obj.on('foo', function(val) {
+                return true;
+            });
+
+            obj.on('foo', function(val) {
+                return false;
+            });
+
+            var result = emit('foo', 1);
+
+            result.should.be.false;
+        });
     });
 
     describe('emit()', function() {
