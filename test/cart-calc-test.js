@@ -70,6 +70,23 @@ describe("cart().total()", function() {
     });
 });
 
+describe("cart().currency()", function() {
+    var instance;
+
+    beforeEach(function() {
+        instance = cart();
+    });
+
+    it("returns default currency", function() {
+        assert.strictEqual(instance.currency(), 'USD');
+    });
+
+    it("returns configured currency", function() {
+        instance = cart({currency: 'EUR'});
+        assert.strictEqual(instance.currency(), 'EUR');
+    });
+});
+
 describe("cart().shipping()", function() {
     var instance;
 

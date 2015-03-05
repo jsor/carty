@@ -92,6 +92,10 @@ function createCart(options) {
         }, 0);
     };
 
+    cart.currency = function() {
+        return _options.currency;
+    };
+
     cart.shipping = function() {
         if (!cart.size()) {
             return 0;

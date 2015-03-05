@@ -4,7 +4,10 @@ var type = require('./util/type');
 
 var _defaultAttributes = {
     quantity: 1,
-    price: 0
+    price: 0,
+    currency: null,
+    shipping: 0,
+    tax: 0
 };
 
 function createItem(attributes) {
