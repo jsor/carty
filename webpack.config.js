@@ -6,14 +6,12 @@ var autoprefixer = require("autoprefixer-core");
 var pkg = require("./package.json");
 
 var config = {
-    entry: {
-        carty: "./index.js",
-        'carty.store.localstorage': "./store/localStorage.js"
-    },
     output: {
         path: path.join(__dirname, "dist"),
         publicPath: "/",
-        filename: "[name].js"
+        filename: "[name].js",
+        library: "[name]",
+        libraryTarget: "umd"
     },
     module: {
         loaders: [
@@ -67,4 +65,39 @@ var configMin = extend(true, {}, config, {
     ])
 });
 
-module.exports = [config, configMin];
+var carty = extend(true, {}, config, {
+    entry: {
+        carty: "./index.js"
+    }
+});
+
+var cartyMin = extend(true, {}, configMin, {
+    entry: {
+        carty: "./index.js"
+    }
+});
+
+var cartyStoreLocalStorage = extend(true, {}, config, {
+    entry: {
+        cartyStoreLocalStorage: "./store/localStorage.js"
+    },
+    output: {
+        filename: "carty.store.localstorage.js"
+    }
+});
+
+var cartyStoreLocalStorageMin = extend(true, {}, configMin, {
+    entry: {
+        cartyStoreLocalStorage: "./store/localStorage.js"
+    },
+    output: {
+        filename: "carty.store.localstorage.min.js"
+    }
+});
+
+module.exports = [
+    carty,
+    cartyMin,
+    cartyStoreLocalStorage,
+    cartyStoreLocalStorageMin
+];
