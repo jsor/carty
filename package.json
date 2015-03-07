@@ -4,18 +4,24 @@
   "description": "A lightweight and simple to use shopping cart.",
   "version": "0.1.0",
   "dependencies": {
-    "extend": "~2.0"
+    "extend": "^2.0.0"
   },
   "devDependencies": {
-    "browserify": "~9.0",
-    "chai": "~2.1",
-    "es6-promise": "~2.0",
-    "istanbul": "~0.3.6",
-    "mocha": "~2.1",
-    "sinon": "~1.12",
-    "uglify": "~0.1.1"
+    "autoprefixer-core": "^5.1.7",
+    "chai": "^2.1.1",
+    "css-loader": "^0.9.1",
+    "es6-promise": "^2.0.1",
+    "istanbul": "^0.3.7",
+    "less-loader": "^2.1.0",
+    "lodash": "^3.4.0",
+    "mocha": "^2.2.0",
+    "postcss-loader": "^0.3.0",
+    "sinon": "^1.13.0",
+    "style-loader": "^0.8.3",
+    "webpack": "^1.7.2"
   },
   "scripts": {
+    "dist": "make dist",
     "test": "make test",
     "test-cov": "make test-cov",
     "travis": "make travis"
