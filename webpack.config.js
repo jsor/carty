@@ -82,7 +82,8 @@ var cartyStoreLocalStorage = extend(true, {}, config, {
         cartyStoreLocalStorage: "./lib/store/localStorage.js"
     },
     output: {
-        filename: "carty.store.localstorage.js"
+        filename: "carty.store.localstorage.js",
+        library: ["carty", "store", "localStorage"]
     }
 });
 
@@ -91,7 +92,8 @@ var cartyStoreLocalStorageMin = extend(true, {}, configMin, {
         cartyStoreLocalStorage: "./lib/store/localStorage.js"
     },
     output: {
-        filename: "carty.store.localstorage.min.js"
+        filename: "carty.store.localstorage.min.js",
+        library: ["carty", "vistoreew", "localStorage"]
     }
 });
 

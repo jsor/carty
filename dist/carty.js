@@ -76,10 +76,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	var extend = __webpack_require__(8);
-	var emitter = __webpack_require__(5);
-	var number = __webpack_require__(3);
-	var property = __webpack_require__(6);
-	var value = __webpack_require__(7);
+	var emitter = __webpack_require__(3);
+	var number = __webpack_require__(4);
+	var property = __webpack_require__(5);
+	var value = __webpack_require__(6);
 	var createItem = __webpack_require__(2);
 
 	var resolve = Promise.resolve.bind(Promise);
@@ -315,8 +315,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var extend = __webpack_require__(8);
-	var number = __webpack_require__(3);
-	var type = __webpack_require__(4);
+	var number = __webpack_require__(4);
+	var type = __webpack_require__(7);
 
 	var _defaultAttributes = {
 	    quantity: 1,
@@ -391,78 +391,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = function number(value, decimal) {
-	    var float = parseFloat(value);
-
-	    if (isFinite(float)) {
-	        return float;
-	    }
-
-	    var string = '' + value;
-
-	    if (!decimal) {
-	        var dotPos = string.indexOf('.'),
-	            commaPos = string.indexOf(',');
-
-	        decimal = '.';
-
-	        if (dotPos > -1 && commaPos > -1 && commaPos > dotPos) {
-	            decimal = ',';
-	        }
-	    }
-
-	    var regex = new RegExp("[^0-9-" + decimal + "]", ["g"]);
-
-	    return parseFloat(
-	        string
-	            .replace(/\(([^-]+)\)/, "-$1") // replace bracketed values with negatives
-	            .replace(regex, '') // strip out any cruft
-	            .replace(decimal, '.') // make sure decimal point is standard
-	    ) || 0;
-	};
-
-
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var natives = {
-	    '[object Arguments]': 'arguments',
-	    '[object Array]': 'array',
-	    '[object Date]': 'date',
-	    '[object Function]': 'function',
-	    '[object Number]': 'number',
-	    '[object RegExp]': 'regexp',
-	    '[object String]': 'string'
-	};
-
-	module.exports = function type(obj) {
-	    var str = Object.prototype.toString.call(obj);
-
-	    if (natives[str]) {
-	        return natives[str];
-	    }
-
-	    if (obj === null) {
-	        return 'null';
-	    }
-
-	    if (obj === undefined) {
-	        return 'undefined';
-	    }
-
-	    if (obj === Object(obj)) {
-	        return 'object';
-	    }
-
-	    return typeof obj;
-	};
-
-
-/***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
 	'use strict';
 
 	// Adapted from component-emitter
@@ -534,11 +462,46 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 6 */
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = function number(value, decimal) {
+	    var float = parseFloat(value);
+
+	    if (isFinite(float)) {
+	        return float;
+	    }
+
+	    var string = '' + value;
+
+	    if (!decimal) {
+	        var dotPos = string.indexOf('.'),
+	            commaPos = string.indexOf(',');
+
+	        decimal = '.';
+
+	        if (dotPos > -1 && commaPos > -1 && commaPos > dotPos) {
+	            decimal = ',';
+	        }
+	    }
+
+	    var regex = new RegExp("[^0-9-" + decimal + "]", ["g"]);
+
+	    return parseFloat(
+	        string
+	            .replace(/\(([^-]+)\)/, "-$1") // replace bracketed values with negatives
+	            .replace(regex, '') // strip out any cruft
+	            .replace(decimal, '.') // make sure decimal point is standard
+	    ) || 0;
+	};
+
+
+/***/ },
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var extend = __webpack_require__(8);
-	var type = __webpack_require__(4);
+	var type = __webpack_require__(7);
 
 	module.exports = function property(options, key) {
 	    if (arguments.length === 1) {
@@ -550,10 +513,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 7 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var type = __webpack_require__(4);
+	var type = __webpack_require__(7);
 
 	module.exports = function value(value, context, args) {
 	    if (type(value) === 'function') {
@@ -561,6 +524,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    return value;
+	};
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var natives = {
+	    '[object Arguments]': 'arguments',
+	    '[object Array]': 'array',
+	    '[object Date]': 'date',
+	    '[object Function]': 'function',
+	    '[object Number]': 'number',
+	    '[object RegExp]': 'regexp',
+	    '[object String]': 'string'
+	};
+
+	module.exports = function type(obj) {
+	    var str = Object.prototype.toString.call(obj);
+
+	    if (natives[str]) {
+	        return natives[str];
+	    }
+
+	    if (obj === null) {
+	        return 'null';
+	    }
+
+	    if (obj === undefined) {
+	        return 'undefined';
+	    }
+
+	    if (obj === Object(obj)) {
+	        return 'object';
+	    }
+
+	    return typeof obj;
 	};
 
 
