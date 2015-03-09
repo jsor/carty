@@ -2,9 +2,21 @@ var assert = require('chai').assert;
 var createItem = typeof window !== 'undefined' ? window.carty.item : require('../lib/item');
 
 describe("item()", function() {
-    it("does not create an empty item", function() {
+    it("does not create an item from empty object", function() {
         assert.throw(function() {
             createItem({});
+        }.bind(this), undefined, 'Item must be a string or an object with at least an id property.');
+    });
+
+    it("does not create an item from undefined", function() {
+        assert.throw(function() {
+            createItem();
+        }.bind(this), undefined, 'Item must be a string or an object with at least an id property.');
+    });
+
+    it("does not create an item from null", function() {
+        assert.throw(function() {
+            createItem(null);
         }.bind(this), undefined, 'Item must be a string or an object with at least an id property.');
     });
 

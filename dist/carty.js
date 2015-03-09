@@ -335,11 +335,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        attributes = {id: attributes};
 	    }
 
-	    if (!attributes.id) {
+	    var _attributes = extend({}, _defaultAttributes, attributes);
+
+	    if (!_attributes.id) {
 	        throw 'Item must be a string or an object with at least an id property.';
 	    }
-
-	    var _attributes = extend({}, _defaultAttributes, attributes);
 
 	    function item() {
 	        return extend({}, _attributes);
