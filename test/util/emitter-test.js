@@ -29,21 +29,35 @@ describe("util/emitter()", function() {
 
             result.should.be.false;
         });
-    });
 
-    describe('emit()', function() {
-        it('returns false if a listener returns false', function() {
+        it('returns false if listeners as array return false', function() {
             obj.on('foo', function(val) {
                 return true;
             });
 
-            obj.on('foo', function(val) {
+            obj.on('bar', function(val) {
                 return false;
             });
 
-            var result = emit('foo', 1);
+            var result = emit(['foo', 'bar'], 1);
 
             result.should.be.false;
+        });
+
+        it('triggers events as array', function() {
+            var num = 0;
+
+            obj.on('foo', function(val) {
+                num += val;
+            });
+
+            obj.on('bar', function(val) {
+                num += val;
+            });
+
+            emit(['foo', 'bar'], 1);
+
+            num.should.eql(2);
         });
     });
 
@@ -82,6 +96,19 @@ describe("util/emitter()", function() {
 
             calls.should.eql(['one', 1, 'two', 2]);
         });
+
+        it('adds listeners as array', function() {
+            var num = 0;
+
+            obj.on(['foo', 'bar'], function(val) {
+                num += val;
+            });
+
+            emit('foo', 1);
+            emit('bar', 1);
+
+            num.should.eql(2);
+        });
     });
 
     describe('.once(event, fn)', function() {
@@ -98,7 +125,23 @@ describe("util/emitter()", function() {
             emit('bar', 1);
 
             calls.should.eql(['one', 1]);
-        })
+        });
+
+        it('adds a single-shot listeners as array', function() {
+            var num = 0;
+
+            obj.once(['foo', 'bar'], function(val) {
+                num += val;
+            });
+
+            emit('foo', 1);
+            emit('bar', 1);
+
+            emit('foo', 1);
+            emit('bar', 1);
+
+            num.should.eql(2);
+        });
     });
 
     describe('.off(event, fn)', function() {
@@ -120,6 +163,23 @@ describe("util/emitter()", function() {
             emit('foo');
 
             calls.should.eql(['one']);
+        });
+
+        it('removes listeners as array', function() {
+            var num = 0;
+
+            function cb(val) {
+                num += val;
+            }
+
+            obj.on('foo', cb);
+            obj.on('bar', cb);
+            obj.off(['foo', 'bar'], cb);
+
+            emit('foo', 1);
+            emit('bar', 1);
+
+            num.should.eql(0);
         });
 
         it('works with .once()', function() {
@@ -182,6 +242,23 @@ describe("util/emitter()", function() {
             emit('foo');
 
             calls.should.eql([]);
+        });
+
+        it('removes all listeners as array for an event', function() {
+            var num = 0;
+
+            function cb(val) {
+                num += val;
+            }
+
+            obj.on('foo', cb);
+            obj.on('bar', cb);
+            obj.off(['foo', 'bar']);
+
+            emit('foo', 1);
+            emit('bar', 1);
+
+            num.should.eql(0);
         })
     });
 

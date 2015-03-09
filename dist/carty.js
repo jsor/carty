@@ -393,18 +393,34 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
+	var isArray = Array.isArray;
+
 	// Adapted from component-emitter
 	module.exports = function emitter(object) {
 	    var _callbacks = {};
 
 	    object.on = function(event, fn) {
-	        (_callbacks['$' + event] = _callbacks['$' + event] || [])
-	            .push(fn);
+	        if (isArray(event)) {
+	            event.forEach(function(evt) {
+	                object.on(evt, fn);
+	            });
+	        } else {
+	            (_callbacks['$' + event] = _callbacks['$' + event] || [])
+	                .push(fn);
+	        }
 
 	        return object;
 	    };
 
 	    object.once = function(event, fn) {
+	        if (isArray(event)) {
+	            event.forEach(function(evt) {
+	                object.once(evt, fn);
+	            });
+
+	            return object;
+	        }
+
 	        function on() {
 	            object.off(event, on);
 	            fn.apply(object, arguments);
@@ -419,6 +435,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    object.off = function(event, fn) {
 	        if (0 == arguments.length) {
 	            _callbacks = {};
+	            return object;
+	        }
+
+	        if (isArray(event)) {
+	            event.forEach(function(evt) {
+	                object.off(evt, fn);
+	            });
+
 	            return object;
 	        }
 
@@ -448,9 +472,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    return function emit(event) {
 	        var args = [].slice.call(arguments, 1),
-	            callbacks = _callbacks['$' + event],
-	            passed = true
-	        ;
+	            passed = true;
+
+	        if (isArray(event)) {
+	            event.forEach(function(evt) {
+	                if (!emit.apply(object, [evt].concat(args))) {
+	                    passed = false;
+	                }
+	            });
+
+	            return passed;
+	        }
+
+	        var callbacks = _callbacks['$' + event];
 
 	        if (callbacks) {
 	            callbacks = callbacks.slice(0);
