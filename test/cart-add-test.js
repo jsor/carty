@@ -1,4 +1,5 @@
 var assert = require('chai').assert;
+var sinon = require('sinon');
 var cart = typeof window !== 'undefined' ? window.carty : require('../lib/cart');
 
 describe("cart().add()", function() {
@@ -94,15 +95,35 @@ describe("cart().add()", function() {
         ;
     });
 
-    it("removes item if quantity lower 0", function(done) {
+    it("removes existing item if quantity lower 0", function(done) {
+        var callback = sinon.spy();
+
+        instance.on('add', callback);
+
         instance
             .add({id: 'Item'})
             .ready(function() {
-                assert.strictEqual(1, instance.size());
+                assert.strictEqual(instance.size(), 1);
             })
             .add({id: 'Item', quantity: -1})
             .ready(function() {
                 assert.strictEqual(instance.size(), 0);
+                assert.isTrue(callback.called);
+                done();
+            })
+        ;
+    });
+
+    it("does nothing if item quantity lower 0", function(done) {
+        var callback = sinon.spy();
+
+        instance.on('remove', callback);
+
+        instance
+            .add({id: 'Nonexisting Item', quantity: -1})
+            .ready(function() {
+                assert.strictEqual(instance.size(), 0);
+                assert.isFalse(callback.called);
                 done();
             })
         ;
