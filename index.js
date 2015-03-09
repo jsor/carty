@@ -1,5 +1,5 @@
-var createCart = require('./cart');
-var createItem = require('./item');
+var createCart = require('./lib/cart');
+var createItem = require('./lib/item');
 
 var carty = createCart;
 

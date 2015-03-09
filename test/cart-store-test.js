@@ -1,6 +1,6 @@
 var assert = require('chai').assert;
 var sinon = require('sinon');
-var cart = typeof window !== 'undefined' ? window.carty : require('../cart');
+var cart = typeof window !== 'undefined' ? window.carty : require('../lib/cart');
 
 describe("cart().option('store')", function() {
     var store, mock;

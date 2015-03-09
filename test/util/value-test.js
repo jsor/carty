@@ -1,5 +1,5 @@
 var assert = require('chai').assert;
-var value = require('../../util/value');
+var value = require('../../lib/util/value');
 
 describe("util/value()", function() {
     var val = 'foo', func = function() {

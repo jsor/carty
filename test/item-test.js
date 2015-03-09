@@ -1,5 +1,5 @@
 var assert = require('chai').assert;
-var createItem = typeof window !== 'undefined' ? window.carty.item : require('../item');
+var createItem = typeof window !== 'undefined' ? window.carty.item : require('../lib/item');
 
 describe("item()", function() {
     it("does not create an empty item", function() {

@@ -1,6 +1,6 @@
 var should = require('chai').should();
 var assert = require('chai').assert;
-var emitter = require('../../util/emitter');
+var emitter = require('../../lib/util/emitter');
 
 // Adapted from component-emitter
 describe("util/emitter()", function() {

@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
 var sinon = require('sinon');
-var localStorage = require('../../store/localStorage');
-var createItem = typeof window !== 'undefined' ? window.carty.item : require('../../item');
+var localStorage = require('../../lib/store/localStorage');
+var createItem = typeof window !== 'undefined' ? window.carty.item : require('../../lib/item');
 
 describe("storage/localStorage()", function() {
     var mockLocalStorage = {

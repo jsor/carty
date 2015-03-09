@@ -1,5 +1,5 @@
 var assert = require('chai').assert;
-var property = require('../../util/property');
+var property = require('../../lib/util/property');
 
 describe("util/property()", function() {
     var option, options = {

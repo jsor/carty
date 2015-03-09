@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-var number = require('../../util/number');
+var number = require('../../lib/util/number');
 
 // Adapted from component-emitter
 describe("util/number()", function() {

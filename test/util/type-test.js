@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-var type = require('../../util/type');
+var type = require('../../lib/util/type');
 
 describe("util/type()", function() {
     it('detects string', function() {
