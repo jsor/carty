@@ -423,7 +423,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        var callbacks = _callbacks['$' + event];
-	        if (!callbacks) return object;
+
+	        if (!callbacks) {
+	            return object;
+	        }
 
 	        if (1 == arguments.length) {
 	            delete _callbacks['$' + event];
@@ -431,6 +434,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        var cb;
+
 	        for (var i = 0; i < callbacks.length; i++) {
 	            cb = callbacks[i];
 	            if (cb === fn || cb.fn === fn) {
@@ -438,6 +442,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                break;
 	            }
 	        }
+
 	        return object;
 	    };
 
@@ -449,6 +454,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        if (callbacks) {
 	            callbacks = callbacks.slice(0);
+
 	            for (var i = 0, len = callbacks.length; i < len; ++i) {
 	                if (!callbacks[i].apply(object, args)) {
 	                    passed = false;
