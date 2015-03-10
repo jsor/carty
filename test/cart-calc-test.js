@@ -40,30 +40,30 @@ describe("cart().quantity()", function() {
     });
 });
 
-describe("cart().total()", function() {
+describe("cart().subtotal()", function() {
     var instance;
 
     beforeEach(function() {
         instance = cart();
     });
 
-    it("calculates total", function(done) {
+    it("calculates subtotal", function(done) {
         instance
             .add({id: 'Item', quantity: 2, price: 10})
             .add({id: 'Item2', quantity: 10, price: .5})
             .ready(function() {
-                assert.strictEqual(instance.total(), (2 * 10) + (10 * .5));
+                assert.strictEqual(instance.subtotal(), (2 * 10) + (10 * .5));
                 done();
             })
         ;
     });
 
-    it("calculates total with mixed values", function(done) {
+    it("calculates subtotal with mixed values", function(done) {
         instance
             .add({id: 'Item', quantity: 2, price: function() { return 10 }})
             .add({id: 'Item2', quantity: "10", price: ".5"})
             .ready(function() {
-                assert.strictEqual(instance.total(), (2 * 10) + (10 * .5));
+                assert.strictEqual(instance.subtotal(), (2 * 10) + (10 * .5));
                 done();
             })
         ;
@@ -253,10 +253,10 @@ describe("cart().tax()", function() {
     });
 });
 
-describe("cart().grandTotal()", function() {
+describe("cart().total()", function() {
     var instance;
 
-    it("calculates grandTotal", function(done) {
+    it("calculates total", function(done) {
         instance = cart({
             tax: 10,
             shipping: 10
@@ -266,7 +266,7 @@ describe("cart().grandTotal()", function() {
             .add({id: 'Item2', tax: "10"})
             .add({id: 'Item3', tax: function() { return 10 }})
             .ready(function() {
-                assert.strictEqual(instance.grandTotal(), 50);
+                assert.strictEqual(instance.total(), 50);
                 done();
             })
         ;

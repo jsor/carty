@@ -161,7 +161,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }, 0);
 	    };
 
-	    cart.total = function() {
+	    cart.subtotal = function() {
 	        return cart().reduce(function(previous, item) {
 	            return previous + (item.price() * item.quantity());
 	        }, 0);
@@ -191,8 +191,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }, number(value(_options.tax, cart)));
 	    };
 
-	    cart.grandTotal = function() {
-	        return cart.total() + cart.tax() + cart.shipping();
+	    cart.total = function() {
+	        return cart.subtotal() + cart.tax() + cart.shipping();
 	    };
 
 	    function ready(onReady) {
