@@ -16,6 +16,20 @@ describe("cart().option('store')", function() {
         mock = sinon.mock(store)
     });
 
+    it("can load non-array data", function(done) {
+        mock.expects('load').once().returns(null);
+
+        cart({store: store})
+            .ready(function(instance) {
+                assert.strictEqual(0, instance.size());
+                assert.strictEqual(0, instance().length);
+
+                mock.verify();
+
+                done();
+            });
+    });
+
     it("loads items from store", function(done) {
         mock.expects('load').once().returns([{id: 'id'}]);
 
