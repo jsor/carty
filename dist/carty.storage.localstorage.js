@@ -1,5 +1,5 @@
 /*!
- * Carty - v0.1.0 - 2015-03-09
+ * Carty - v0.1.0 - 2015-03-10
  * http://sorgalla.com/carty/
  * Copyright (c) 2015 Jan Sorgalla; Licensed MIT
  */
@@ -11,7 +11,7 @@
 	else if(typeof exports === 'object')
 		exports["localStorage"] = factory();
 	else
-		root["carty"] = root["carty"] || {}, root["carty"]["store"] = root["carty"]["store"] || {}, root["carty"]["store"]["localStorage"] = factory();
+		root["carty"] = root["carty"] || {}, root["carty"]["storage"] = root["carty"]["storage"] || {}, root["carty"]["storage"]["localStorage"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache

@@ -13,6 +13,13 @@ var config = {
         library: "[name]",
         libraryTarget: "umd"
     },
+    externals: {
+        "jquery": {
+            "root": "jQuery",
+            "commonjs": "jquery",
+            "commonjs2": "jquery"
+        }
+    },
     module: {
         loaders: [
             {
@@ -77,29 +84,29 @@ var cartyMin = extend(true, {}, configMin, {
     }
 });
 
-var cartyStoreLocalStorage = extend(true, {}, config, {
+var cartyStorageLocalStorage = extend(true, {}, config, {
     entry: {
-        cartyStoreLocalStorage: "./lib/store/localStorage.js"
+        cartyStorageLocalStorage: "./lib/storage/localStorage.js"
     },
     output: {
-        filename: "carty.store.localstorage.js",
-        library: ["carty", "store", "localStorage"]
+        filename: "carty.storage.localstorage.js",
+        library: ["carty", "storage", "localStorage"]
     }
 });
 
-var cartyStoreLocalStorageMin = extend(true, {}, configMin, {
+var cartyStorageLocalStorageMin = extend(true, {}, configMin, {
     entry: {
-        cartyStoreLocalStorage: "./lib/store/localStorage.js"
+        cartyStorageLocalStorage: "./lib/storage/localStorage.js"
     },
     output: {
-        filename: "carty.store.localstorage.min.js",
-        library: ["carty", "vistoreew", "localStorage"]
+        filename: "carty.storage.localstorage.min.js",
+        library: ["carty", "storage", "localStorage"]
     }
 });
 
 module.exports = [
     carty,
     cartyMin,
-    cartyStoreLocalStorage,
-    cartyStoreLocalStorageMin
+    cartyStorageLocalStorage,
+    cartyStorageLocalStorageMin
 ];

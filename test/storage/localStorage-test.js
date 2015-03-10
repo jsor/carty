@@ -1,6 +1,6 @@
 var assert = require('chai').assert;
 var sinon = require('sinon');
-var localStorage = require('../../lib/store/localStorage');
+var localStorage = require('../../lib/storage/localStorage');
 var createItem = typeof window !== 'undefined' ? window.carty.item : require('../../lib/item');
 
 describe("storage/localStorage()", function() {
@@ -79,7 +79,7 @@ describe("storage/localStorage()", function() {
         mock.verify();
     });
 
-    it("clears store", function() {
+    it("clears storage", function() {
         mock.expects('removeItem').once();
 
         var storage = localStorage(null, mockLocalStorage);

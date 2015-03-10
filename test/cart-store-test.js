@@ -2,24 +2,24 @@ var assert = require('chai').assert;
 var sinon = require('sinon');
 var cart = typeof window !== 'undefined' ? window.carty : require('../lib/cart');
 
-describe("cart().option('store')", function() {
-    var store, mock;
+describe("cart().option('storage')", function() {
+    var storage, mock;
 
     beforeEach(function() {
-        store = {
+        storage = {
             load: function () { return [{id: 'Existing Item'}]; },
             add: function (item, items) { },
             remove: function (item, items) { },
             clear: function () {}
         };
 
-        mock = sinon.mock(store)
+        mock = sinon.mock(storage)
     });
 
     it("can load non-array data", function(done) {
         mock.expects('load').once().returns(null);
 
-        cart({store: store})
+        cart({storage: storage})
             .ready(function(instance) {
                 assert.strictEqual(0, instance.size());
                 assert.strictEqual(0, instance().length);
@@ -30,10 +30,10 @@ describe("cart().option('store')", function() {
             });
     });
 
-    it("loads items from store", function(done) {
+    it("loads items from storage", function(done) {
         mock.expects('load').once().returns([{id: 'id'}]);
 
-        cart({store: store})
+        cart({storage: storage})
             .ready(function(instance) {
                 assert.strictEqual(1, instance.size());
                 assert.strictEqual(1, instance().length);
@@ -44,10 +44,10 @@ describe("cart().option('store')", function() {
             });
     });
 
-    it("adds items to store", function(done) {
+    it("adds items to storage", function(done) {
         mock.expects('add').twice();
 
-        cart({store: store})
+        cart({storage: storage})
             .add('Item')
             .add('Item2')
             .ready(function() {
@@ -60,7 +60,7 @@ describe("cart().option('store')", function() {
     it("propagates add error", function(done) {
         mock.expects('add').once().returns(Promise.reject('error'));
 
-        cart({store: store})
+        cart({storage: storage})
             .add('Item')
             .error(function(error) {
                 assert.strictEqual(error, 'error');
@@ -84,10 +84,10 @@ describe("cart().option('store')", function() {
         ;
     });
 
-    it("removes items from store", function(done) {
+    it("removes items from storage", function(done) {
         mock.expects('remove').once();
 
-        cart({store: store})
+        cart({storage: storage})
             .remove('Existing Item')
             .ready(function() {
                 mock.verify();
@@ -99,7 +99,7 @@ describe("cart().option('store')", function() {
     it("propagates remove error returned as Promise", function(done) {
         mock.expects('remove').once().returns(Promise.reject('error'));
 
-        cart({store: store})
+        cart({storage: storage})
             .remove('Existing Item')
             .error(function(error) {
                 assert.strictEqual(error, 'error');
@@ -127,7 +127,7 @@ describe("cart().option('store')", function() {
         var exception = new Error('error');
         mock.expects('remove').once().throws(exception);
 
-        cart({store: store})
+        cart({storage: storage})
             .remove('Existing Item')
             .error(function(error) {
                 assert.strictEqual(error, exception);
@@ -151,10 +151,10 @@ describe("cart().option('store')", function() {
         ;
     });
 
-    it("clears store", function(done) {
+    it("clears storage", function(done) {
         mock.expects('clear').once();
 
-        cart({store: store})
+        cart({storage: storage})
             .clear()
             .ready(function() {
                 mock.verify();

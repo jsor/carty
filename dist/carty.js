@@ -1,5 +1,5 @@
 /*!
- * Carty - v0.1.0 - 2015-03-09
+ * Carty - v0.1.0 - 2015-03-10
  * http://sorgalla.com/carty/
  * Copyright (c) 2015 Jan Sorgalla; Licensed MIT
  */
@@ -86,7 +86,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var reject = Promise.reject.bind(Promise);
 
 	var _defaultOptions = {
-	    store: null,
+	    storage: null,
 	    currency: 'USD',
 	    shipping: null,
 	    tax: null
@@ -94,7 +94,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function createCart(options) {
 	    var _options = extend({}, _defaultOptions, options);
-	    var _store = _options.store;
+	    var _storage = _options.storage;
 	    var _items = [];
 	    var _ready = load();
 
@@ -104,13 +104,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var emit = emitter(cart);
 
-	    cart.ready = function(success) {
-	        ready(success);
+	    cart.ready = function(onReady) {
+	        ready(onReady);
 	        return cart;
 	    };
 
-	    cart.error = function(error) {
-	        ready(null, error);
+	    cart.error = function(onError) {
+	        error(onError);
 	        return cart;
 	    };
 
@@ -195,25 +195,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return cart.total() + cart.tax() + cart.shipping();
 	    };
 
-	    function ready(success, error) {
-	        if (!success && !error) {
-	            return;
-	        }
+	    function ready(onReady) {
+	        _ready['catch'](function(e) {
+	            setTimeout(function() { throw e; });
+	        });
 
-	        _ready = _ready.then(success ? function() {
-	            return success(cart);
-	        } : null, error ? function(e) {
-	            return error(e, cart);
-	        } : null);
+	        _ready = _ready.then(function() {
+	            return onReady(cart);
+	        });
+	    }
+
+	    function error(onError) {
+	        _ready = _ready['catch'](function(e) {
+	            return onError(e, cart);
+	        });
 	    }
 
 	    function load() {
 	        return resolve(
-	            _store ? _store.load() : []
+	            _storage ? _storage.load() : []
 	        ).then(function(items) {
-	            _items = items.map(function(attr) {
-	                return createItem(attr);
-	            });
+	            if (Array.isArray(items)) {
+	                _items = items.map(function(attr) {
+	                    return createItem(attr);
+	                });
+	            }
 	        });
 	    }
 
@@ -263,7 +269,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        return resolve(
-	            _store ? _store.add(item, cart) : null
+	            _storage ? _storage.add(item, cart) : null
 	        ).then(emit.bind(cart, 'added', item), function(e) {
 	            emit('addfailed', e, item);
 	            return reject(e);
@@ -280,7 +286,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _items.splice(existing.index, 1);
 
 	        return resolve(
-	            _store ?_store.remove(existing.item, cart) : null
+	            _storage ?_storage.remove(existing.item, cart) : null
 	        ).then(emit.bind(cart, 'removed', existing.item), function(e) {
 	            emit('removefailed', e, existing.item);
 	            return reject(e);
@@ -295,7 +301,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _items.length = 0;
 
 	        return resolve(
-	            _store ? _store.clear() : null
+	            _storage ? _storage.clear() : null
 	        ).then(emit.bind(cart, 'cleared'), function(e) {
 	            emit('clearfailed', e);
 	            return reject(e);
@@ -323,7 +329,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    price: 0,
 	    currency: null,
 	    shipping: 0,
-	    tax: 0
+	    tax: 0,
+	    variant: null
 	};
 
 	function createItem(attributes) {
@@ -373,12 +380,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return number(_attributes.tax);
 	    };
 
-	    item.equals = function(otherItem) {
+	    item.variant = function() {
+	        return _attributes.variant;
+	    };
+
+	    item.equals = function(other) {
 	        try {
-	            return createItem(otherItem).id() === item.id();
+	            var otherItem = createItem(other);
 	        } catch (e) {
 	            return false;
 	        }
+
+	        if (otherItem.id() !== item.id()) {
+	            return false;
+	        }
+
+	        var itemType = type(item.variant());
+
+	        if (type(otherItem.variant()) !== itemType) {
+	            return false;
+	        }
+
+	        var itemVariant =  item.variant(),
+	            otherVariant = otherItem.variant()
+	        ;
+
+	        if (itemType === 'object' || itemType === 'array') {
+	            return Object.keys(itemVariant).every(function(key) {
+	                return type(otherVariant[key]) !== 'undefined' && otherVariant[key] === itemVariant[key];
+	            });
+	        }
+
+	        return otherVariant === itemVariant;
 	    };
 
 	    return item;
@@ -476,7 +509,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        if (isArray(event)) {
 	            event.forEach(function(evt) {
-	                if (!emit.apply(object, [evt].concat(args))) {
+	                if (false === emit.apply(object, [evt].concat(args))) {
 	                    passed = false;
 	                }
 	            });
@@ -490,7 +523,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            callbacks = callbacks.slice(0);
 
 	            for (var i = 0, len = callbacks.length; i < len; ++i) {
-	                if (!callbacks[i].apply(object, args)) {
+	                if (false === callbacks[i].apply(object, args)) {
 	                    passed = false;
 	                }
 	            }
