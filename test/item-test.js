@@ -127,6 +127,7 @@ describe("item()", function() {
 
         assert.isFalse(item.equals({label: 'foo'}));
         assert.isFalse(item.equals({variant: 'variant'}));
+        assert.isFalse(item.equals({id: 'label', variant: ['variant']}));
     });
 
     it("compares items with object variant", function() {
