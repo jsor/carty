@@ -63,6 +63,8 @@ describe("cart().remove()", function() {
             .remove('Item')
             .ready(function() {
                 assert.strictEqual(instance.size(), 1);
+            })
+            .ready(function() {
                 done();
             })
         ;

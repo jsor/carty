@@ -14,6 +14,8 @@ describe("cart().get()", function() {
             .ready(function() {
                 var item = instance.get({id: 'Item'});
                 assert.strictEqual(item.id(), 'Item');
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -24,6 +26,8 @@ describe("cart().get()", function() {
             .ready(function() {
                 var item = instance.get('Item');
                 assert.strictEqual(item.id(), 'Item');
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -33,6 +37,8 @@ describe("cart().get()", function() {
         instance
             .ready(function() {
                 assert.isNull(instance.get({id: 'Missing'}));
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -42,6 +48,8 @@ describe("cart().get()", function() {
         instance
             .ready(function() {
                 assert.isNull(instance.get('Missing'));
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -55,6 +63,8 @@ describe("cart().get()", function() {
                 assert.isFalse(instance.has([]));
                 assert.isFalse(instance.has(null));
                 assert.isFalse(instance.has(undefined));
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -66,6 +76,8 @@ describe("cart().get()", function() {
             .ready(function() {
                 var item = instance.get({id: 'Item with quantity', quantity: 2});
                 assert.strictEqual(item.id(), 'Item with quantity');
+            })
+            .ready(function() {
                 done();
             })
         ;

@@ -1,0 +1,7 @@
+docs/
+example/
+test/
+.travis.yml
+bower.json
+Makefile
+webpack.config.js

@@ -14,6 +14,8 @@ describe("cart().quantity()", function() {
             .add({id: 'Item2', quantity: 10})
             .ready(function() {
                 assert.strictEqual(instance.quantity(), 13);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -24,6 +26,8 @@ describe("cart().quantity()", function() {
             .add({id: 'Item2', quantity: "10"})
             .ready(function() {
                 assert.strictEqual(instance.quantity(), 10);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -34,6 +38,8 @@ describe("cart().quantity()", function() {
             .add({id: 'Item', quantity: {}})
             .ready(function() {
                 assert.strictEqual(instance.quantity(), 0);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -53,6 +59,8 @@ describe("cart().subtotal()", function() {
             .add({id: 'Item2', quantity: 10, price: .5})
             .ready(function() {
                 assert.strictEqual(instance.subtotal(), (2 * 10) + (10 * .5));
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -64,26 +72,11 @@ describe("cart().subtotal()", function() {
             .add({id: 'Item2', quantity: "10", price: ".5"})
             .ready(function() {
                 assert.strictEqual(instance.subtotal(), (2 * 10) + (10 * .5));
+            })
+            .ready(function() {
                 done();
             })
         ;
-    });
-});
-
-describe("cart().currency()", function() {
-    var instance;
-
-    beforeEach(function() {
-        instance = cart();
-    });
-
-    it("returns default currency", function() {
-        assert.strictEqual(instance.currency(), 'USD');
-    });
-
-    it("returns configured currency", function() {
-        instance = cart({currency: 'EUR'});
-        assert.strictEqual(instance.currency(), 'EUR');
     });
 });
 
@@ -107,6 +100,8 @@ describe("cart().shipping()", function() {
             .add('Item')
             .ready(function() {
                 assert.strictEqual(instance.shipping(), 10);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -121,6 +116,8 @@ describe("cart().shipping()", function() {
             .add('Item')
             .ready(function() {
                 assert.strictEqual(instance.shipping(), 10);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -135,6 +132,8 @@ describe("cart().shipping()", function() {
             .add('Item')
             .ready(function() {
                 assert.strictEqual(instance.shipping(), .5);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -149,6 +148,8 @@ describe("cart().shipping()", function() {
             .add({id: 'Item', shipping: 10})
             .ready(function() {
                 assert.strictEqual(instance.shipping(), 20);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -164,6 +165,8 @@ describe("cart().shipping()", function() {
             .add({id: 'Item3', shipping: function() { return 10 }})
             .ready(function() {
                 assert.strictEqual(instance.shipping(), 40);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -190,6 +193,8 @@ describe("cart().tax()", function() {
             .add('Item')
             .ready(function() {
                 assert.strictEqual(instance.tax(), 10);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -204,6 +209,8 @@ describe("cart().tax()", function() {
             .add('Item')
             .ready(function() {
                 assert.strictEqual(instance.tax(), 10);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -218,6 +225,8 @@ describe("cart().tax()", function() {
             .add('Item')
             .ready(function() {
                 assert.strictEqual(instance.tax(), .5);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -232,6 +241,8 @@ describe("cart().tax()", function() {
             .add({id: 'Item', tax: 10})
             .ready(function() {
                 assert.strictEqual(instance.tax(), 20);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -247,6 +258,8 @@ describe("cart().tax()", function() {
             .add({id: 'Item3', tax: function() { return 10 }})
             .ready(function() {
                 assert.strictEqual(instance.tax(), 40);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -267,6 +280,8 @@ describe("cart().total()", function() {
             .add({id: 'Item3', tax: function() { return 10 }})
             .ready(function() {
                 assert.strictEqual(instance.total(), 50);
+            })
+            .ready(function() {
                 done();
             })
         ;

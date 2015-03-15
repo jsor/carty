@@ -19,6 +19,8 @@ describe("cart().each()", function() {
                 });
 
                 assert.strictEqual(count, 2);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -34,6 +36,8 @@ describe("cart().each()", function() {
                 });
 
                 assert.strictEqual(count, 1);
+            })
+            .ready(function() {
                 done();
             })
         ;

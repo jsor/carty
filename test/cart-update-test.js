@@ -2,16 +2,30 @@ var assert = require('chai').assert;
 var sinon = require('sinon');
 var cart = typeof window !== 'undefined' ? window.carty : require('../lib/cart');
 
-describe("cart().add()", function() {
+describe("cart().update()", function() {
     var instance;
 
     beforeEach(function() {
         instance = cart();
     });
 
-    it("adds an item", function(done) {
+    it("updates an item", function(done) {
         instance
             .add({id: 'Item'})
+            .update({id: 'Item', price: 10})
+            .ready(function() {
+                assert.deepEqual(instance.get({id: 'Item'}).price(), 10);
+            })
+            .ready(function() {
+                done();
+            })
+        ;
+    });
+
+    it("updates an item as string", function(done) {
+        instance
+            .add('Item')
+            .update('Item')
             .ready(function() {
                 assert.isTrue(instance.has({id: 'Item'}));
             })
@@ -21,11 +35,11 @@ describe("cart().add()", function() {
         ;
     });
 
-    it("adds an item as string", function(done) {
+    it("does nothing if item does not exist", function(done) {
         instance
-            .add('Item')
+            .update({id: 'Item'})
             .ready(function() {
-                assert.isTrue(instance.has({id: 'Item'}));
+                assert.isFalse(instance.has({id: 'Item'}));
             })
             .ready(function() {
                 done();
@@ -33,23 +47,10 @@ describe("cart().add()", function() {
         ;
     });
 
-    it("updates quantity for existing item", function(done) {
+    it("sets quantity for existing item", function(done) {
         instance
             .add({id: 'Item'})
-            .add({id: 'Item', quantity: 2})
-            .ready(function() {
-                assert.strictEqual(instance.get('Item').quantity(), 3);
-            })
-            .ready(function() {
-                done();
-            })
-        ;
-    });
-
-    it("updates quantity for existing item added as string", function(done) {
-        instance
-            .add('Item')
-            .add('Item')
+            .update({id: 'Item', quantity: 2})
             .ready(function() {
                 assert.strictEqual(instance.get('Item').quantity(), 2);
             })
@@ -59,12 +60,12 @@ describe("cart().add()", function() {
         ;
     });
 
-    it("updates quantity for mixed item type", function(done) {
+    it("sets quantity for mixed item type", function(done) {
         instance
             .add('Item')
-            .add({id: 'Item', quantity: 2})
+            .update({id: 'Item', quantity: 2})
             .ready(function() {
-                assert.strictEqual(instance.get('Item').quantity(), 3);
+                assert.strictEqual(instance.get('Item').quantity(), 2);
             })
             .ready(function() {
                 done();
@@ -75,7 +76,7 @@ describe("cart().add()", function() {
     it("updates existing item attributes", function(done) {
         instance
             .add({id: 'Item', tax: 0})
-            .add({id: 'Item', tax: .5, shipping: 10})
+            .update({id: 'Item', tax: .5, shipping: 10})
             .ready(function() {
                 assert.strictEqual(instance.get('Item').tax(), .5);
                 assert.strictEqual(instance.get('Item').shipping(), 10);
@@ -88,6 +89,7 @@ describe("cart().add()", function() {
 
     it("keeps custom item attributes", function(done) {
         instance
+            .add({id: 'Item'})
             .add({id: 'Item', custom: 'foo'})
             .ready(function() {
                 assert.strictEqual(instance.get('Item').call().custom, 'foo');
@@ -101,7 +103,7 @@ describe("cart().add()", function() {
     it("updates custom item attributes", function(done) {
         instance
             .add({id: 'Item', custom: 'foo'})
-            .add({id: 'Item', custom: 'bar'})
+            .update({id: 'Item', custom: 'bar'})
             .ready(function() {
                 assert.strictEqual(instance.get('Item').call().custom, 'bar');
             })
@@ -121,7 +123,7 @@ describe("cart().add()", function() {
             .ready(function() {
                 assert.strictEqual(instance.size(), 1);
             })
-            .add({id: 'Item', quantity: -1})
+            .update({id: 'Item', quantity: 0})
             .ready(function() {
                 assert.strictEqual(instance.size(), 0);
                 assert.isTrue(callback.called);
@@ -132,43 +134,28 @@ describe("cart().add()", function() {
         ;
     });
 
-    it("does nothing if item quantity lower 0", function(done) {
-        var callback = sinon.spy();
-
-        instance.on('remove', callback);
-
-        instance
-            .add({id: 'Nonexisting Item', quantity: -1})
-            .ready(function() {
-                assert.strictEqual(instance.size(), 0);
-                assert.isFalse(callback.called);
-            })
-            .ready(function() {
-                done();
-            })
-        ;
-    });
-
-    it("emits add event", function(done) {
-        instance.on('add', function(it) {
+    it("emits update event", function(done) {
+        instance.on('update', function(it) {
             assert.strictEqual(it.id(), 'Item');
             done();
         });
 
         instance
             .add('Item')
+            .update('Item')
         ;
     });
 
-    it("aborts if add event listener returns false", function(done) {
-        instance.on('add', function() {
+    it("aborts if update event listener returns false", function(done) {
+        instance.on('update', function() {
             return false;
         });
 
         instance
             .add('Item')
+            .update({id: 'Item', quantity: 2})
             .ready(function() {
-                assert.strictEqual(instance.size(), 0);
+                assert.strictEqual(instance.get('Item').quantity(), 1);
             })
             .ready(function() {
                 done();
@@ -176,32 +163,35 @@ describe("cart().add()", function() {
         ;
     });
 
-    it("emits added event", function(done) {
-        instance.on('added', function(it) {
+    it("emits updated event", function(done) {
+        instance.on('updated', function(it) {
             assert.strictEqual(it.id(), 'Item');
             done();
         });
 
         instance
             .add('Item')
+            .update('Item')
         ;
     });
 
-    it("emits addfailed event", function(done) {
+    it("emits updatefailed event", function(done) {
         instance = cart({
             storage: {
                 load: function() { return []; },
-                add: function() { return Promise.reject('error'); }
+                add: function() { return Promise.resolve(); },
+                update: function() { return Promise.reject('error'); }
             }
         });
 
-        instance.on('addfailed', function(error) {
+        instance.on('updatefailed', function(error) {
             assert.strictEqual(error, 'error')
             done();
         });
 
         instance
             .add('Item')
+            .update('Item')
         ;
     });
 });

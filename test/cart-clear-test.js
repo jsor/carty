@@ -24,6 +24,8 @@ describe("cart().clear()", function() {
                 assert.strictEqual(count, 0);
 
                 assert.strictEqual(instance().length, 0);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -46,6 +48,8 @@ describe("cart().clear()", function() {
             .clear()
             .ready(function() {
                 assert.strictEqual(instance.size(), 2);
+            })
+            .ready(function() {
                 done();
             })
         ;

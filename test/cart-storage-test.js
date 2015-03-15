@@ -2,13 +2,14 @@ var assert = require('chai').assert;
 var sinon = require('sinon');
 var cart = typeof window !== 'undefined' ? window.carty : require('../lib/cart');
 
-describe("cart().option('storage')", function() {
+describe("cart().options('storage')", function() {
     var storage, mock;
 
     beforeEach(function() {
         storage = {
             load: function () { return [{id: 'Existing Item'}]; },
             add: function (item, items) { },
+            update: function (item, items) { },
             remove: function (item, items) { },
             clear: function () {}
         };
@@ -25,9 +26,11 @@ describe("cart().option('storage')", function() {
                 assert.strictEqual(0, instance().length);
 
                 mock.verify();
-
+            })
+            .ready(function() {
                 done();
-            });
+            })
+        ;
     });
 
     it("loads items from storage", function(done) {
@@ -39,9 +42,11 @@ describe("cart().option('storage')", function() {
                 assert.strictEqual(1, instance().length);
 
                 mock.verify();
-
+            })
+            .ready(function() {
                 done();
-            });
+            })
+        ;
     });
 
     it("adds items to storage", function(done) {
@@ -52,6 +57,23 @@ describe("cart().option('storage')", function() {
             .add('Item2')
             .ready(function() {
                 mock.verify();
+            })
+            .ready(function() {
+                done();
+            })
+        ;
+    });
+
+    it("adds items to storage", function(done) {
+        mock.expects('update').once();
+
+        cart({storage: storage})
+            .add('Item')
+            .update('Item')
+            .ready(function() {
+                mock.verify();
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -73,13 +95,15 @@ describe("cart().option('storage')", function() {
             .ready(function(error) {
                 assert.notStrictEqual(error, 'error');
                 mock.verify();
-                done();
             })
             .error(function() {
                 process.nextTick(function() {
                     assert.fail();
                     done();
                 }, 10);
+            })
+            .ready(function() {
+                done();
             })
         ;
     });
@@ -91,6 +115,8 @@ describe("cart().option('storage')", function() {
             .remove('Existing Item')
             .ready(function() {
                 mock.verify();
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -112,13 +138,15 @@ describe("cart().option('storage')", function() {
             .ready(function(error) {
                 assert.notStrictEqual(error, 'error');
                 mock.verify();
-                done();
             })
             .error(function() {
                 process.nextTick(function() {
                     assert.fail();
                     done();
                 }, 10);
+            })
+            .ready(function() {
+                done();
             })
         ;
     });
@@ -140,13 +168,15 @@ describe("cart().option('storage')", function() {
             .ready(function(error) {
                 assert.notStrictEqual(error, exception);
                 mock.verify();
-                done();
             })
             .error(function() {
                 process.nextTick(function() {
                     assert.fail();
                     done();
                 }, 10);
+            })
+            .ready(function() {
+                done();
             })
         ;
     });
@@ -158,8 +188,10 @@ describe("cart().option('storage')", function() {
             .clear()
             .ready(function() {
                 mock.verify();
-
+            })
+            .ready(function() {
                 done();
-            });
+            })
+        ;
     });
 });

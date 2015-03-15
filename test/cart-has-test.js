@@ -13,6 +13,8 @@ describe("cart().has()", function() {
         instance
             .ready(function() {
                 assert.isTrue(instance.has({id: 'Item'}));
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -22,6 +24,8 @@ describe("cart().has()", function() {
         instance
             .ready(function() {
                 assert.isTrue(instance.has('Item'));
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -31,6 +35,8 @@ describe("cart().has()", function() {
         instance
             .ready(function() {
                 assert.isFalse(instance.has({id: 'Missing'}));
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -40,6 +46,8 @@ describe("cart().has()", function() {
         instance
             .ready(function() {
                 assert.isFalse(instance.has('Missing'));
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -53,6 +61,8 @@ describe("cart().has()", function() {
                 assert.isFalse(instance.has([]));
                 assert.isFalse(instance.has(null));
                 assert.isFalse(instance.has(undefined));
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -63,6 +73,8 @@ describe("cart().has()", function() {
             .add({id: 'Item with quantity', quantity: 1})
             .ready(function() {
                 assert.isTrue(instance.has({id: 'Item with quantity', quantity: 2}));
+            })
+            .ready(function() {
                 done();
             })
         ;

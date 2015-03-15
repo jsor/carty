@@ -7,17 +7,12 @@
     "extend": "^2.0.0"
   },
   "devDependencies": {
-    "autoprefixer-core": "^5.1.7",
     "chai": "^2.1.1",
-    "css-loader": "^0.9.1",
     "es6-promise": "^2.0.1",
     "istanbul": "^0.3.7",
-    "less-loader": "^2.1.0",
     "lodash": "^3.4.0",
     "mocha": "^2.2.0",
-    "postcss-loader": "^0.3.0",
     "sinon": "^1.13.0",
-    "style-loader": "^0.8.3",
     "webpack": "^1.7.2"
   },
   "scripts": {
@@ -34,7 +29,11 @@
     "cart",
     "shopping",
     "shopping cart",
-    "lightweight"
+    "shop",
+    "ecommerce",
+    "lightweight",
+    "jquery-plugin",
+    "ecosystem:jquery"
   ],
   "author": {
     "name": "Jan Sorgalla",
