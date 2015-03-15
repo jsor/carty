@@ -686,8 +686,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                cart.clear()
 	            })
 	            .on('click', _checkoutSelector, function() {
-	                $.each(_checkoutCallbacks, function(i, callback) {
-	                    callback(cart);
+	                cart.ready(function() {
+	                    $.each(_checkoutCallbacks, function(i, callback) {
+	                        callback(cart);
+	                    });
 	                });
 	            })
 	        ;
