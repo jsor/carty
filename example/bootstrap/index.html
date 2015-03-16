@@ -311,7 +311,21 @@
         <script src="../../dist/carty.jquery.js"></script>
 
         <script>
-            var cart = carty();
+            var cart = carty({
+                currency: 'USD',
+                decimalSeparator: '.',
+                thousandsSeparator: ',',
+                tax: function(cart) {
+                    return cart.subtotal() / 100 * 19;
+                },
+                shipping: function(cart) {
+                    if (cart.subtotal() + cart.tax() > 100) {
+                        return 0;
+                    }
+
+                    return 10;
+                }
+            });
 
             cart.ui.notify(function(cart) {
                 // React when items are added, removed etc.
