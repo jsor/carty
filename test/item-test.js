@@ -34,17 +34,12 @@ describe("item()", function() {
         var item = createItem(attr);
 
         assert.strictEqual(item.price(), 0);
-        assert.isUndefined(item.currency());
-        assert.strictEqual(item.shipping(), 0);
-        assert.strictEqual(item.tax(), 0);
+        assert.strictEqual(item.quantity(), 1);
         assert.deepEqual(item.variant(), {});
 
         var object = item();
 
         assert.isUndefined(object.price);
-        assert.isUndefined(object.currency);
-        assert.isUndefined(object.shipping);
-        assert.isUndefined(object.tax);
         assert.isUndefined(object.variant);
     });
 
@@ -67,9 +62,6 @@ describe("item()", function() {
         assert.strictEqual(item.label(), 'label');
         assert.strictEqual(item.quantity(), 12);
         assert.strictEqual(item.price(), 11);
-        assert.strictEqual(item.currency(), 'EUR');
-        assert.strictEqual(item.shipping(), 10);
-        assert.strictEqual(item.tax(), 5);
         assert.deepEqual(item.variant(), {variant: 'variant'});
 
         var object = item();

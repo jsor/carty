@@ -91,7 +91,7 @@ describe("cart().shipping()", function() {
         assert.strictEqual(instance.shipping(), 0);
     });
 
-    it("calculates shipping from global option", function(done) {
+    it("calculates shipping", function(done) {
         instance = cart({
             shipping: 10
         });
@@ -107,7 +107,7 @@ describe("cart().shipping()", function() {
         ;
     });
 
-    it("calculates shipping from global option with function", function(done) {
+    it("calculates shipping with function", function(done) {
         instance = cart({
             shipping: function() { return 10; }
         });
@@ -123,7 +123,7 @@ describe("cart().shipping()", function() {
         ;
     });
 
-    it("calculates shipping from global option with string", function(done) {
+    it("calculates shipping with string", function(done) {
         instance = cart({
             shipping: ".5"
         });
@@ -132,39 +132,6 @@ describe("cart().shipping()", function() {
             .add('Item')
             .ready(function() {
                 assert.strictEqual(instance.shipping(), .5);
-            })
-            .ready(function() {
-                done();
-            })
-        ;
-    });
-
-    it("calculates shipping with item shippings", function(done) {
-        instance = cart({
-            shipping: 10
-        });
-
-        instance
-            .add({id: 'Item', shipping: 10})
-            .ready(function() {
-                assert.strictEqual(instance.shipping(), 20);
-            })
-            .ready(function() {
-                done();
-            })
-        ;
-    });
-
-    it("calculates shipping with mixed item shippings", function(done) {
-        instance = cart({
-            shipping: 10
-        });
-
-        instance.add({id: 'Item', shipping: 10})
-            .add({id: 'Item2', shipping: "10"})
-            .add({id: 'Item3', shipping: function() { return 10 }})
-            .ready(function() {
-                assert.strictEqual(instance.shipping(), 40);
             })
             .ready(function() {
                 done();
@@ -184,7 +151,7 @@ describe("cart().tax()", function() {
         assert.strictEqual(instance.tax(), 0);
     });
 
-    it("calculates tax from global option", function(done) {
+    it("calculates tax", function(done) {
         instance = cart({
             tax: 10
         });
@@ -200,7 +167,7 @@ describe("cart().tax()", function() {
         ;
     });
 
-    it("calculates tax from global option with function", function(done) {
+    it("calculates tax with function", function(done) {
         instance = cart({
             tax: function() { return 10; }
         });
@@ -216,7 +183,7 @@ describe("cart().tax()", function() {
         ;
     });
 
-    it("calculates tax from global option with string", function(done) {
+    it("calculates tax from with string", function(done) {
         instance = cart({
             tax: ".5"
         });
@@ -225,39 +192,6 @@ describe("cart().tax()", function() {
             .add('Item')
             .ready(function() {
                 assert.strictEqual(instance.tax(), .5);
-            })
-            .ready(function() {
-                done();
-            })
-        ;
-    });
-
-    it("calculates tax with item taxes", function(done) {
-        instance = cart({
-            tax: 10
-        });
-
-        instance
-            .add({id: 'Item', tax: 10})
-            .ready(function() {
-                assert.strictEqual(instance.tax(), 20);
-            })
-            .ready(function() {
-                done();
-            })
-        ;
-    });
-
-    it("calculates tax with mixed item taxes", function(done) {
-        instance = cart({
-            tax: 10
-        });
-
-        instance.add({id: 'Item', tax: 10})
-            .add({id: 'Item2', tax: "10"})
-            .add({id: 'Item3', tax: function() { return 10 }})
-            .ready(function() {
-                assert.strictEqual(instance.tax(), 40);
             })
             .ready(function() {
                 done();
@@ -275,11 +209,11 @@ describe("cart().total()", function() {
             shipping: 10
         });
 
-        instance.add({id: 'Item', tax: 10})
-            .add({id: 'Item2', tax: "10"})
-            .add({id: 'Item3', tax: function() { return 10 }})
+        instance.add({id: 'Item', price: 10})
+            .add({id: 'Item2', price: "10"})
+            .add({id: 'Item3'})
             .ready(function() {
-                assert.strictEqual(instance.total(), 50);
+                assert.strictEqual(instance.total(), 40);
             })
             .ready(function() {
                 done();

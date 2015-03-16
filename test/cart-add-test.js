@@ -72,38 +72,14 @@ describe("cart().add()", function() {
         ;
     });
 
-    it("updates existing item attributes", function(done) {
+    it("updates item attributes", function(done) {
         instance
-            .add({id: 'Item', tax: 0})
-            .add({id: 'Item', tax: .5, shipping: 10})
+            .add({id: 'Item', price: 0, foo: 'bar'})
+            .add({id: 'Item', price: 5, foo: 'baz', bar: 'baz'})
             .ready(function() {
-                assert.strictEqual(instance.get('Item').tax(), .5);
-                assert.strictEqual(instance.get('Item').shipping(), 10);
-            })
-            .ready(function() {
-                done();
-            })
-        ;
-    });
-
-    it("keeps custom item attributes", function(done) {
-        instance
-            .add({id: 'Item', custom: 'foo'})
-            .ready(function() {
-                assert.strictEqual(instance.get('Item').call().custom, 'foo');
-            })
-            .ready(function() {
-                done();
-            })
-        ;
-    });
-
-    it("updates custom item attributes", function(done) {
-        instance
-            .add({id: 'Item', custom: 'foo'})
-            .add({id: 'Item', custom: 'bar'})
-            .ready(function() {
-                assert.strictEqual(instance.get('Item').call().custom, 'bar');
+                assert.strictEqual(instance.get('Item').price(), 5);
+                assert.strictEqual(instance.get('Item').call().foo, 'baz');
+                assert.strictEqual(instance.get('Item').call().bar, 'baz');
             })
             .ready(function() {
                 done();

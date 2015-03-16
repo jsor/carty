@@ -73,13 +73,14 @@ describe("cart().update()", function() {
         ;
     });
 
-    it("updates existing item attributes", function(done) {
+    it("updates item attributes", function(done) {
         instance
-            .add({id: 'Item', tax: 0})
-            .update({id: 'Item', tax: .5, shipping: 10})
+            .add({id: 'Item', price: 0, foo: 'bar'})
+            .update({id: 'Item', price: 5, foo: 'baz', bar: 'baz'})
             .ready(function() {
-                assert.strictEqual(instance.get('Item').tax(), .5);
-                assert.strictEqual(instance.get('Item').shipping(), 10);
+                assert.strictEqual(instance.get('Item').price(), 5);
+                assert.strictEqual(instance.get('Item').call().foo, 'baz');
+                assert.strictEqual(instance.get('Item').call().bar, 'baz');
             })
             .ready(function() {
                 done();
