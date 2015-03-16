@@ -44,13 +44,13 @@ var configMin = extend(true, {}, config, {
 
 var cartyJquery = extend(true, {}, config, {
     entry: {
-        "carty.jquery": "./src/carty.jquery.js"
+        "carty.jquery": "./entry/carty.jquery.js"
     }
 });
 
 var cartyJqueryMin = extend(true, {}, configMin, {
     entry: {
-        "carty.jquery.min": "./src/carty.jquery.js"
+        "carty.jquery.min": "./entry/carty.jquery.js"
     }
 });
 
