@@ -87,7 +87,7 @@
                         <div class="panel-heading">
                             <h3 class="panel-title" data-carty-item-label>iPod nano 5G</h3>
                         </div>
-                        <a href="https://www.flickr.com/photos/nartlacsap/3922691141">
+                        <a href="https://www.flickr.com/photos/nartlacsap/3922691141" data-carty-item-imagelink>
                             <img src="../assets/ipod-nano-5g.jpg" alt="iPod nano 5G" class="img-responsive" data-carty-item-image>
                         </a>
                         <div class="panel-body">
@@ -212,7 +212,9 @@
                         {% var item = items[i]; %}
                         <div class="row" data-carty-item="{%= item.id() %}">
                             <div class="col-md-2 col-xs-2">
-                                <img class="img-responsive" src="{%= item().image %}" alt="{%= item.label() %}">
+                                <a href="{%= item().imagelink %}">
+                                    <img class="img-responsive" src="{%= item().image %}" alt="{%= item.label() %}">
+                                </a>
                             </div>
                             <div class="col-md-4 col-xs-6">
                                 <h4 style="margin:0">{%= item.label() %}</h4>

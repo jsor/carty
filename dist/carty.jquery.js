@@ -566,11 +566,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	                .filter(_inputSelector)
 	                .val(value)
 	                .end()
+	                .filter('a')
+	                .attr('href', value)
+	                .end()
 	                .filter('img')
 	                .attr('src', value)
 	                .end()
 	                .not(_inputSelector)
 	                .not('img')
+	                .not('a')
 	                .text(value)
 	            ;
 	        }
@@ -578,8 +582,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        function getValue(el, dataKey) {
 	            return el.data(dataKey) // data- attribute
 	                || el.val() // form element
-	                || $.trim(el.text()) // html container element
+	                || el.attr('href') // <a> element
 	                || el.attr('src') // <img> element
+	                || $.trim(el.text()) // html container element
 	                || null;
 	        }
 
