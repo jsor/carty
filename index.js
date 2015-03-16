@@ -1,10 +1,13 @@
-module.exports = {
-    cart: require('./lib/cart'),
-    item: require('./lib/item'),
-    storage: {
-        localStorage: require('./lib/storage/local-storage')
-    },
-    ui: {
-        jquery: require('./lib/ui/jquery')
-    }
+'use strict';
+
+var carty = require('./lib/cart');
+
+carty.storage = {
+    localStorage: require('./lib/storage/local-storage')
 };
+
+carty.ui = {
+    jquery: require('./lib/ui/jquery')
+};
+
+module.exports = carty;
