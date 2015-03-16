@@ -1,6 +1,7 @@
 docs/
 example/
 test/
+vendor/
 .travis.yml
 bower.json
 Makefile
