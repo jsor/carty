@@ -211,19 +211,13 @@
                     {% for (var i = 0, l = items.length; i < l; i++) { %}
                         {% var item = items[i]; %}
                         <div class="row" data-carty-item="{%= item.id() %}">
-                            <div class="col-md-6 col-xs-8">
-                                <div class="media">
-                                    <div class="media-left">
-                                        <a href="#">
-                                            <img class="media-object image-responsive" style="max-width:75px" src="{%= item().image %}" alt="{%= formatCurrency(item.label()) %}">
-                                        </a>
-                                    </div>
-                                    <div class="media-body">
-                                        <h4 class="media-heading">{%= item.label() %}</h4>
-                                        {% var variant = item.variant(); var list = Object.keys(variant).map(function(key) { return key + ': ' + variant[key]; }); %}
-                                        {%= list.join(", ") %}
-                                    </div>
-                                </div>
+                            <div class="col-md-2 col-xs-2">
+                                <img class="img-responsive" src="{%= item().image %}" alt="{%= item.label() %}">
+                            </div>
+                            <div class="col-md-4 col-xs-6">
+                                <h4 style="margin:0">{%= item.label() %}</h4>
+                                {% var variant = item.variant(); var list = Object.keys(variant).map(function(key) { return key + ': ' + variant[key]; }); %}
+                                {%= list.join(", ") %}
                             </div>
                             <div class="col-md-2 col-xs-4 text-right">
                                 <span class="lead">{%= formatCurrency(item.price()) %}</span>
