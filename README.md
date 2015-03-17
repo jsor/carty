@@ -6,6 +6,13 @@ Carty
 
 A lightweight and simple to use shopping cart.
 
+Documentation
+-------------
+
+* [Introduction](docs/introduction.md)
+* Carty with jQuery
+* Carty with Node.js
+
 Browser Support and Polyfills
 -----------------------------
 
@@ -39,7 +46,7 @@ are supported in Node since version 0.11.13.
 For browser support, check [caniuse](http://caniuse.com/#search=promise)
 
 You can use [es6-promise](https://github.com/jakearchibald/es6-promise) to
-polyfill both node and browsers.
+polyfill both Node and browsers.
 
 ### Other
 
