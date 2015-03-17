@@ -1,7 +1,7 @@
 var expect = require('chai').expect;
-var formatNumber = require('../../lib/util/format-number');
+var formatNumber = require('../../lib/format/number');
 
-describe("util/formatNumber()", function() {
+describe("format/number()", function() {
     it('formats numbers', function() {
         expect(formatNumber(123456.78)).to.equal('123456.78');
         expect(formatNumber(-123456.78, {precision: 4, decimalSeparator: '%', thousandsSeparator: ';', prefix: 'FOO ', suffix: ' BAR'})).to.equal('FOO -123;456%7800 BAR');
