@@ -1,29 +1,35 @@
 var assert = require('chai').assert;
-var cart = typeof window !== 'undefined' ? window.carty : require('../lib/cart');
+var carty = typeof window !== 'undefined' ? window.carty : require('../lib/carty');
 
 describe("cart().clear()", function() {
-    var instance;
+    var cart;
 
     beforeEach(function() {
-        instance = cart();
-        instance.add({id: 'Item'});
-        instance.add({id: 'Item2'});
+        cart = carty({
+            storage: {
+                load: function() { return [{id: 'Item'}, {id: 'Item2'}]; },
+                add: function (item, items) { },
+                update: function (item, items) { },
+                remove: function (item, items) { },
+                clear: function () {}
+            }
+        });
     });
 
     it("removes all items", function(done) {
-        instance
+        cart
             .clear()
             .ready(function() {
-                assert.strictEqual(instance.size(), 0);
+                assert.strictEqual(cart.size(), 0);
 
                 var count = 0;
-                instance.each(function() {
+                cart.each(function() {
                     count++;
                 });
 
                 assert.strictEqual(count, 0);
 
-                assert.strictEqual(instance().length, 0);
+                assert.strictEqual(cart().items.length, 0);
             })
             .ready(function() {
                 done();
@@ -32,22 +38,22 @@ describe("cart().clear()", function() {
     });
 
     it("emits clear event", function(done) {
-        instance.on('clear', function() {
+        cart.on('clear', function() {
             done();
         });
 
-        instance.clear();
+        cart.clear();
     });
 
     it("aborts if clear event listener returns false", function(done) {
-        instance.on('clear', function() {
+        cart.on('clear', function() {
             return false;
         });
 
-        instance
+        cart
             .clear()
             .ready(function() {
-                assert.strictEqual(instance.size(), 2);
+                assert.strictEqual(cart.size(), 2);
             })
             .ready(function() {
                 done();
@@ -56,26 +62,57 @@ describe("cart().clear()", function() {
     });
 
     it("emits cleared event", function(done) {
-        instance.on('cleared', function() {
+        cart.on('cleared', function() {
             done();
         });
 
-        instance.clear();
+        cart.clear();
     });
 
     it("emits clearfailed event", function(done) {
-        instance = cart({
+        cart = carty({
             storage: {
                 load: function() { return []; },
                 clear: function() { return Promise.reject('error'); }
             }
         });
 
-        instance.on('clearfailed', function(error) {
+        cart.on('clearfailed', function(error) {
             assert.strictEqual(error, 'error')
             done();
         });
 
-        instance.clear();
+        cart.clear();
+    });
+
+    it("emits change event", function(done) {
+        cart.on('change', function() {
+            done();
+        });
+
+        cart.clear();
+    });
+
+    it("emits changed event", function(done) {
+        cart.on('changed', function() {
+            done();
+        });
+
+        cart.clear();
+    });
+
+    it("emits changefailed event", function(done) {
+        cart = carty({
+            storage: {
+                load: function() { return []; },
+                clear: function() { return Promise.reject('error'); }
+            }
+        });
+
+        cart.on('changefailed', function() {
+            done();
+        });
+
+        cart.clear();
     });
 });

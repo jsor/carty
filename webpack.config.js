@@ -9,7 +9,7 @@ var config = {
         path: path.join(__dirname, "dist"),
         publicPath: "/",
         filename: "[name].js",
-        library: "carty",
+        library: "[name]",
         libraryTarget: "umd"
     },
     externals: {
@@ -37,24 +37,55 @@ var config = {
 };
 
 var configMin = extend(true, {}, config, {
-    plugins: config.plugins.concat([
-        new webpack.optimize.UglifyJsPlugin()
-    ])
+    output: {
+        filename: "[name].min.js"
+    },
+    plugins: [].concat([
+        new webpack.optimize.UglifyJsPlugin({
+            comments: /(?!x)x/
+        })
+    ], config.plugins)
 });
 
-var cartyJquery = extend(true, {}, config, {
+// ---
+
+var carty = extend(true, {}, config, {
     entry: {
-        "carty.jquery": "./entry/carty.jquery.js"
+        carty: "./"
     }
 });
 
-var cartyJqueryMin = extend(true, {}, configMin, {
+var cartyMin = extend(true, {}, configMin, {
     entry: {
-        "carty.jquery.min": "./entry/carty.jquery.js"
+        carty: "./"
     }
 });
+
+// ---
+
+var cartyWithPromise = extend(true, {}, config, {
+    entry: {
+        "carty-promise-polyfill": ["./es6-promise-polyfill", "./"]
+    },
+    output: {
+        library: "carty"
+    }
+});
+
+var cartyWithPromiseMin = extend(true, {}, configMin, {
+    entry: {
+        "carty-promise-polyfill": ["./es6-promise-polyfill", "./"]
+    },
+    output: {
+        library: "carty"
+    }
+});
+
+// ---
 
 module.exports = [
-    cartyJquery,
-    cartyJqueryMin
+    carty,
+    cartyMin,
+    cartyWithPromise,
+    cartyWithPromiseMin
 ];

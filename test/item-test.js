@@ -32,15 +32,12 @@ describe("item()", function() {
         };
 
         var item = createItem(attr);
-
-        assert.strictEqual(item.price(), 0);
-        assert.strictEqual(item.quantity(), 1);
-        assert.deepEqual(item.variant(), {});
-
         var object = item();
 
-        assert.isUndefined(object.price);
-        assert.isUndefined(object.variant);
+        assert.strictEqual(object.id, 'id');
+        assert.strictEqual(object.price, 0);
+        assert.strictEqual(object.quantity, 1);
+        assert.deepEqual(object.variant, {});
     });
 
     it("adds all item attributes", function() {
@@ -57,13 +54,6 @@ describe("item()", function() {
         };
 
         var item = createItem(attr);
-
-        assert.strictEqual(item.id(), 'id');
-        assert.strictEqual(item.label(), 'label');
-        assert.strictEqual(item.quantity(), 12);
-        assert.strictEqual(item.price(), 11);
-        assert.deepEqual(item.variant(), {variant: 'variant'});
-
         var object = item();
 
         assert.strictEqual(object.id, 'id');
@@ -74,13 +64,10 @@ describe("item()", function() {
         assert.strictEqual(object.shipping, 10);
         assert.strictEqual(object.tax, 5);
         assert.strictEqual(object.foo, 'bar');
-        assert.strictEqual(object.variant, 'variant');
+        assert.deepEqual(object.variant, {variant: 'variant'});
 
         assert.isFalse(item.equals('foo'));
-        assert.isFalse(item.equals(function() { return 'foo'; }));
-
         assert.isTrue(item.equals(attr));
-        assert.isTrue(item.equals(function() { return attr; }));
     });
 
     it("uses id as label if label is undefined", function() {
@@ -90,7 +77,7 @@ describe("item()", function() {
 
         var item = createItem(props);
 
-        assert.strictEqual(item.label(), 'id');
+        assert.strictEqual(item().label, 'id');
     });
 
     it("compares items", function() {
@@ -104,7 +91,6 @@ describe("item()", function() {
         assert.isTrue(item.equals({id: 'label', foo: 'bar'}));
         assert.isTrue(item.equals({id: 'label'}));
         assert.isTrue(item.equals({id: 'label', label: 'bar'}));
-        assert.isTrue(item.equals(item));
 
         assert.isFalse(item.equals({label: 'foo'}));
         assert.isFalse(item.equals({foo: 'bar'}));
@@ -123,7 +109,6 @@ describe("item()", function() {
 
         assert.isTrue(item.equals({id: 'label', variant: 'variant'}));
         assert.isTrue(item.equals({id: 'label', label: 'bar', variant: 'variant'}));
-        assert.isTrue(item.equals(item));
 
         assert.isFalse(item.equals({label: 'foo'}));
         assert.isFalse(item.equals({variant: 'variant'}));
@@ -149,7 +134,6 @@ describe("item()", function() {
             variant1: 'variant1',
             variant2: 'variant2'
         }}));
-        assert.isTrue(item.equals(item));
 
         assert.isFalse(item.equals({label: 'foo'}));
         assert.isFalse(item.equals({id: 'label', variant: {

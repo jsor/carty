@@ -1,18 +1,18 @@
 var assert = require('chai').assert;
-var cart = typeof window !== 'undefined' ? window.carty : require('../lib/cart');
+var carty = typeof window !== 'undefined' ? window.carty : require('../lib/carty');
 
 describe("cart().has()", function() {
-    var instance;
+    var cart;
 
     beforeEach(function() {
-        instance = cart();
-        instance.add({id: 'Item'});
+        cart = carty();
+        cart.add({id: 'Item'});
     });
 
     it("returns true for existing item", function(done) {
-        instance
+        cart
             .ready(function() {
-                assert.isTrue(instance.has({id: 'Item'}));
+                assert.isTrue(cart.has({id: 'Item'}));
             })
             .ready(function() {
                 done();
@@ -21,9 +21,9 @@ describe("cart().has()", function() {
     });
 
     it("returns true for existing item passed as string", function(done) {
-        instance
+        cart
             .ready(function() {
-                assert.isTrue(instance.has('Item'));
+                assert.isTrue(cart.has('Item'));
             })
             .ready(function() {
                 done();
@@ -32,9 +32,9 @@ describe("cart().has()", function() {
     });
 
     it("returns false for missing item", function(done) {
-        instance
+        cart
             .ready(function() {
-                assert.isFalse(instance.has({id: 'Missing'}));
+                assert.isFalse(cart.has({id: 'Missing'}));
             })
             .ready(function() {
                 done();
@@ -43,9 +43,9 @@ describe("cart().has()", function() {
     });
 
     it("returns false for missing item passed as string", function(done) {
-        instance
+        cart
             .ready(function() {
-                assert.isFalse(instance.has('Missing'));
+                assert.isFalse(cart.has('Missing'));
             })
             .ready(function() {
                 done();
@@ -54,13 +54,13 @@ describe("cart().has()", function() {
     });
 
     it("returns false for invalid item", function(done) {
-        instance
+        cart
             .ready(function() {
-                assert.isFalse(instance.has({}));
-                assert.isFalse(instance.has({foo: 'bar'}));
-                assert.isFalse(instance.has([]));
-                assert.isFalse(instance.has(null));
-                assert.isFalse(instance.has(undefined));
+                assert.isFalse(cart.has({}));
+                assert.isFalse(cart.has({foo: 'bar'}));
+                assert.isFalse(cart.has([]));
+                assert.isFalse(cart.has(null));
+                assert.isFalse(cart.has(undefined));
             })
             .ready(function() {
                 done();
@@ -69,10 +69,10 @@ describe("cart().has()", function() {
     });
 
     it("ignores quantity", function(done) {
-        instance
+        cart
             .add({id: 'Item with quantity', quantity: 1})
             .ready(function() {
-                assert.isTrue(instance.has({id: 'Item with quantity', quantity: 2}));
+                assert.isTrue(cart.has({id: 'Item with quantity', quantity: 2}));
             })
             .ready(function() {
                 done();

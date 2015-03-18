@@ -25,11 +25,12 @@ support the required features.
 You may use ES5 polyfills for the following features (if you have to support
 browsers like IE8 for example):
 
-* [`Object.keys`](http://kangax.github.io/compat-table/es5/#Object.keys)
 * [`Array.isArray`](http://kangax.github.io/compat-table/es5/#Array.isArray)
 * [`Array.prototype.every`](http://kangax.github.io/compat-table/es5/#Array.prototype.every)
+* [`Array.prototype.forEach`](http://kangax.github.io/compat-table/es5/#Array.prototype.forEach)
 * [`Array.prototype.map`](http://kangax.github.io/compat-table/es5/#Array.prototype.map)
 * [`Function.prototype.bind`](http://kangax.github.io/compat-table/es5/#Function.prototype.bind)
+* [`Object.keys`](http://kangax.github.io/compat-table/es5/#Object.keys)
 
 You can use [es5-shim](https://github.com/es-shims/es5-shim) which provides the
 required polyfills.

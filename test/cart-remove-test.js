@@ -1,68 +1,84 @@
 var assert = require('chai').assert;
-var cart = typeof window !== 'undefined' ? window.carty : require('../lib/cart');
+var sinon = require('sinon');
+var carty = typeof window !== 'undefined' ? window.carty : require('../lib/carty');
 
 describe("cart().remove()", function() {
-    var instance;
+    var cart;
 
     beforeEach(function() {
-        instance = cart();
-        instance.add({id: 'Item'});
+        cart = carty({
+            storage: {
+                load: function() { return [{id: 'Item'}]; },
+                add: function (item, items) { },
+                update: function (item, items) { },
+                remove: function (item, items) { },
+                clear: function () {}
+            }
+        });
     });
 
     it("removes an item", function() {
-        instance.remove({id: 'Item'});
+        cart.remove({id: 'Item'});
 
-        assert.isFalse(instance.has({id: 'Item'}));
+        assert.isFalse(cart.has({id: 'Item'}));
     });
 
     it("removes an item as string", function() {
-        instance.remove('Item');
+        cart.remove('Item');
 
-        assert.isFalse(instance.has({id: 'Item'}));
+        assert.isFalse(cart.has({id: 'Item'}));
     });
 
     it("ignores unknown item", function() {
-        instance.on('remove', function(item) {
+        cart.on('remove', function(item) {
             assert.strictEqual('Foo', item);
         });
 
-        instance.on('removed', function(item) {
+        cart.on('removed', function(item) {
             assert.isNull(item);
         });
 
-        instance.remove('Foo');
+        cart.remove('Foo');
     });
 
     it("silently ignores invalid item", function(done) {
-        instance.remove({});
-        instance.remove({foo: 'bar'});
-        instance.remove([]);
-        instance.remove(null);
-        instance.remove(undefined);
+        cart.remove({});
+        cart.remove({foo: 'bar'});
+        cart.remove([]);
+        cart.remove(null);
+        cart.remove(undefined);
 
-        done();
+        cart.ready(function() {
+            done();
+        });
     });
 
     it("emits remove event", function(done) {
-        instance.on('remove', function(it) {
-            assert.strictEqual(it.id(), 'Item');
-            done();
-        });
+        var spy = sinon.spy();
 
-        instance
+        cart.on('remove', spy);
+
+        cart
             .remove('Item')
+            .ready(function() {
+                assert.isTrue(spy.called);
+                assert.strictEqual(spy.args[0][0], 'Item');
+            })
+            .ready(function() {
+                done();
+            })
         ;
     });
 
     it("aborts if remove event listener returns false", function(done) {
-        instance.on('remove', function() {
+        cart.on('remove', function() {
             return false;
         });
 
-        instance
+        cart
             .remove('Item')
             .ready(function() {
-                assert.strictEqual(instance.size(), 1);
+                assert.strictEqual(cart.size(), 1);
             })
             .ready(function() {
                 done();
@@ -72,30 +88,95 @@ describe("cart().remove()", function() {
     });
 
     it("emits removed event", function(done) {
-        instance.on('removed', function(it) {
-            assert.strictEqual(it.id(), 'Item');
-            done();
-        });
+        var spy = sinon.spy();
 
-        instance
+        cart.on('removed', spy);
+
+        cart
             .remove('Item')
+            .ready(function() {
+                assert.isTrue(spy.called);
+                assert.deepEqual(spy.args[0][0], {
+                    id: 'Item',
+                    label: "Item",
+                    price: 0,
+                    quantity: 1,
+                    variant: {}
+                });
+            })
+            .ready(function() {
+                done();
+            })
         ;
     });
 
     it("emits removefailed event", function(done) {
-        instance = cart({
+        cart = carty({
             storage: {
                 load: function() { return [{id: 'Item'}]; },
                 remove: function() { return Promise.reject('error'); }
             }
         });
 
-        instance.on('removefailed', function(error) {
-            assert.strictEqual(error, 'error');
+        var spy = sinon.spy();
+
+        cart.on('removefailed', spy);
+
+        cart
+            .remove('Item')
+            .error(function() {
+                assert.strictEqual(spy.args[0][0], 'error');
+                assert.deepEqual(spy.args[0][1], {
+                    id: 'Item',
+                    label: "Item",
+                    price: 0,
+                    quantity: 1,
+                    variant: {}
+                });
+            })
+            .ready(function() {
+                assert.isTrue(spy.called);
+            })
+            .ready(function() {
+                done();
+            })
+        ;
+    });
+
+    it("emits change event", function(done) {
+        cart.on('change', function() {
+            console.log('test')
             done();
         });
 
-        instance
+        cart
+            .remove('Item')
+        ;
+    });
+
+    it("emits changed event", function(done) {
+        cart.on('changed', function() {
+            done();
+        });
+
+        cart
+            .remove('Item')
+        ;
+    });
+
+    it("emits changefailed event", function(done) {
+        cart = carty({
+            storage: {
+                load: function() { return [{id: 'Item'}]; },
+                remove: function() { return Promise.reject('error'); }
+            }
+        });
+
+        cart.on('changefailed', function() {
+            done();
+        });
+
+        cart
             .remove('Item')
         ;
     });

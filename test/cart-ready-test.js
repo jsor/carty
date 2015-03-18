@@ -1,9 +1,9 @@
 var assert = require('chai').assert;
-var cart = typeof window !== 'undefined' ? window.carty : require('../lib/cart');
+var carty = typeof window !== 'undefined' ? window.carty : require('../lib/carty');
 
 describe("cart().ready()", function() {
     it("throws uncaught errors", function(done) {
-        cart()
+        carty()
             .ready(function() {
                 throw "foo";
             })
@@ -21,7 +21,7 @@ describe("cart().ready()", function() {
 
 describe("cart().error()", function() {
     it("receives thrown exceptions from previous ready()", function(done) {
-        cart()
+        carty()
             .ready(function() {
                 throw "foo";
             })

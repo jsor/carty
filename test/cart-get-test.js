@@ -1,19 +1,25 @@
 var assert = require('chai').assert;
-var cart = typeof window !== 'undefined' ? window.carty : require('../lib/cart');
+var carty = typeof window !== 'undefined' ? window.carty : require('../lib/carty');
 
 describe("cart().get()", function() {
-    var instance;
+    var cart;
 
     beforeEach(function() {
-        instance = cart();
-        instance.add({id: 'Item'});
+        cart = carty();
+        cart.add({id: 'Item'});
     });
 
     it("returns existing item", function(done) {
-        instance
+        cart
             .ready(function() {
-                var item = instance.get({id: 'Item'});
-                assert.strictEqual(item.id(), 'Item');
+                var item = cart.get({id: 'Item'});
+                assert.deepEqual(item, {
+                    id: 'Item',
+                    label: "Item",
+                    price: 0,
+                    quantity: 1,
+                    variant: {}
+                });
             })
             .ready(function() {
                 done();
@@ -22,10 +28,16 @@ describe("cart().get()", function() {
     });
 
     it("returns existing item passed as string", function(done) {
-        instance
+        cart
             .ready(function() {
-                var item = instance.get('Item');
-                assert.strictEqual(item.id(), 'Item');
+                var item = cart.get('Item');
+                assert.deepEqual(item, {
+                    id: 'Item',
+                    label: "Item",
+                    price: 0,
+                    quantity: 1,
+                    variant: {}
+                });
             })
             .ready(function() {
                 done();
@@ -34,9 +46,9 @@ describe("cart().get()", function() {
     });
 
     it("returns null for missing item", function(done) {
-        instance
+        cart
             .ready(function() {
-                assert.isNull(instance.get({id: 'Missing'}));
+                assert.isNull(cart.get({id: 'Missing'}));
             })
             .ready(function() {
                 done();
@@ -45,9 +57,9 @@ describe("cart().get()", function() {
     });
 
     it("returns null for missing item passed as string", function(done) {
-        instance
+        cart
             .ready(function() {
-                assert.isNull(instance.get('Missing'));
+                assert.isNull(cart.get('Missing'));
             })
             .ready(function() {
                 done();
@@ -56,13 +68,13 @@ describe("cart().get()", function() {
     });
 
     it("returns null for invalid item", function(done) {
-        instance
+        cart
             .ready(function() {
-                assert.isFalse(instance.has({}));
-                assert.isFalse(instance.has({foo: 'bar'}));
-                assert.isFalse(instance.has([]));
-                assert.isFalse(instance.has(null));
-                assert.isFalse(instance.has(undefined));
+                assert.isFalse(cart.has({}));
+                assert.isFalse(cart.has({foo: 'bar'}));
+                assert.isFalse(cart.has([]));
+                assert.isFalse(cart.has(null));
+                assert.isFalse(cart.has(undefined));
             })
             .ready(function() {
                 done();
@@ -71,11 +83,17 @@ describe("cart().get()", function() {
     });
 
     it("ignores quantity", function(done) {
-        instance
+        cart
             .add({id: 'Item with quantity', quantity: 1})
             .ready(function() {
-                var item = instance.get({id: 'Item with quantity', quantity: 2});
-                assert.strictEqual(item.id(), 'Item with quantity');
+                var item = cart.get({id: 'Item with quantity', quantity: 2});
+                assert.deepEqual(item, {
+                    id: 'Item with quantity',
+                    label: "Item with quantity",
+                    price: 0,
+                    quantity: 1,
+                    variant: {}
+                });
             })
             .ready(function() {
                 done();

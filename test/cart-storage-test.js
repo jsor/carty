@@ -1,8 +1,8 @@
 var assert = require('chai').assert;
 var sinon = require('sinon');
-var cart = typeof window !== 'undefined' ? window.carty : require('../lib/cart');
+var carty = typeof window !== 'undefined' ? window.carty : require('../lib/carty');
 
-describe("cart().options('storage')", function() {
+describe("carty().options('storage')", function() {
     var storage, mock;
 
     beforeEach(function() {
@@ -20,10 +20,10 @@ describe("cart().options('storage')", function() {
     it("can load non-array data", function(done) {
         mock.expects('load').once().returns(null);
 
-        cart({storage: storage})
-            .ready(function(instance) {
-                assert.strictEqual(0, instance.size());
-                assert.strictEqual(0, instance().length);
+        carty({storage: storage})
+            .ready(function(cart) {
+                assert.strictEqual(cart.size(), 0);
+                assert.strictEqual(cart().items.length, 0);
 
                 mock.verify();
             })
@@ -36,10 +36,10 @@ describe("cart().options('storage')", function() {
     it("loads items from storage", function(done) {
         mock.expects('load').once().returns([{id: 'id'}]);
 
-        cart({storage: storage})
-            .ready(function(instance) {
-                assert.strictEqual(1, instance.size());
-                assert.strictEqual(1, instance().length);
+        carty({storage: storage})
+            .ready(function(cart) {
+                assert.strictEqual(cart.size(), 1);
+                assert.strictEqual(cart().items.length, 1);
 
                 mock.verify();
             })
@@ -52,7 +52,7 @@ describe("cart().options('storage')", function() {
     it("adds items to storage", function(done) {
         mock.expects('add').twice();
 
-        cart({storage: storage})
+        carty({storage: storage})
             .add('Item')
             .add('Item2')
             .ready(function() {
@@ -67,7 +67,7 @@ describe("cart().options('storage')", function() {
     it("adds items to storage", function(done) {
         mock.expects('update').once();
 
-        cart({storage: storage})
+        carty({storage: storage})
             .add('Item')
             .update('Item')
             .ready(function() {
@@ -82,7 +82,7 @@ describe("cart().options('storage')", function() {
     it("propagates add error", function(done) {
         mock.expects('add').once().returns(Promise.reject('error'));
 
-        cart({storage: storage})
+        carty({storage: storage})
             .add('Item')
             .error(function(error) {
                 assert.strictEqual(error, 'error');
@@ -111,7 +111,7 @@ describe("cart().options('storage')", function() {
     it("removes items from storage", function(done) {
         mock.expects('remove').once();
 
-        cart({storage: storage})
+        carty({storage: storage})
             .remove('Existing Item')
             .ready(function() {
                 mock.verify();
@@ -125,7 +125,7 @@ describe("cart().options('storage')", function() {
     it("propagates remove error returned as Promise", function(done) {
         mock.expects('remove').once().returns(Promise.reject('error'));
 
-        cart({storage: storage})
+        carty({storage: storage})
             .remove('Existing Item')
             .error(function(error) {
                 assert.strictEqual(error, 'error');
@@ -155,7 +155,7 @@ describe("cart().options('storage')", function() {
         var exception = new Error('error');
         mock.expects('remove').once().throws(exception);
 
-        cart({storage: storage})
+        carty({storage: storage})
             .remove('Existing Item')
             .error(function(error) {
                 assert.strictEqual(error, exception);
@@ -184,7 +184,7 @@ describe("cart().options('storage')", function() {
     it("clears storage", function(done) {
         mock.expects('clear').once();
 
-        cart({storage: storage})
+        carty({storage: storage})
             .clear()
             .ready(function() {
                 mock.verify();

@@ -13,6 +13,7 @@
         </style>
 
         <!--[if lt IE 9]>
+        <script src="../../vendor/json2.js"></script>
         <script src="../../vendor/es5-shim.js"></script>
         <script src="../../vendor/html5shiv.js"></script>
         <script src="../../vendor/respond.js"></script>
@@ -21,64 +22,65 @@
     <body>
         <div class="container">
             <div class="page-header">
-                <h1>Carty with jQuery</h1>
+                <h1>Carty with Bootstrap + jQuery + Handlebars</h1>
             </div>
 
-            <p>
-                <div class="btn-group">
-                    <button type="button" class="btn btn-primary">
-                        <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span>
-                        Cart (<span data-carty-quantity></span>)
-                    </button>
-                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <span class="caret"></span>
-                        <span class="sr-only">Toggle Dropdown</span>
-                    </button>
-                    <div class="dropdown-menu" data-carty-cart="#carty-cart-template-dropdown" style="min-width:300px;padding:10px">
+            <div class="row">
+                <div class="col-xs-6 lead">
+                    Quantity: <span data-carty-quantity></span> / Total: <span data-carty-total></span>
+                </div>
+                <div class="col-xs-6">
+                    <div class="btn-group pull-right">
+                        <button type="button" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span>
+                            Cart (<span data-carty-quantity></span>)
+                        </button>
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            <span class="caret"></span>
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <div class="dropdown-menu" id="carty-cart-dropdown" style="min-width:300px;padding:10px">
+                        </div>
                     </div>
                 </div>
-            </p>
+            </div>
 
-            <script type="text/x-template" id="carty-cart-template-dropdown">
-                {% var items = cart(); %}
-                {% if (!items.length) { %}
-                <span>
-                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                    Cart is empty.
-                </span>
-                {% } else { %}
+            <script type="text/x-template" id="carty-cart-dropdown-template">
+                {{#if cart.size }}
                 <ul class="list-group">
-                    {% for (var i = 0, l = items.length; i < l; i++) { %}
-                    {% var item = items[i]; %}
-                    <li class="list-group-item" data-carty-item="{%= item.id() %}">
-                        {% var variant = item.variant(); var list = Object.keys(variant).map(function(key) { return key + ': ' + variant[key]; }); %}
-                        <span class="badge">{%= formatNumber(item.quantity()) %}x</span>
+                    {{#each cart.items}}
+                    <li class="list-group-item" data-carty-item="{{jsonStringify this }}">
+                        <span class="badge">{{formatNumber this.quantity }}x</span>
                         <h4 class="list-group-item-heading">
-                            {%= item.label() %}
-                            {% if (list.length) { %}
-                            <small>{%= list.join(", ") %}</small>
-                            {% } %}
+                            {{ this.label }}
+                            <small>{{variant this.variant }}</small>
                         </h4>
                         <p class="list-group-item-text">
-                            <span class="label label-success">{%= formatCurrency(item.price()) %}</span>
+                            <span class="label label-success">{{formatCurrency this.price }}</span>
                             <button class="btn btn-link btn-xs" data-carty-remove>
                                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                                 Remove
                             </button>
                         </p>
                     </li>
-                    {% } %}
+                    {{/each}}
                 </ul>
 
                 <div class="row" style="margin-top:-10px">
                     <div class="col-xs-6">
-                        <span class="lead" style="padding-left:15px;">{%= formatCurrency(cart.total()) %}</span>
+                        <span class="lead" style="padding-left:15px;">{{formatCurrency cart.total }}</span>
                     </div>
                     <div class="col-xs-6 text-right">
                         <button class="btn btn-success btn-sm" data-carty-checkout>Checkout</button>
                     </div>
                 </div>
-                {% } %}
+                {{else}}
+                <span>
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    Cart is empty.
+                </span>
+
+                {{/if}}
             </script>
 
             <div class="row">
@@ -178,11 +180,9 @@
 
             <hr>
 
-            <div data-carty-cart="#carty-cart-template-large"></div>
+            <div id="carty-cart-large"></div>
 
-            <script type="text/x-template" id="carty-cart-template-large">
-                {% var items = cart(); %}
-
+            <script type="text/x-template" id="carty-cart-large-template">
                 <div class="panel panel-info">
                     <div class="panel-heading">
                         <div class="panel-title">
@@ -191,41 +191,34 @@
                                     <h5><span class="glyphicon glyphicon-shopping-cart"></span> Shopping Cart</h5>
                                 </div>
                                 <div class="col-xs-4 text-right">
-                                {% if (!!items.length) { %}
+                                {{#if cart.size }}
                                     <button type="button" class="btn btn-success" data-carty-checkout>
                                         <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
                                         Checkout
                                     </button>
-                                {% } %}
+                                {{/if}}
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="panel-body">
-                {% if (!items.length) { %}
-                        <span>
-                            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                            Cart is empty.
-                        </span>
-                {% } else { %}
-                    {% for (var i = 0, l = items.length; i < l; i++) { %}
-                        {% var item = items[i]; %}
-                        <div class="row" data-carty-item="{%= item.id() %}">
+                {{#if cart.size }}
+                        {{#each cart.items }}
+                        <div class="row" data-carty-item="{{jsonStringify this }}">
                             <div class="col-md-2 col-xs-2">
-                                <a href="{%= item().imagelink %}">
-                                    <img class="img-responsive" src="{%= item().image %}" alt="{%= item.label() %}">
+                                <a href="{{ this.imagelink }}">
+                                    <img class="img-responsive" src="{{ this.image }}" alt="{{ this.label }}">
                                 </a>
                             </div>
                             <div class="col-md-4 col-xs-6">
-                                <h4 style="margin:0">{%= item.label() %}</h4>
-                                {% var variant = item.variant(); var list = Object.keys(variant).map(function(key) { return key + ': ' + variant[key]; }); %}
-                                {%= list.join(", ") %}
+                                <h4 style="margin:0">{{ this.label }}</h4>
+                                {{variant this.variant }}
                             </div>
                             <div class="col-md-2 col-xs-4 text-right">
-                                <span class="lead">{%= formatCurrency(item.price()) %}</span>
+                                <span class="lead">{{formatCurrency this.price }}</span>
                             </div>
                             <div class="col-md-4 col-xs-12 text-right">
-                                <input type="number" class="form-control" style="display:inline-block;max-width:60px;" name="quantity" value="{%= item.quantity() %}" data-carty-update>
+                                <input type="number" class="form-control" style="display:inline-block;max-width:60px;" name="quantity" value="{{ this.quantity }}" data-carty-update>
 
                                 <button class="btn btn-link btn-xs" data-carty-add='{"quantity": 1}'>
                                     <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
@@ -239,40 +232,45 @@
                             </div>
                         </div>
                         <hr>
-                    {% } %}
+                        {{/each}}
                         <div class="row">
                             <div class="col-md-6 col-xs-8 text-right">
                                 <span class="lead">Subtotal</span>
                             </div>
                             <div class="col-md-2 col-xs-4 text-right">
-                                <span class="lead"><strong>{%= formatCurrency(cart.subtotal()) %}</strong></span>
+                                <span class="lead"><strong>{{formatCurrency cart.subtotal }}</strong></span>
                             </div>
                         </div>
-                    {% if (cart.tax() > 0) { %}
+                        {{#if cart.tax }}
                         <hr>
                         <div class="row">
                             <div class="col-md-6 col-xs-8 text-right">
                                 <span class="lead">Tax</span>
                             </div>
                             <div class="col-md-2 col-xs-4 text-right">
-                                <span class="lead">{%= formatCurrency(cart.tax()) %}</span>
+                                <span class="lead">{{formatCurrency cart.tax }}</span>
                             </div>
                         </div>
-                    {% } %}
-                    {% if (cart.shipping() > 0) { %}
+                        {{/if}}
+                        {{#if cart.shipping }}
                         <hr>
                         <div class="row">
                             <div class="col-md-6 col-xs-8 text-right">
                                 <span class="lead">Shipping</span>
                             </div>
                             <div class="col-md-2 col-xs-4 text-right">
-                                <span class="lead">{%= formatCurrency(cart.shipping()) %}</span>
+                                <span class="lead">{{formatCurrency cart.shipping }}</span>
                             </div>
                         </div>
-                    {% } %}
-                {% } %}
+                        {{/if}}
+                {{else}}
+                        <span>
+                            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                            Cart is empty.
+                        </span>
+                {{/if}}
                     </div>
-                    {% if (!!items.length) { %}
+                    {{#if cart.size }}
                     <div class="panel-footer">
                         <div class="row">
                             <div class="col-md-4 col-xs-4">
@@ -285,7 +283,7 @@
                                 <span class="lead">Total</span>
                             </div>
                             <div class="col-md-2 col-xs-4 text-right">
-                                <span class="lead"><strong>{%= formatCurrency(cart.total()) %}</strong></span>
+                                <span class="lead"><strong>{{formatCurrency cart.total }}</strong></span>
                             </div>
                             <div class="col-md-4 col-xs-12 text-right">
                                 <button type="button" class="btn btn-success" data-carty-checkout>
@@ -295,41 +293,77 @@
                             </div>
                         </div>
                     </div>
-                    {% } %}
+                    {{/if}}
                 </div>
             </script>
         </div>
 
-        <script src="../../vendor/es6-promise.js"></script>
-        <script>ES6Promise.polyfill();</script>
-
         <script src="../../vendor/jquery.js"></script>
+        <script src="../../vendor/handlebars.js"></script>
         <script src="../../vendor/bootstrap/js/bootstrap.js"></script>
-        <script src="../../dist/carty.jquery.js"></script>
+        <script src="../../dist/carty-promise-polyfill.js"></script>
 
         <script>
-            var cart = carty({
-                currency: 'USD',
-                decimalSeparator: '.',
-                thousandsSeparator: ',',
-                tax: function(cart) {
-                    return cart.subtotal() / 100 * 19;
-                },
-                shipping: function(cart) {
-                    if (cart.subtotal() + cart.tax() > 100) {
-                        return 0;
+            (function($) {
+                // Cart options shared across the cart and ui instance and the
+                // format helpers
+                var options = {
+                    storage: carty.storage.localStorage(),
+                    currency: 'USD',
+                    decimalSeparator: '.',
+                    thousandsSeparator: ',',
+                    tax: function(cart) {
+                        return cart.subtotal() / 100 * 19;
+                    },
+                    shipping: function(cart) {
+                        if (cart.subtotal() + cart.tax() > 100) {
+                            return 0;
+                        }
+
+                        return 10;
+                    }
+                };
+
+                // Cart setup
+                var cart = carty(options);
+
+                // jQuery ui setup
+                carty.ui.jquery(cart, options);
+
+                // Handlebars setup to render 2 different representations of the
+                // cart (a large cart and a dropdown list)
+                Handlebars.registerHelper('formatNumber', function(value) {
+                    return carty.format.number(value, options);
+                });
+                Handlebars.registerHelper('formatCurrency', function(value) {
+                    return carty.format.currency(value, options);
+                });
+                Handlebars.registerHelper('jsonStringify', function(object) {
+                    return JSON.stringify(object);
+                });
+                Handlebars.registerHelper('variant', function(object) {
+                    return Object.keys(object).map(function(key) { return key + ': ' + object[key]; }).join(', ');
+                });
+
+                $(function() {
+                    var dropdown = $('#carty-cart-dropdown');
+                    var dropdownTemplate = Handlebars.compile($("#carty-cart-dropdown-template").html());
+                    var large = $('#carty-cart-large');
+                    var largeTemplate = Handlebars.compile($("#carty-cart-large-template").html());
+
+                    function render() {
+                        var context = {
+                            cart: cart()
+                        };
+
+                        dropdown.html(dropdownTemplate(context));
+                        large.html(largeTemplate(context));
                     }
 
-                    return 10;
-                }
-            });
-
-            cart.ui.notify(function(cart) {
-                // React when items are added, removed etc.
-            });
-            cart.ui.checkout(function(cart) {
-                // Implement checkout logic
-            });
+                    cart.ready(render);
+                    cart.on('changed', render);
+                });
+            })(jQuery);
         </script>
     </body>
 </html>

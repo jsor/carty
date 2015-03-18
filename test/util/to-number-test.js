@@ -131,4 +131,22 @@ describe("util/toNumber()", function() {
 
         expect(parse('$ 123%456')).to.equal(123.456);
     });
+
+    it('parses without Number.isFinite', function() {
+        var backup = Number.isFinite;
+        Number.isFinite = null;
+
+        var modulePath = require.resolve('../../lib/util/to-number');
+
+        delete require.cache[modulePath];
+        toNumber = require('../../lib/util/to-number');
+
+        expect(toNumber('123456,789')).to.equal(123456789);
+        expect(toNumber(123456789)).to.equal(123456789);
+
+        Number.isFinite = backup;
+        delete require.cache[modulePath];
+        toNumber = require('../../lib/util/to-number');
+    });
+
 });

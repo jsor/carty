@@ -3,7 +3,7 @@ var sinon = require('sinon');
 var localStorage = require('../../lib/storage/local-storage');
 var createItem = typeof window !== 'undefined' ? window.carty.item : require('../../lib/item');
 
-describe("storage/localStorage()", function() {
+describe("storage/localStorage(null, )", function() {
     var mockLocalStorage = {
         setItem: function (data, done) { },
         getItem: function (done) { },
@@ -13,11 +13,26 @@ describe("storage/localStorage()", function() {
     beforeEach(function() {
         mock = sinon.mock(mockLocalStorage)
     });
-    
+
+    it("works with window.localStorage", function() {
+        global.window = {
+            localStorage: mockLocalStorage
+        };
+        mock.expects('setItem').once();
+
+        var storage = localStorage();
+
+        storage.add(null, function() { return [createItem('Item')]; });
+
+        mock.verify();
+
+        delete global.window;
+    });
+
     it("adds data", function() {
         mock.expects('setItem').once();
 
-        var storage = localStorage(mockLocalStorage);
+        var storage = localStorage(null, mockLocalStorage);
 
         storage.add(null, function() { return [createItem('Item')]; });
 
@@ -27,7 +42,7 @@ describe("storage/localStorage()", function() {
     it("updates data", function() {
         mock.expects('setItem').once();
 
-        var storage = localStorage(mockLocalStorage);
+        var storage = localStorage(null, mockLocalStorage);
 
         storage.update(null, function() { return [createItem('Item')]; });
 
@@ -37,7 +52,7 @@ describe("storage/localStorage()", function() {
     it("removes data", function() {
         mock.expects('setItem').once();
 
-        var storage = localStorage(mockLocalStorage);
+        var storage = localStorage(null, mockLocalStorage);
 
         storage.remove(null, function() { return [createItem('Item')]; });
 
@@ -47,7 +62,7 @@ describe("storage/localStorage()", function() {
     it("loads data", function() {
         mock.expects('getItem').once().returns('["test"]');
 
-        var storage = localStorage(mockLocalStorage);
+        var storage = localStorage(null, mockLocalStorage);
 
         var data = storage.load();
 
@@ -60,7 +75,7 @@ describe("storage/localStorage()", function() {
     it("loads invalid data", function() {
         mock.expects('getItem').once().returns('foo');
 
-        var storage = localStorage(mockLocalStorage);
+        var storage = localStorage(null, mockLocalStorage);
 
         storage.load();
 
@@ -70,7 +85,7 @@ describe("storage/localStorage()", function() {
     it("loads when storage throws", function() {
         mock.expects('getItem').once().throws('foo');
 
-        var storage = localStorage(mockLocalStorage);
+        var storage = localStorage(null, mockLocalStorage);
 
         storage.load(function() {});
 
@@ -80,7 +95,7 @@ describe("storage/localStorage()", function() {
     it("clears storage", function() {
         mock.expects('removeItem').once();
 
-        var storage = localStorage(mockLocalStorage);
+        var storage = localStorage(null, mockLocalStorage);
 
         storage.clear();
 

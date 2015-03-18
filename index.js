@@ -1,6 +1,6 @@
 'use strict';
 
-var carty = require('./lib/cart');
+var carty = require('./lib/carty');
 
 carty.format = {
     currency: require('./lib/format/currency'),

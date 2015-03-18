@@ -1,20 +1,20 @@
 var assert = require('chai').assert;
-var cart = typeof window !== 'undefined' ? window.carty : require('../lib/cart');
+var carty = typeof window !== 'undefined' ? window.carty : require('../lib/carty');
 
 describe("cart().each()", function() {
-    var instance;
+    var cart;
 
     beforeEach(function() {
-        instance = cart();
-        instance.add({id: 'Item'});
-        instance.add({id: 'Item2'});
+        cart = carty();
+        cart.add({id: 'Item'});
+        cart.add({id: 'Item2'});
     });
 
     it("iterates over all items", function(done) {
-        instance
+        cart
             .ready(function() {
                 var count = 0;
-                instance.each(function() {
+                cart.each(function() {
                     count++;
                 });
 
@@ -27,10 +27,10 @@ describe("cart().each()", function() {
     });
 
     it("aborts iteration if callback returns false", function(done) {
-        instance
+        cart
             .ready(function() {
                 var count = 0;
-                instance.each(function() {
+                cart.each(function() {
                     count++;
                     return false;
                 });

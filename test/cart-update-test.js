@@ -1,20 +1,27 @@
 var assert = require('chai').assert;
 var sinon = require('sinon');
-var cart = typeof window !== 'undefined' ? window.carty : require('../lib/cart');
+var carty = typeof window !== 'undefined' ? window.carty : require('../lib/carty');
 
 describe("cart().update()", function() {
-    var instance;
+    var cart;
 
     beforeEach(function() {
-        instance = cart();
+        cart = carty({
+            storage: {
+                load: function() { return [{id: 'Item'}]; },
+                add: function (item, items) { },
+                update: function (item, items) { },
+                remove: function (item, items) { },
+                clear: function () {}
+            }
+        });
     });
 
     it("updates an item", function(done) {
-        instance
-            .add({id: 'Item'})
+        cart
             .update({id: 'Item', price: 10})
             .ready(function() {
-                assert.deepEqual(instance.get({id: 'Item'}).price(), 10);
+                assert.deepEqual(cart.get({id: 'Item'}).price, 10);
             })
             .ready(function() {
                 done();
@@ -23,11 +30,10 @@ describe("cart().update()", function() {
     });
 
     it("updates an item as string", function(done) {
-        instance
-            .add('Item')
+        cart
             .update('Item')
             .ready(function() {
-                assert.isTrue(instance.has({id: 'Item'}));
+                assert.isTrue(cart.has({id: 'Item'}));
             })
             .ready(function() {
                 done();
@@ -36,10 +42,10 @@ describe("cart().update()", function() {
     });
 
     it("does nothing if item does not exist", function(done) {
-        instance
+        carty()
             .update({id: 'Item'})
-            .ready(function() {
-                assert.isFalse(instance.has({id: 'Item'}));
+            .ready(function(cart) {
+                assert.isFalse(cart.has({id: 'Item'}));
             })
             .ready(function() {
                 done();
@@ -48,11 +54,10 @@ describe("cart().update()", function() {
     });
 
     it("sets quantity for existing item", function(done) {
-        instance
-            .add({id: 'Item'})
+        cart
             .update({id: 'Item', quantity: 2})
             .ready(function() {
-                assert.strictEqual(instance.get('Item').quantity(), 2);
+                assert.strictEqual(cart.get('Item').quantity, 2);
             })
             .ready(function() {
                 done();
@@ -61,11 +66,10 @@ describe("cart().update()", function() {
     });
 
     it("sets quantity for mixed item type", function(done) {
-        instance
-            .add('Item')
+        cart
             .update({id: 'Item', quantity: 2})
             .ready(function() {
-                assert.strictEqual(instance.get('Item').quantity(), 2);
+                assert.strictEqual(cart.get('Item').quantity, 2);
             })
             .ready(function() {
                 done();
@@ -74,26 +78,12 @@ describe("cart().update()", function() {
     });
 
     it("updates item attributes", function(done) {
-        instance
-            .add({id: 'Item', price: 0, foo: 'bar'})
-            .update({id: 'Item', price: 5, foo: 'baz', bar: 'baz'})
+        cart
+            .update({id: 'Item', price: 5, foo: 'bar', bar: 'baz'})
             .ready(function() {
-                assert.strictEqual(instance.get('Item').price(), 5);
-                assert.strictEqual(instance.get('Item').call().foo, 'baz');
-                assert.strictEqual(instance.get('Item').call().bar, 'baz');
-            })
-            .ready(function() {
-                done();
-            })
-        ;
-    });
-
-    it("keeps custom item attributes", function(done) {
-        instance
-            .add({id: 'Item'})
-            .add({id: 'Item', custom: 'foo'})
-            .ready(function() {
-                assert.strictEqual(instance.get('Item').call().custom, 'foo');
+                assert.strictEqual(cart.get('Item').price, 5);
+                assert.strictEqual(cart.get('Item').foo, 'bar');
+                assert.strictEqual(cart.get('Item').bar, 'baz');
             })
             .ready(function() {
                 done();
@@ -102,11 +92,11 @@ describe("cart().update()", function() {
     });
 
     it("updates custom item attributes", function(done) {
-        instance
-            .add({id: 'Item', custom: 'foo'})
+        cart
+            .update({id: 'Item', custom: 'foo'})
             .update({id: 'Item', custom: 'bar'})
             .ready(function() {
-                assert.strictEqual(instance.get('Item').call().custom, 'bar');
+                assert.strictEqual(cart.get('Item').custom, 'bar');
             })
             .ready(function() {
                 done();
@@ -115,19 +105,13 @@ describe("cart().update()", function() {
     });
 
     it("removes existing item if quantity lower 0", function(done) {
-        var callback = sinon.spy();
-
-        instance.on('add', callback);
-
-        instance
-            .add({id: 'Item'})
-            .ready(function() {
-                assert.strictEqual(instance.size(), 1);
+        cart
+            .ready(function(cart) {
+                assert.strictEqual(cart.size(), 1);
             })
             .update({id: 'Item', quantity: 0})
-            .ready(function() {
-                assert.strictEqual(instance.size(), 0);
-                assert.isTrue(callback.called);
+            .ready(function(cart) {
+                assert.strictEqual(cart.size(), 0);
             })
             .ready(function() {
                 done();
@@ -136,27 +120,31 @@ describe("cart().update()", function() {
     });
 
     it("emits update event", function(done) {
-        instance.on('update', function(it) {
-            assert.strictEqual(it.id(), 'Item');
-            done();
-        });
+        var spy = sinon.spy();
 
-        instance
-            .add('Item')
+        cart.on('update', spy);
+
+        cart
             .update('Item')
+            .ready(function() {
+                assert.isTrue(spy.called);
+                assert.strictEqual(spy.args[0][0], 'Item');
+            })
+            .ready(function() {
+                done();
+            })
         ;
     });
 
     it("aborts if update event listener returns false", function(done) {
-        instance.on('update', function() {
+        cart.on('update', function() {
             return false;
         });
 
-        instance
-            .add('Item')
+        cart
             .update({id: 'Item', quantity: 2})
             .ready(function() {
-                assert.strictEqual(instance.get('Item').quantity(), 1);
+                assert.strictEqual(cart.get('Item').quantity, 1);
             })
             .ready(function() {
                 done();
@@ -165,33 +153,95 @@ describe("cart().update()", function() {
     });
 
     it("emits updated event", function(done) {
-        instance.on('updated', function(it) {
-            assert.strictEqual(it.id(), 'Item');
-            done();
-        });
+        var spy = sinon.spy();
 
-        instance
-            .add('Item')
+        cart.on('updated', spy);
+
+        cart
             .update('Item')
+            .ready(function() {
+                assert.isTrue(spy.called);
+                console.log(spy.args[0][0])
+                assert.deepEqual(spy.args[0][0], {
+                    id: 'Item',
+                    label: "Item",
+                    price: 0,
+                    quantity: 1,
+                    variant: {}
+                });
+            })
+            .ready(function() {
+                done();
+            })
         ;
     });
 
     it("emits updatefailed event", function(done) {
-        instance = cart({
+        cart = carty({
             storage: {
-                load: function() { return []; },
-                add: function() { return Promise.resolve(); },
+                load: function() { return [{id: 'Item'}]; },
                 update: function() { return Promise.reject('error'); }
             }
         });
 
-        instance.on('updatefailed', function(error) {
-            assert.strictEqual(error, 'error')
+        var spy = sinon.spy();
+
+        cart.on('updatefailed', spy);
+
+        cart
+            .update('Item')
+            .error(function() {
+                assert.strictEqual(spy.args[0][0], 'error');
+                assert.deepEqual(spy.args[0][1], {
+                    id: 'Item',
+                    label: "Item",
+                    price: 0,
+                    quantity: 1,
+                    variant: {}
+                });
+            })
+            .ready(function() {
+                assert.isTrue(spy.called);
+            })
+            .ready(function() {
+                done();
+            })
+        ;
+    });
+
+    it("emits change event", function(done) {
+        cart.on('change', function() {
             done();
         });
 
-        instance
-            .add('Item')
+        cart
+            .update('Item')
+        ;
+    });
+
+    it("emits changed event", function(done) {
+        cart.on('changed', function() {
+            done();
+        });
+
+        cart
+            .update('Item')
+        ;
+    });
+
+    it("emits changefailed event", function(done) {
+        cart = carty({
+            storage: {
+                load: function() { return [{id: 'Item'}]; },
+                update: function() { return Promise.reject('error'); }
+            }
+        });
+
+        cart.on('changefailed', function() {
+            done();
+        });
+
+        cart
             .update('Item')
         ;
     });
