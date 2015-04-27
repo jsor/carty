@@ -1,5 +1,5 @@
 /*!
- * Carty - v0.1.0 - 2015-03-18
+ * Carty - v0.1.0 - 2015-04-27
  * http://sorgalla.com/carty/
  * Copyright (c) 2015 Jan Sorgalla; Licensed MIT
  */
@@ -1198,12 +1198,20 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var hasOwn = Object.prototype.hasOwnProperty;
-	var toString = Object.prototype.toString;
+	var toStr = Object.prototype.toString;
 	var undefined;
+
+	var isArray = function isArray(arr) {
+		if (typeof Array.isArray === 'function') {
+			return Array.isArray(arr);
+		}
+
+		return toStr.call(arr) === '[object Array]';
+	};
 
 	var isPlainObject = function isPlainObject(obj) {
 		'use strict';
-		if (!obj || toString.call(obj) !== '[object Object]') {
+		if (!obj || toStr.call(obj) !== '[object Object]') {
 			return false;
 		}
 
@@ -1255,10 +1263,10 @@ return /******/ (function(modules) { // webpackBootstrap
 					}
 
 					// Recurse if we're merging plain objects or arrays
-					if (deep && copy && (isPlainObject(copy) || (copyIsArray = Array.isArray(copy)))) {
+					if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
 						if (copyIsArray) {
 							copyIsArray = false;
-							clone = src && Array.isArray(src) ? src : [];
+							clone = src && isArray(src) ? src : [];
 						} else {
 							clone = src && isPlainObject(src) ? src : {};
 						}
