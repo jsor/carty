@@ -63,29 +63,7 @@ var cartyMin = extend(true, {}, configMin, {
 
 // ---
 
-var cartyWithPromise = extend(true, {}, config, {
-    entry: {
-        "carty-promise-polyfill": ["es6-promise", "./"]
-    },
-    output: {
-        library: "carty"
-    }
-});
-
-var cartyWithPromiseMin = extend(true, {}, configMin, {
-    entry: {
-        "carty-promise-polyfill": ["es6-promise", "./"]
-    },
-    output: {
-        library: "carty"
-    }
-});
-
-// ---
-
 module.exports = [
     carty,
-    cartyMin,
-    cartyWithPromise,
-    cartyWithPromiseMin
+    cartyMin
 ];
