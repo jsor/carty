@@ -64,16 +64,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	var carty = __webpack_require__(1);
 
 	carty.format = {
-	    currency: __webpack_require__(2),
-	    number: __webpack_require__(3)
+	    currency: __webpack_require__(3),
+	    number: __webpack_require__(2)
 	};
 
 	carty.storage = {
-	    localStorage: __webpack_require__(4)
+	    localStorage: __webpack_require__(5)
 	};
 
 	carty.ui = {
-	    jquery: __webpack_require__(5)
+	    jquery: __webpack_require__(4)
 	};
 
 	module.exports = carty;
@@ -88,11 +88,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = carty;
 
 	var extend = __webpack_require__(15);
-	var emitter = __webpack_require__(11);
+	var emitter = __webpack_require__(10);
 	var toNumber = __webpack_require__(7);
-	var options = __webpack_require__(12);
-	var value = __webpack_require__(13);
-	var createItem = __webpack_require__(14);
+	var options = __webpack_require__(11);
+	var value = __webpack_require__(12);
+	var createItem = __webpack_require__(13);
 
 	var resolve = Promise.resolve.bind(Promise);
 	var reject = Promise.reject.bind(Promise);
@@ -391,43 +391,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	module.exports = formatCurrency;
-
-	var extend = __webpack_require__(15);
-	var defaultCurrencies = __webpack_require__(10);
-	var formatNumber = __webpack_require__(3);
-
-	function formatCurrency(value, options) {
-	    return _formatCurrency(options, value);
-	}
-
-	formatCurrency.configure = function(options) {
-	    return _formatCurrency.bind(undefined, options);
-	};
-
-	function _formatCurrency(options, value) {
-	    options = options || {};
-
-	    var currency = options.currency;
-	    var currencies = options.currencies || defaultCurrencies;
-	    var currencyOpts = currencies[currency] || {suffix: currency ? ' ' + currency : ''};
-
-	    var opts = extend(
-	        {precision: 2},
-	        currencyOpts,
-	        options
-	    );
-
-	    return formatNumber(value, opts);
-	}
-
-
-/***/ },
-/* 3 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
 	module.exports = formatNumber;
 
 	var toNumber = __webpack_require__(7);
@@ -489,41 +452,44 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 4 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	module.exports = storageLocalStorage;
+	module.exports = formatCurrency;
 
-	function storageLocalStorage(namespace, localStorage) {
-	    namespace = namespace || 'carty';
-	    localStorage = localStorage || window.localStorage;
+	var extend = __webpack_require__(15);
+	var defaultCurrencies = __webpack_require__(14);
+	var formatNumber = __webpack_require__(2);
 
-	    function save(item, cart) {
-	        localStorage.setItem(namespace, JSON.stringify(cart().items));
-	    }
+	function formatCurrency(value, options) {
+	    return _formatCurrency(options, value);
+	}
 
-	    return {
-	        load: function() {
-	            try {
-	                return JSON.parse(localStorage.getItem(namespace));
-	            } catch (e) {
-	                return []
-	            }
-	        },
-	        add: save,
-	        update: save,
-	        remove: save,
-	        clear: function() {
-	            localStorage.removeItem(namespace);
-	        }
-	    };
+	formatCurrency.configure = function(options) {
+	    return _formatCurrency.bind(undefined, options);
+	};
+
+	function _formatCurrency(options, value) {
+	    options = options || {};
+
+	    var currency = options.currency;
+	    var currencies = options.currencies || defaultCurrencies;
+	    var currencyOpts = currencies[currency] || {suffix: currency ? ' ' + currency : ''};
+
+	    var opts = extend(
+	        {precision: 2},
+	        currencyOpts,
+	        options
+	    );
+
+	    return formatNumber(value, opts);
 	}
 
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -531,11 +497,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = uiJquery;
 
 	var $ = __webpack_require__(6);
-	var formatCurrency = __webpack_require__(2);
-	var formatNumber = __webpack_require__(3);
 
 	var _defaultOptions = {
-	    namespace: 'carty'
+	    namespace: 'carty',
+	    numberFormatter: function(number) {
+	        return number;
+	    },
+	    currencyFormatter: function(number) {
+	        return number;
+	    }
 	};
 
 	var _inputSelector = 'input,select,textarea';
@@ -714,7 +684,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        ], function (i, prop) {
 	            setValue(
 	                $(dataSelector(prop)),
-	                formatNumber(cart[prop](), _options)
+	                _options.numberFormatter(cart[prop]())
 	            );
 	        });
 
@@ -726,7 +696,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        ], function (i, prop) {
 	            setValue(
 	                $(dataSelector(prop)),
-	                formatCurrency(cart[prop](), _options)
+	                _options.currencyFormatter(cart[prop]())
 	            );
 	        });
 	    }
@@ -739,6 +709,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 
 	    return update;
+	}
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = storageLocalStorage;
+
+	function storageLocalStorage(namespace, localStorage) {
+	    namespace = namespace || 'carty';
+	    localStorage = localStorage || window.localStorage;
+
+	    function save(item, cart) {
+	        localStorage.setItem(namespace, JSON.stringify(cart().items));
+	    }
+
+	    return {
+	        load: function() {
+	            try {
+	                return JSON.parse(localStorage.getItem(namespace));
+	            } catch (e) {
+	                return []
+	            }
+	        },
+	        add: save,
+	        update: save,
+	        remove: save,
+	        clear: function() {
+	            localStorage.removeItem(namespace);
+	        }
+	    };
 	}
 
 
@@ -879,78 +883,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	module.exports = {
-	    AED: { prefix: '\u062c' },
-	    ANG: { prefix: '\u0192' },
-	    ARS: { prefix: '$', suffix: ' ARS' },
-	    AUD: { prefix: '$', suffix: ' AUD' },
-	    AWG: { prefix: '\u0192' },
-	    BBD: { prefix: '$', suffix: ' BBD' },
-	    BGN: { prefix: '\u043b\u0432' },
-	    BTC: { suffix: ' BTC', precision: 4 },
-	    BMD: { prefix: '$', suffix: ' BMD' },
-	    BND: { prefix: '$', suffix: ' BND' },
-	    BRL: { prefix: 'R$' },
-	    BSD: { prefix: '$', suffix: ' BSD' },
-	    CAD: { prefix: '$', suffix: ' CAD' },
-	    CHF: { suffix: ' CHF' },
-	    CLP: { prefix: '$', suffix: ' CLP' },
-	    CNY: { prefix: '\u00A5' },
-	    COP: { prefix: '$', suffix: ' COP' },
-	    CRC: { prefix: '\u20A1' },
-	    CZK: { prefix: 'Kc' },
-	    DKK: { prefix: 'kr' },
-	    DOP: { prefix: '$', suffix: ' DOP' },
-	    EEK: { prefix: 'kr' },
-	    EUR: { prefix: '\u20AC' },
-	    GBP: { prefix: '\u00A3' },
-	    GTQ: { prefix: 'Q' },
-	    HKD: { prefix: '$', suffix: ' HKD' },
-	    HRK: { prefix: 'kn' },
-	    HUF: { prefix: 'Ft' },
-	    IDR: { prefix: 'Rp' },
-	    ILS: { prefix: '\u20AA' },
-	    INR: { prefix: 'Rs.' },
-	    ISK: { prefix: 'kr' },
-	    JMD: { prefix: 'J$' },
-	    JPY: { prefix: '\u00A5', precision: 0 },
-	    KRW: { prefix: '\u20A9' },
-	    KYD: { prefix: '$', suffix: ' KYD' },
-	    LTL: { prefix: 'Lt' },
-	    LVL: { prefix: 'Ls' },
-	    MXN: { prefix: '$', suffix: ' MXN' },
-	    MYR: { prefix: 'RM' },
-	    NOK: { prefix: 'kr' },
-	    NZD: { prefix: '$', suffix: ' NZD' },
-	    PEN: { prefix: 'S/' },
-	    PHP: { prefix: 'Php' },
-	    PLN: { prefix: 'z' },
-	    QAR: { prefix: '\ufdfc' },
-	    RON: { prefix: 'lei' },
-	    RUB: { prefix: '\u0440\u0443\u0431' },
-	    SAR: { prefix: '\ufdfc' },
-	    SEK: { prefix: 'kr' },
-	    SGD: { prefix: '$', suffix: ' SGD' },
-	    THB: { prefix: '\u0E3F' },
-	    TRY: { prefix: 'TL' },
-	    TTD: { prefix: 'TT$' },
-	    TWD: { prefix: 'NT$' },
-	    UAH: { prefix: '\u20b4' },
-	    USD: { prefix: '$' },
-	    UYU: { prefix: '$U' },
-	    VEF: { prefix: 'Bs' },
-	    VND: { prefix: '\u20ab' },
-	    XCD: { prefix: '$', suffix: ' XCD' },
-	    ZAR: { prefix: 'R' }
-	};
-
-
-/***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
 	module.exports = emitter;
 
 	var isArray = Array.isArray;
@@ -1062,7 +994,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1092,7 +1024,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1111,7 +1043,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1191,6 +1123,78 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    return item;
 	}
+
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = {
+	    AED: { prefix: '\u062c' },
+	    ANG: { prefix: '\u0192' },
+	    ARS: { prefix: '$', suffix: ' ARS' },
+	    AUD: { prefix: '$', suffix: ' AUD' },
+	    AWG: { prefix: '\u0192' },
+	    BBD: { prefix: '$', suffix: ' BBD' },
+	    BGN: { prefix: '\u043b\u0432' },
+	    BTC: { suffix: ' BTC', precision: 4 },
+	    BMD: { prefix: '$', suffix: ' BMD' },
+	    BND: { prefix: '$', suffix: ' BND' },
+	    BRL: { prefix: 'R$' },
+	    BSD: { prefix: '$', suffix: ' BSD' },
+	    CAD: { prefix: '$', suffix: ' CAD' },
+	    CHF: { suffix: ' CHF' },
+	    CLP: { prefix: '$', suffix: ' CLP' },
+	    CNY: { prefix: '\u00A5' },
+	    COP: { prefix: '$', suffix: ' COP' },
+	    CRC: { prefix: '\u20A1' },
+	    CZK: { prefix: 'Kc' },
+	    DKK: { prefix: 'kr' },
+	    DOP: { prefix: '$', suffix: ' DOP' },
+	    EEK: { prefix: 'kr' },
+	    EUR: { prefix: '\u20AC' },
+	    GBP: { prefix: '\u00A3' },
+	    GTQ: { prefix: 'Q' },
+	    HKD: { prefix: '$', suffix: ' HKD' },
+	    HRK: { prefix: 'kn' },
+	    HUF: { prefix: 'Ft' },
+	    IDR: { prefix: 'Rp' },
+	    ILS: { prefix: '\u20AA' },
+	    INR: { prefix: 'Rs.' },
+	    ISK: { prefix: 'kr' },
+	    JMD: { prefix: 'J$' },
+	    JPY: { prefix: '\u00A5', precision: 0 },
+	    KRW: { prefix: '\u20A9' },
+	    KYD: { prefix: '$', suffix: ' KYD' },
+	    LTL: { prefix: 'Lt' },
+	    LVL: { prefix: 'Ls' },
+	    MXN: { prefix: '$', suffix: ' MXN' },
+	    MYR: { prefix: 'RM' },
+	    NOK: { prefix: 'kr' },
+	    NZD: { prefix: '$', suffix: ' NZD' },
+	    PEN: { prefix: 'S/' },
+	    PHP: { prefix: 'Php' },
+	    PLN: { prefix: 'z' },
+	    QAR: { prefix: '\ufdfc' },
+	    RON: { prefix: 'lei' },
+	    RUB: { prefix: '\u0440\u0443\u0431' },
+	    SAR: { prefix: '\ufdfc' },
+	    SEK: { prefix: 'kr' },
+	    SGD: { prefix: '$', suffix: ' SGD' },
+	    THB: { prefix: '\u0E3F' },
+	    TRY: { prefix: 'TL' },
+	    TTD: { prefix: 'TT$' },
+	    TWD: { prefix: 'NT$' },
+	    UAH: { prefix: '\u20b4' },
+	    USD: { prefix: '$' },
+	    UYU: { prefix: '$U' },
+	    VEF: { prefix: 'Bs' },
+	    VND: { prefix: '\u20ab' },
+	    XCD: { prefix: '$', suffix: ' XCD' },
+	    ZAR: { prefix: 'R' }
+	};
 
 
 /***/ },

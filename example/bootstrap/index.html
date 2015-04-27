@@ -52,13 +52,13 @@
                 <ul class="list-group">
                     {{#each cart.items}}
                     <li class="list-group-item" data-carty-item="{{jsonStringify this }}">
-                        <span class="badge">{{formatNumber this.quantity }}x</span>
+                        <span class="badge">{{numberFormatter this.quantity }}x</span>
                         <h4 class="list-group-item-heading">
                             {{ this.label }}
                             <small>{{variant this.variant }}</small>
                         </h4>
                         <p class="list-group-item-text">
-                            <span class="label label-success">{{formatCurrency this.price }}</span>
+                            <span class="label label-success">{{currencyFormatter this.price }}</span>
                             <button class="btn btn-link btn-xs" data-carty-remove>
                                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                                 Remove
@@ -70,7 +70,7 @@
 
                 <div class="row" style="margin-top:-10px">
                     <div class="col-xs-6">
-                        <span class="lead" style="padding-left:15px;">{{formatCurrency cart.total }}</span>
+                        <span class="lead" style="padding-left:15px;">{{currencyFormatter cart.total }}</span>
                     </div>
                     <div class="col-xs-6 text-right">
                         <button class="btn btn-success btn-sm" data-carty-checkout>Checkout</button>
@@ -217,7 +217,7 @@
                                 {{variant this.variant }}
                             </div>
                             <div class="col-md-2 col-xs-4 text-right">
-                                <span class="lead">{{formatCurrency this.price }}</span>
+                                <span class="lead">{{currencyFormatter this.price }}</span>
                             </div>
                             <div class="col-md-4 col-xs-12 text-right">
                                 <input type="number" class="form-control" style="display:inline-block;max-width:60px;" name="quantity" value="{{ this.quantity }}" data-carty-update>
@@ -240,7 +240,7 @@
                                 <span class="lead">Subtotal</span>
                             </div>
                             <div class="col-md-2 col-xs-4 text-right">
-                                <span class="lead"><strong>{{formatCurrency cart.subtotal }}</strong></span>
+                                <span class="lead"><strong>{{currencyFormatter cart.subtotal }}</strong></span>
                             </div>
                         </div>
                         {{#if cart.tax }}
@@ -250,7 +250,7 @@
                                 <span class="lead">Tax</span>
                             </div>
                             <div class="col-md-2 col-xs-4 text-right">
-                                <span class="lead">{{formatCurrency cart.tax }}</span>
+                                <span class="lead">{{currencyFormatter cart.tax }}</span>
                             </div>
                         </div>
                         {{/if}}
@@ -261,7 +261,7 @@
                                 <span class="lead">Shipping</span>
                             </div>
                             <div class="col-md-2 col-xs-4 text-right">
-                                <span class="lead">{{formatCurrency cart.shipping }}</span>
+                                <span class="lead">{{currencyFormatter cart.shipping }}</span>
                             </div>
                         </div>
                         {{/if}}
@@ -285,7 +285,7 @@
                                 <span class="lead">Total</span>
                             </div>
                             <div class="col-md-2 col-xs-4 text-right">
-                                <span class="lead"><strong>{{formatCurrency cart.total }}</strong></span>
+                                <span class="lead"><strong>{{currencyFormatter cart.total }}</strong></span>
                             </div>
                             <div class="col-md-4 col-xs-12 text-right">
                                 <button type="button" class="btn btn-success" data-carty-checkout>
@@ -307,8 +307,7 @@
 
         <script>
             (function($) {
-                // Cart options shared across the cart and ui instance and the
-                // format helpers
+                // Cart options shared across the cart and ui instance
                 var options = {
                     storage: carty.storage.localStorage(),
                     currency: 'USD',
@@ -326,6 +325,9 @@
                     }
                 };
 
+                options.numberFormatter = carty.format.number.configure(options);
+                options.currencyFormatter = carty.format.currency.configure(options);
+
                 // Cart setup
                 var cart = carty(options);
 
@@ -334,11 +336,11 @@
 
                 // Handlebars setup to render 2 different representations of the
                 // cart (a large cart and a dropdown list)
-                Handlebars.registerHelper('formatNumber', function(value) {
-                    return carty.format.number(value, options);
+                Handlebars.registerHelper('numberFormatter', function(value) {
+                    return options.numberFormatter(value, options);
                 });
-                Handlebars.registerHelper('formatCurrency', function(value) {
-                    return carty.format.currency(value, options);
+                Handlebars.registerHelper('currencyFormatter', function(value) {
+                    return options.currencyFormatter(value, options);
                 });
                 Handlebars.registerHelper('jsonStringify', function(object) {
                     return JSON.stringify(object);
