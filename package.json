@@ -1,7 +1,8 @@
 {
   "name": "carty",
   "title": "Carty",
-  "description": "A lightweight and simple to use shopping cart.",
+  "description": "A lightweight and simple to use shopping cart system.",
+  "author": "Jan Sorgalla <jsorgalla@gmail.com>",
   "version": "0.1.0",
   "dependencies": {
     "extend": "^2.0.0"
@@ -35,10 +36,6 @@
     "jquery-plugin",
     "ecosystem:jquery"
   ],
-  "author": {
-    "name": "Jan Sorgalla",
-    "url": "http://sorgalla.com"
-  },
   "licenses": [
     {
       "type": "MIT",
