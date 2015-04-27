@@ -1,0 +1,42 @@
+{
+  "name": "carty",
+  "version": "0.1.0",
+  "authors": [
+    "Jan Sorgalla <jsorgalla@gmail.com>"
+  ],
+  "description": "A lightweight and simple to use shopping cart system.",
+  "main": "dist/carty.min.js",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "cart",
+    "shopping",
+    "shopping cart",
+    "shop",
+    "ecommerce",
+    "lightweight",
+    "jquery-plugin",
+    "ecosystem:jquery"
+  ],
+  "license": "MIT",
+  "homepage": "http://sorgalla.com/carty/",
+  "ignore": [
+    "**/.*",
+    "docs",
+    "example",
+    "lib",
+    "node_modules",
+    "bower_components",
+    "test",
+    "vendor",
+    ".npmignore",
+    ".travis.yml",
+    "index.js",
+    "Makefile",
+    "package.json",
+    "webpack.config.js"
+  ]
+}
