@@ -145,7 +145,6 @@ describe("cart().remove()", function() {
 
     it("emits change event", function(done) {
         cart.on('change', function() {
-            console.log('test')
             done();
         });
 

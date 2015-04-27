@@ -161,7 +161,6 @@ describe("cart().update()", function() {
             .update('Item')
             .ready(function() {
                 assert.isTrue(spy.called);
-                console.log(spy.args[0][0])
                 assert.deepEqual(spy.args[0][0], {
                     id: 'Item',
                     label: "Item",
