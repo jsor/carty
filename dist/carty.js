@@ -1,7 +1,7 @@
 /*!
- * Carty - v0.1.0 - 2015-04-27
+ * Carty - v0.1.0 - 2015-04-28
  * http://sorgalla.com/carty/
- * Copyright (c) 2015 Jan Sorgalla; Licensed MIT
+ * Copyright (c) 2015 undefined; Licensed MIT
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -85,7 +85,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	module.exports = carty;
+	module.exports = createCart;
 
 	var extend = __webpack_require__(15);
 	var emitter = __webpack_require__(7);
@@ -103,7 +103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    tax: null
 	};
 
-	function carty(opts) {
+	function createCart(opts) {
 	    var _options = extend({}, _defaultOptions, opts);
 	    var _items = [];
 	    var _ready = load();
@@ -382,7 +382,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return cart;
 	}
 
-	carty.options = options.bind(carty, _defaultOptions);
+	createCart.options = options.bind(createCart, _defaultOptions);
 
 
 /***/ },
