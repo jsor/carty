@@ -88,11 +88,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = createCart;
 
 	var extend = __webpack_require__(15);
-	var emitter = __webpack_require__(8);
-	var toNumber = __webpack_require__(9);
-	var options = __webpack_require__(10);
-	var value = __webpack_require__(11);
-	var createItem = __webpack_require__(12);
+	var emitter = __webpack_require__(11);
+	var toNumber = __webpack_require__(7);
+	var options = __webpack_require__(12);
+	var value = __webpack_require__(13);
+	var createItem = __webpack_require__(14);
 
 	var resolve = Promise.resolve.bind(Promise);
 	var reject = Promise.reject.bind(Promise);
@@ -387,7 +387,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = formatCurrency;
 
 	var extend = __webpack_require__(15);
-	var defaultCurrencies = __webpack_require__(7);
+	var defaultCurrencies = __webpack_require__(10);
 	var formatNumber = __webpack_require__(3);
 
 	function formatCurrency(value, options) {
@@ -423,9 +423,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = formatNumber;
 
-	var toNumber = __webpack_require__(9);
-	var toFixed = __webpack_require__(13);
-	var type = __webpack_require__(14);
+	var toNumber = __webpack_require__(7);
+	var toFixed = __webpack_require__(8);
+	var type = __webpack_require__(9);
 
 	function formatNumber(value, options) {
 	    return _formatNumber(options, value);
@@ -572,7 +572,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var _clearSelector = dataSelector('clear');
 
 	    function normalizeData(data) {
-	        return !data ? {} : ($.type(data) === 'string' ? {id: data} : data);
+	        return !data ? {} : ($.type(data) !== 'object' ? {id: data} : data);
 	    }
 
 	    function setValue(el, value) {
@@ -751,6 +751,131 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
+	module.exports = toNumber;
+
+	var numIsFinite = Number.isFinite || function(value) {
+	    return typeof value === 'number' && isFinite(value);
+	};
+
+	function toNumber(value, options) {
+	    return _toNumber(options, value);
+	}
+
+	toNumber.configure = function(options) {
+	    return _toNumber.bind(undefined, options);
+	};
+
+	function _toNumber(options, value) {
+	    if (numIsFinite(value)) {
+	        return value;
+	    }
+
+	    var decimalSeparator = options && options.decimalSeparator || '.';
+
+	    var string = '' + value;
+
+	    var dotPos = string.indexOf('.');
+	    var commaPos = string.indexOf(',');
+
+	    if (commaPos > -1) {
+	        if (dotPos > -1 && commaPos > dotPos) {
+	            decimalSeparator = ',';
+	        } else if (dotPos === -1) {
+	            var decimalLength = string.substr(commaPos + 1).length;
+	            if (decimalLength > 0 && decimalLength < 3) {
+	                decimalSeparator = ',';
+	            }
+	        }
+	    }
+
+	    if (dotPos > -1 && commaPos > -1 && commaPos > dotPos) {
+	        decimalSeparator = ',';
+	    } else if (dotPos === -1 && commaPos > -1 && string.substr(commaPos + 1).length < 3) {
+	        decimalSeparator = ',';
+	    }
+
+	    var regex = new RegExp("[^0-9-" + decimalSeparator + "]", ["g"]);
+
+	    return parseFloat(
+	        string
+	            .replace(/\(([^-]+)\)/, "-$1") // replace bracketed values with negatives
+	            .replace(regex, '') // strip out any cruft
+	            .replace(decimalSeparator, '.') // make sure decimal separator is standard
+	    ) || 0;
+	}
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = toFixed;
+
+	function toFixed(value, precision, options) {
+	    return _toFixed(options, value, precision);
+	}
+
+	toFixed.configure = function(options) {
+	    return _toFixed.bind(undefined, options);
+	};
+
+	function _toFixed(options, value, precision) {
+	    var roundingFunction = options && options.roundingFunction || Math.round;
+	    var power = Math.pow(10, precision || 0);
+
+	    return (roundingFunction(value * power) / power).toFixed(precision);
+	}
+
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = type;
+
+	var natives = {
+	    '[object Arguments]': 'arguments',
+	    '[object Array]': 'array',
+	    '[object Date]': 'date',
+	    '[object Function]': 'function',
+	    '[object Number]': 'number',
+	    '[object RegExp]': 'regexp',
+	    '[object String]': 'string'
+	};
+
+	function type(obj) {
+	    var str = Object.prototype.toString.call(obj);
+
+	    if (natives[str]) {
+	        return natives[str];
+	    }
+
+	    if (obj === null) {
+	        return 'null';
+	    }
+
+	    if (obj === undefined) {
+	        return 'undefined';
+	    }
+
+	    if (obj === Object(obj)) {
+	        return 'object';
+	    }
+
+	    return typeof obj;
+	}
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
 	module.exports = {
 	    AED: { prefix: '\u062c' },
 	    ANG: { prefix: '\u0192' },
@@ -818,7 +943,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 8 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -934,67 +1059,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	module.exports = toNumber;
-
-	var numIsFinite = Number.isFinite || function(value) {
-	    return typeof value === 'number' && isFinite(value);
-	};
-
-	function toNumber(value, options) {
-	    return _toNumber(options, value);
-	}
-
-	toNumber.configure = function(options) {
-	    return _toNumber.bind(undefined, options);
-	};
-
-	function _toNumber(options, value) {
-	    if (numIsFinite(value)) {
-	        return value;
-	    }
-
-	    var decimalSeparator = options && options.decimalSeparator || '.';
-
-	    var string = '' + value;
-
-	    var dotPos = string.indexOf('.');
-	    var commaPos = string.indexOf(',');
-
-	    if (commaPos > -1) {
-	        if (dotPos > -1 && commaPos > dotPos) {
-	            decimalSeparator = ',';
-	        } else if (dotPos === -1) {
-	            var decimalLength = string.substr(commaPos + 1).length;
-	            if (decimalLength > 0 && decimalLength < 3) {
-	                decimalSeparator = ',';
-	            }
-	        }
-	    }
-
-	    if (dotPos > -1 && commaPos > -1 && commaPos > dotPos) {
-	        decimalSeparator = ',';
-	    } else if (dotPos === -1 && commaPos > -1 && string.substr(commaPos + 1).length < 3) {
-	        decimalSeparator = ',';
-	    }
-
-	    var regex = new RegExp("[^0-9-" + decimalSeparator + "]", ["g"]);
-
-	    return parseFloat(
-	        string
-	            .replace(/\(([^-]+)\)/, "-$1") // replace bracketed values with negatives
-	            .replace(regex, '') // strip out any cruft
-	            .replace(decimalSeparator, '.') // make sure decimal separator is standard
-	    ) || 0;
-	}
-
-
-/***/ },
-/* 10 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1002,7 +1067,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = options;
 
 	var extend = __webpack_require__(15);
-	var type = __webpack_require__(14);
+	var type = __webpack_require__(9);
 
 	function options(options, key, value) {
 	    if (arguments.length === 1) {
@@ -1024,14 +1089,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 11 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	module.exports = value;
 
-	var type = __webpack_require__(14);
+	var type = __webpack_require__(9);
 
 	function value(value, context, args) {
 	    if (type(value) === 'function') {
@@ -1043,7 +1108,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1051,8 +1116,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = createItem;
 
 	var extend = __webpack_require__(15);
-	var toNumber = __webpack_require__(9);
-	var type = __webpack_require__(14);
+	var toNumber = __webpack_require__(7);
+	var type = __webpack_require__(9);
 
 	var _defaultAttributes = {
 	    quantity: 1
@@ -1121,71 +1186,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    return item;
-	}
-
-
-/***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	module.exports = toFixed;
-
-	function toFixed(value, precision, options) {
-	    return _toFixed(options, value, precision);
-	}
-
-	toFixed.configure = function(options) {
-	    return _toFixed.bind(undefined, options);
-	};
-
-	function _toFixed(options, value, precision) {
-	    var roundingFunction = options && options.roundingFunction || Math.round;
-	    var power = Math.pow(10, precision || 0);
-
-	    return (roundingFunction(value * power) / power).toFixed(precision);
-	}
-
-
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	module.exports = type;
-
-	var natives = {
-	    '[object Arguments]': 'arguments',
-	    '[object Array]': 'array',
-	    '[object Date]': 'date',
-	    '[object Function]': 'function',
-	    '[object Number]': 'number',
-	    '[object RegExp]': 'regexp',
-	    '[object String]': 'string'
-	};
-
-	function type(obj) {
-	    var str = Object.prototype.toString.call(obj);
-
-	    if (natives[str]) {
-	        return natives[str];
-	    }
-
-	    if (obj === null) {
-	        return 'null';
-	    }
-
-	    if (obj === undefined) {
-	        return 'undefined';
-	    }
-
-	    if (obj === Object(obj)) {
-	        return 'object';
-	    }
-
-	    return typeof obj;
 	}
 
 
