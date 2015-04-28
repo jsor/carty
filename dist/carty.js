@@ -124,17 +124,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var emit = emitter(cart);
 
-	    cart.on(['add', 'update', 'remove', 'clear'], function() {
-	        emit('change');
-	    });
-
-	    cart.on(['added', 'updated', 'removed', 'cleared'], function() {
-	        emit('changed');
-	    });
-
-	    cart.on(['addfailed', 'updatefailed', 'removefailed', 'clearfailed'], function() {
-	        emit('changefailed');
-	    });
+	    cart.on(['add', 'update', 'remove', 'clear'], emit.bind(undefined, 'change'));
+	    cart.on(['added', 'updated', 'removed', 'cleared'], emit.bind(undefined, 'changed'));
+	    cart.on(['addfailed', 'updatefailed', 'removefailed', 'clearfailed'], emit.bind(undefined, 'changefailed'));
 
 	    cart.options = options.bind(cart, _options);
 
@@ -274,6 +266,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            return !found;
 	        });
+
 	        return found;
 	    }
 
@@ -1002,7 +995,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function createItem(attributes) {
-
 	    var _attributes = extend({}, _defaultAttributes, normalize(attributes));
 
 	    if (!_attributes.id) {
