@@ -92,7 +92,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var toNumber = __webpack_require__(8);
 	var options = __webpack_require__(9);
 	var value = __webpack_require__(10);
-	var createItem = __webpack_require__(11);
+	var type = __webpack_require__(11);
+	var createItem = __webpack_require__(12);
 
 	var resolve = Promise.resolve.bind(Promise);
 	var reject = Promise.reject.bind(Promise);
@@ -241,7 +242,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return resolve(
 	            _options.storage && _options.storage.load()
 	        ).then(function(items) {
-	            if (Array.isArray(items)) {
+	            if (type(items) === 'array') {
 	                _items = items.map(function(attr) {
 	                    return createItem(attr);
 	                });
@@ -387,7 +388,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = formatCurrency;
 
 	var extend = __webpack_require__(15);
-	var defaultCurrencies = __webpack_require__(12);
+	var defaultCurrencies = __webpack_require__(13);
 	var formatNumber = __webpack_require__(3);
 
 	function formatCurrency(value, options) {
@@ -424,8 +425,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = formatNumber;
 
 	var toNumber = __webpack_require__(8);
-	var toFixed = __webpack_require__(13);
-	var type = __webpack_require__(14);
+	var toFixed = __webpack_require__(14);
+	var type = __webpack_require__(11);
 
 	function formatNumber(value, options) {
 	    return _formatNumber(options, value);
@@ -753,7 +754,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = emitter;
 
-	var isArray = Array.isArray;
+	var type = __webpack_require__(11);
+
+	function isArray(value) {
+	    return type(value) === 'array';
+	}
 
 	// Adapted from component-emitter
 	function emitter(object) {
@@ -930,7 +935,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = options;
 
 	var extend = __webpack_require__(15);
-	var type = __webpack_require__(14);
+	var type = __webpack_require__(11);
 
 	function options(options, key, value) {
 	    if (arguments.length === 1) {
@@ -959,7 +964,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = value;
 
-	var type = __webpack_require__(14);
+	var type = __webpack_require__(11);
 
 	function value(value, context, args) {
 	    if (type(value) === 'function') {
@@ -976,11 +981,52 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
+	module.exports = type;
+
+	var natives = {
+	    '[object Arguments]': 'arguments',
+	    '[object Array]': 'array',
+	    '[object Date]': 'date',
+	    '[object Function]': 'function',
+	    '[object Number]': 'number',
+	    '[object RegExp]': 'regexp',
+	    '[object String]': 'string'
+	};
+
+	function type(obj) {
+	    var str = Object.prototype.toString.call(obj);
+
+	    if (natives[str]) {
+	        return natives[str];
+	    }
+
+	    if (obj === null) {
+	        return 'null';
+	    }
+
+	    if (obj === undefined) {
+	        return 'undefined';
+	    }
+
+	    if (obj === Object(obj)) {
+	        return 'object';
+	    }
+
+	    return typeof obj;
+	}
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
 	module.exports = createItem;
 
 	var extend = __webpack_require__(15);
 	var toNumber = __webpack_require__(8);
-	var type = __webpack_require__(14);
+	var type = __webpack_require__(11);
 
 	var _defaultAttributes = {
 	    quantity: 1
@@ -1053,7 +1099,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1125,7 +1171,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1145,47 +1191,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var power = Math.pow(10, precision || 0);
 
 	    return (roundingFunction(value * power) / power).toFixed(precision);
-	}
-
-
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	module.exports = type;
-
-	var natives = {
-	    '[object Arguments]': 'arguments',
-	    '[object Array]': 'array',
-	    '[object Date]': 'date',
-	    '[object Function]': 'function',
-	    '[object Number]': 'number',
-	    '[object RegExp]': 'regexp',
-	    '[object String]': 'string'
-	};
-
-	function type(obj) {
-	    var str = Object.prototype.toString.call(obj);
-
-	    if (natives[str]) {
-	        return natives[str];
-	    }
-
-	    if (obj === null) {
-	        return 'null';
-	    }
-
-	    if (obj === undefined) {
-	        return 'undefined';
-	    }
-
-	    if (obj === Object(obj)) {
-	        return 'object';
-	    }
-
-	    return typeof obj;
 	}
 
 

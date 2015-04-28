@@ -25,7 +25,6 @@ support the required features.
 You may use ES5 polyfills for the following features (if you have to support
 browsers like IE8 for example):
 
-* [`Array.isArray`](http://kangax.github.io/compat-table/es5/#Array.isArray)
 * [`Array.prototype.every`](http://kangax.github.io/compat-table/es5/#Array.prototype.every)
 * [`Array.prototype.forEach`](http://kangax.github.io/compat-table/es5/#Array.prototype.forEach)
 * [`Array.prototype.map`](http://kangax.github.io/compat-table/es5/#Array.prototype.map)
