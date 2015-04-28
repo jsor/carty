@@ -1,5 +1,5 @@
 /*!
- * Carty - v0.2.0 - 2015-04-28
+ * Carty - v0.2.1 - 2015-04-28
  * http://sorgalla.com/carty/
  * Copyright (c) 2015 Jan Sorgalla; Licensed MIT
  */
@@ -88,11 +88,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = createCart;
 
 	var extend = __webpack_require__(15);
-	var emitter = __webpack_require__(11);
-	var toNumber = __webpack_require__(7);
-	var options = __webpack_require__(12);
-	var value = __webpack_require__(13);
-	var createItem = __webpack_require__(14);
+	var emitter = __webpack_require__(7);
+	var toNumber = __webpack_require__(8);
+	var options = __webpack_require__(9);
+	var value = __webpack_require__(10);
+	var createItem = __webpack_require__(11);
 
 	var resolve = Promise.resolve.bind(Promise);
 	var reject = Promise.reject.bind(Promise);
@@ -387,7 +387,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = formatCurrency;
 
 	var extend = __webpack_require__(15);
-	var defaultCurrencies = __webpack_require__(10);
+	var defaultCurrencies = __webpack_require__(12);
 	var formatNumber = __webpack_require__(3);
 
 	function formatCurrency(value, options) {
@@ -423,9 +423,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = formatNumber;
 
-	var toNumber = __webpack_require__(7);
-	var toFixed = __webpack_require__(8);
-	var type = __webpack_require__(9);
+	var toNumber = __webpack_require__(8);
+	var toFixed = __webpack_require__(13);
+	var type = __webpack_require__(14);
 
 	function formatNumber(value, options) {
 	    return _formatNumber(options, value);
@@ -751,203 +751,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	module.exports = toNumber;
-
-	var numIsFinite = Number.isFinite || function(value) {
-	    return typeof value === 'number' && isFinite(value);
-	};
-
-	function toNumber(value, options) {
-	    return _toNumber(options, value);
-	}
-
-	toNumber.configure = function(options) {
-	    return _toNumber.bind(undefined, options);
-	};
-
-	function _toNumber(options, value) {
-	    if (numIsFinite(value)) {
-	        return value;
-	    }
-
-	    var decimalSeparator = options && options.decimalSeparator || '.';
-
-	    var string = '' + value;
-
-	    var dotPos = string.indexOf('.');
-	    var commaPos = string.indexOf(',');
-
-	    if (commaPos > -1) {
-	        if (dotPos > -1 && commaPos > dotPos) {
-	            decimalSeparator = ',';
-	        } else if (dotPos === -1) {
-	            var decimalLength = string.substr(commaPos + 1).length;
-	            if (decimalLength > 0 && decimalLength < 3) {
-	                decimalSeparator = ',';
-	            }
-	        }
-	    }
-
-	    if (dotPos > -1 && commaPos > -1 && commaPos > dotPos) {
-	        decimalSeparator = ',';
-	    } else if (dotPos === -1 && commaPos > -1 && string.substr(commaPos + 1).length < 3) {
-	        decimalSeparator = ',';
-	    }
-
-	    var regex = new RegExp("[^0-9-" + decimalSeparator + "]", ["g"]);
-
-	    return parseFloat(
-	        string
-	            .replace(/\(([^-]+)\)/, "-$1") // replace bracketed values with negatives
-	            .replace(regex, '') // strip out any cruft
-	            .replace(decimalSeparator, '.') // make sure decimal separator is standard
-	    ) || 0;
-	}
-
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	module.exports = toFixed;
-
-	function toFixed(value, precision, options) {
-	    return _toFixed(options, value, precision);
-	}
-
-	toFixed.configure = function(options) {
-	    return _toFixed.bind(undefined, options);
-	};
-
-	function _toFixed(options, value, precision) {
-	    var roundingFunction = options && options.roundingFunction || Math.round;
-	    var power = Math.pow(10, precision || 0);
-
-	    return (roundingFunction(value * power) / power).toFixed(precision);
-	}
-
-
-/***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	module.exports = type;
-
-	var natives = {
-	    '[object Arguments]': 'arguments',
-	    '[object Array]': 'array',
-	    '[object Date]': 'date',
-	    '[object Function]': 'function',
-	    '[object Number]': 'number',
-	    '[object RegExp]': 'regexp',
-	    '[object String]': 'string'
-	};
-
-	function type(obj) {
-	    var str = Object.prototype.toString.call(obj);
-
-	    if (natives[str]) {
-	        return natives[str];
-	    }
-
-	    if (obj === null) {
-	        return 'null';
-	    }
-
-	    if (obj === undefined) {
-	        return 'undefined';
-	    }
-
-	    if (obj === Object(obj)) {
-	        return 'object';
-	    }
-
-	    return typeof obj;
-	}
-
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	module.exports = {
-	    AED: { prefix: '\u062c' },
-	    ANG: { prefix: '\u0192' },
-	    ARS: { prefix: '$', suffix: ' ARS' },
-	    AUD: { prefix: '$', suffix: ' AUD' },
-	    AWG: { prefix: '\u0192' },
-	    BBD: { prefix: '$', suffix: ' BBD' },
-	    BGN: { prefix: '\u043b\u0432' },
-	    BTC: { suffix: ' BTC', precision: 4 },
-	    BMD: { prefix: '$', suffix: ' BMD' },
-	    BND: { prefix: '$', suffix: ' BND' },
-	    BRL: { prefix: 'R$' },
-	    BSD: { prefix: '$', suffix: ' BSD' },
-	    CAD: { prefix: '$', suffix: ' CAD' },
-	    CHF: { suffix: ' CHF' },
-	    CLP: { prefix: '$', suffix: ' CLP' },
-	    CNY: { prefix: '\u00A5' },
-	    COP: { prefix: '$', suffix: ' COP' },
-	    CRC: { prefix: '\u20A1' },
-	    CZK: { prefix: 'Kc' },
-	    DKK: { prefix: 'kr' },
-	    DOP: { prefix: '$', suffix: ' DOP' },
-	    EEK: { prefix: 'kr' },
-	    EUR: { prefix: '\u20AC' },
-	    GBP: { prefix: '\u00A3' },
-	    GTQ: { prefix: 'Q' },
-	    HKD: { prefix: '$', suffix: ' HKD' },
-	    HRK: { prefix: 'kn' },
-	    HUF: { prefix: 'Ft' },
-	    IDR: { prefix: 'Rp' },
-	    ILS: { prefix: '\u20AA' },
-	    INR: { prefix: 'Rs.' },
-	    ISK: { prefix: 'kr' },
-	    JMD: { prefix: 'J$' },
-	    JPY: { prefix: '\u00A5', precision: 0 },
-	    KRW: { prefix: '\u20A9' },
-	    KYD: { prefix: '$', suffix: ' KYD' },
-	    LTL: { prefix: 'Lt' },
-	    LVL: { prefix: 'Ls' },
-	    MXN: { prefix: '$', suffix: ' MXN' },
-	    MYR: { prefix: 'RM' },
-	    NOK: { prefix: 'kr' },
-	    NZD: { prefix: '$', suffix: ' NZD' },
-	    PEN: { prefix: 'S/' },
-	    PHP: { prefix: 'Php' },
-	    PLN: { prefix: 'z' },
-	    QAR: { prefix: '\ufdfc' },
-	    RON: { prefix: 'lei' },
-	    RUB: { prefix: '\u0440\u0443\u0431' },
-	    SAR: { prefix: '\ufdfc' },
-	    SEK: { prefix: 'kr' },
-	    SGD: { prefix: '$', suffix: ' SGD' },
-	    THB: { prefix: '\u0E3F' },
-	    TRY: { prefix: 'TL' },
-	    TTD: { prefix: 'TT$' },
-	    TWD: { prefix: 'NT$' },
-	    UAH: { prefix: '\u20b4' },
-	    USD: { prefix: '$' },
-	    UYU: { prefix: '$U' },
-	    VEF: { prefix: 'Bs' },
-	    VND: { prefix: '\u20ab' },
-	    XCD: { prefix: '$', suffix: ' XCD' },
-	    ZAR: { prefix: 'R' }
-	};
-
-
-/***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
 	module.exports = emitter;
 
 	var isArray = Array.isArray;
@@ -1059,7 +862,67 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = toNumber;
+
+	var numIsFinite = Number.isFinite || function(value) {
+	    return typeof value === 'number' && isFinite(value);
+	};
+
+	function toNumber(value, options) {
+	    return _toNumber(options, value);
+	}
+
+	toNumber.configure = function(options) {
+	    return _toNumber.bind(undefined, options);
+	};
+
+	function _toNumber(options, value) {
+	    if (numIsFinite(value)) {
+	        return value;
+	    }
+
+	    var decimalSeparator = options && options.decimalSeparator || '.';
+
+	    var string = '' + value;
+
+	    var dotPos = string.indexOf('.');
+	    var commaPos = string.indexOf(',');
+
+	    if (commaPos > -1) {
+	        if (dotPos > -1 && commaPos > dotPos) {
+	            decimalSeparator = ',';
+	        } else if (dotPos === -1) {
+	            var decimalLength = string.substr(commaPos + 1).length;
+	            if (decimalLength > 0 && decimalLength < 3) {
+	                decimalSeparator = ',';
+	            }
+	        }
+	    }
+
+	    if (dotPos > -1 && commaPos > -1 && commaPos > dotPos) {
+	        decimalSeparator = ',';
+	    } else if (dotPos === -1 && commaPos > -1 && string.substr(commaPos + 1).length < 3) {
+	        decimalSeparator = ',';
+	    }
+
+	    var regex = new RegExp("[^0-9-" + decimalSeparator + "]", ["g"]);
+
+	    return parseFloat(
+	        string
+	            .replace(/\(([^-]+)\)/, "-$1") // replace bracketed values with negatives
+	            .replace(regex, '') // strip out any cruft
+	            .replace(decimalSeparator, '.') // make sure decimal separator is standard
+	    ) || 0;
+	}
+
+
+/***/ },
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1067,7 +930,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = options;
 
 	var extend = __webpack_require__(15);
-	var type = __webpack_require__(9);
+	var type = __webpack_require__(14);
 
 	function options(options, key, value) {
 	    if (arguments.length === 1) {
@@ -1089,14 +952,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 13 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	module.exports = value;
 
-	var type = __webpack_require__(9);
+	var type = __webpack_require__(14);
 
 	function value(value, context, args) {
 	    if (type(value) === 'function') {
@@ -1108,7 +971,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 14 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1116,8 +979,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = createItem;
 
 	var extend = __webpack_require__(15);
-	var toNumber = __webpack_require__(7);
-	var type = __webpack_require__(9);
+	var toNumber = __webpack_require__(8);
+	var type = __webpack_require__(14);
 
 	var _defaultAttributes = {
 	    quantity: 1
@@ -1186,6 +1049,143 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    return item;
+	}
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = {
+	    AED: { prefix: '\u062c' },
+	    ANG: { prefix: '\u0192' },
+	    ARS: { prefix: '$', suffix: ' ARS' },
+	    AUD: { prefix: '$', suffix: ' AUD' },
+	    AWG: { prefix: '\u0192' },
+	    BBD: { prefix: '$', suffix: ' BBD' },
+	    BGN: { prefix: '\u043b\u0432' },
+	    BTC: { suffix: ' BTC', precision: 4 },
+	    BMD: { prefix: '$', suffix: ' BMD' },
+	    BND: { prefix: '$', suffix: ' BND' },
+	    BRL: { prefix: 'R$' },
+	    BSD: { prefix: '$', suffix: ' BSD' },
+	    CAD: { prefix: '$', suffix: ' CAD' },
+	    CHF: { suffix: ' CHF' },
+	    CLP: { prefix: '$', suffix: ' CLP' },
+	    CNY: { prefix: '\u00A5' },
+	    COP: { prefix: '$', suffix: ' COP' },
+	    CRC: { prefix: '\u20A1' },
+	    CZK: { prefix: 'Kc' },
+	    DKK: { prefix: 'kr' },
+	    DOP: { prefix: '$', suffix: ' DOP' },
+	    EEK: { prefix: 'kr' },
+	    EUR: { prefix: '\u20AC' },
+	    GBP: { prefix: '\u00A3' },
+	    GTQ: { prefix: 'Q' },
+	    HKD: { prefix: '$', suffix: ' HKD' },
+	    HRK: { prefix: 'kn' },
+	    HUF: { prefix: 'Ft' },
+	    IDR: { prefix: 'Rp' },
+	    ILS: { prefix: '\u20AA' },
+	    INR: { prefix: 'Rs.' },
+	    ISK: { prefix: 'kr' },
+	    JMD: { prefix: 'J$' },
+	    JPY: { prefix: '\u00A5', precision: 0 },
+	    KRW: { prefix: '\u20A9' },
+	    KYD: { prefix: '$', suffix: ' KYD' },
+	    LTL: { prefix: 'Lt' },
+	    LVL: { prefix: 'Ls' },
+	    MXN: { prefix: '$', suffix: ' MXN' },
+	    MYR: { prefix: 'RM' },
+	    NOK: { prefix: 'kr' },
+	    NZD: { prefix: '$', suffix: ' NZD' },
+	    PEN: { prefix: 'S/' },
+	    PHP: { prefix: 'Php' },
+	    PLN: { prefix: 'z' },
+	    QAR: { prefix: '\ufdfc' },
+	    RON: { prefix: 'lei' },
+	    RUB: { prefix: '\u0440\u0443\u0431' },
+	    SAR: { prefix: '\ufdfc' },
+	    SEK: { prefix: 'kr' },
+	    SGD: { prefix: '$', suffix: ' SGD' },
+	    THB: { prefix: '\u0E3F' },
+	    TRY: { prefix: 'TL' },
+	    TTD: { prefix: 'TT$' },
+	    TWD: { prefix: 'NT$' },
+	    UAH: { prefix: '\u20b4' },
+	    USD: { prefix: '$' },
+	    UYU: { prefix: '$U' },
+	    VEF: { prefix: 'Bs' },
+	    VND: { prefix: '\u20ab' },
+	    XCD: { prefix: '$', suffix: ' XCD' },
+	    ZAR: { prefix: 'R' }
+	};
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = toFixed;
+
+	function toFixed(value, precision, options) {
+	    return _toFixed(options, value, precision);
+	}
+
+	toFixed.configure = function(options) {
+	    return _toFixed.bind(undefined, options);
+	};
+
+	function _toFixed(options, value, precision) {
+	    var roundingFunction = options && options.roundingFunction || Math.round;
+	    var power = Math.pow(10, precision || 0);
+
+	    return (roundingFunction(value * power) / power).toFixed(precision);
+	}
+
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = type;
+
+	var natives = {
+	    '[object Arguments]': 'arguments',
+	    '[object Array]': 'array',
+	    '[object Date]': 'date',
+	    '[object Function]': 'function',
+	    '[object Number]': 'number',
+	    '[object RegExp]': 'regexp',
+	    '[object String]': 'string'
+	};
+
+	function type(obj) {
+	    var str = Object.prototype.toString.call(obj);
+
+	    if (natives[str]) {
+	        return natives[str];
+	    }
+
+	    if (obj === null) {
+	        return 'null';
+	    }
+
+	    if (obj === undefined) {
+	        return 'undefined';
+	    }
+
+	    if (obj === Object(obj)) {
+	        return 'object';
+	    }
+
+	    return typeof obj;
 	}
 
 
