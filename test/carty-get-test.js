@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
-var carty = typeof window !== 'undefined' ? window.carty : require('../lib/cart');
+var carty = typeof window !== 'undefined' ? window.carty : require('../lib/carty');
 
-describe("cart().get()", function() {
+describe("carty().get()", function() {
     var cart;
 
     beforeEach(function() {
@@ -31,6 +31,24 @@ describe("cart().get()", function() {
         cart
             .ready(function() {
                 var item = cart.get('Item');
+                assert.deepEqual(item, {
+                    id: 'Item',
+                    label: "Item",
+                    price: 0,
+                    quantity: 1,
+                    variant: {}
+                });
+            })
+            .ready(function() {
+                done();
+            })
+        ;
+    });
+
+    it("returns existing item passed as item()", function(done) {
+        cart
+            .ready(function() {
+                var item = cart.get(cart.item('Item'));
                 assert.deepEqual(item, {
                     id: 'Item',
                     label: "Item",

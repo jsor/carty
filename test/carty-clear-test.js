@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
-var carty = typeof window !== 'undefined' ? window.carty : require('../lib/cart');
+var carty = typeof window !== 'undefined' ? window.carty : require('../lib/carty');
 
-describe("cart().clear()", function() {
+describe("carty().clear()", function() {
     var cart;
 
     beforeEach(function() {

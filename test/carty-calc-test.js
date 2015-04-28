@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
-var carty = typeof window !== 'undefined' ? window.carty : require('../lib/cart');
+var carty = typeof window !== 'undefined' ? window.carty : require('../lib/carty');
 
-describe("cart().quantity()", function() {
+describe("carty().quantity()", function() {
     var cart;
 
     beforeEach(function() {
@@ -46,7 +46,7 @@ describe("cart().quantity()", function() {
     });
 });
 
-describe("cart().subtotal()", function() {
+describe("carty().subtotal()", function() {
     var cart;
 
     beforeEach(function() {
@@ -80,7 +80,7 @@ describe("cart().subtotal()", function() {
     });
 });
 
-describe("cart().shipping()", function() {
+describe("carty().shipping()", function() {
     var cart;
 
     it("calculates no shipping for empty cart", function() {
@@ -140,7 +140,7 @@ describe("cart().shipping()", function() {
     });
 });
 
-describe("cart().tax()", function() {
+describe("carty().tax()", function() {
     var cart;
 
     it("calculates no tax for empty cart", function() {
@@ -200,7 +200,7 @@ describe("cart().tax()", function() {
     });
 });
 
-describe("cart().total()", function() {
+describe("carty().total()", function() {
     var cart;
 
     it("calculates total", function(done) {

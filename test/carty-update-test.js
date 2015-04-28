@@ -1,19 +1,63 @@
 var assert = require('chai').assert;
 var sinon = require('sinon');
-var carty = typeof window !== 'undefined' ? window.carty : require('../lib/cart');
+var carty = typeof window !== 'undefined' ? window.carty : require('../lib/carty');
 
-describe("cart().add()", function() {
+describe("carty().update()", function() {
     var cart;
 
     beforeEach(function() {
-        cart = carty();
+        cart = carty({
+            storage: {
+                load: function() { return [{id: 'Item'}]; },
+                add: function (item, items) { },
+                update: function (item, items) { },
+                remove: function (item, items) { },
+                clear: function () {}
+            }
+        });
     });
 
-    it("adds an item", function(done) {
+    it("updates an item", function(done) {
         cart
-            .add({id: 'Item'})
+            .update({id: 'Item', price: 10})
+            .ready(function() {
+                assert.deepEqual(cart.get({id: 'Item'}).price, 10);
+            })
+            .ready(function() {
+                done();
+            })
+        ;
+    });
+
+    it("updates an item as string", function(done) {
+        cart
+            .update('Item')
+            .ready(function() {
+                assert.isTrue(cart.has({id: 'Item'}));
+            })
+            .ready(function() {
+                done();
+            })
+        ;
+    });
+
+    it("updates an item as item()", function(done) {
+        cart
+            .update(cart.item({id: 'Item', price: 10}))
+            .ready(function() {
+                assert.deepEqual(cart.get({id: 'Item'}).price, 10);
+            })
+            .ready(function() {
+                done();
+            })
+        ;
+    });
+
+    it("does nothing if item does not exist", function(done) {
+        carty()
+            .update({id: 'Item2'})
             .ready(function(cart) {
-                assert.isTrue(cart.has({id: 'Item'}));
+                assert.isFalse(cart.has({id: 'Item'}));
             })
             .ready(function() {
                 done();
@@ -21,35 +65,9 @@ describe("cart().add()", function() {
         ;
     });
 
-    it("adds an item as string", function(done) {
+    it("sets quantity for existing item", function(done) {
         cart
-            .add('Item')
-            .ready(function() {
-                assert.isTrue(cart.has({id: 'Item'}));
-            })
-            .ready(function() {
-                done();
-            })
-        ;
-    });
-
-    it("updates quantity for existing item", function(done) {
-        cart
-            .add({id: 'Item'})
-            .add({id: 'Item', quantity: 2})
-            .ready(function() {
-                assert.strictEqual(cart.get('Item').quantity, 3);
-            })
-            .ready(function() {
-                done();
-            })
-        ;
-    });
-
-    it("updates quantity for existing item added as string", function(done) {
-        cart
-            .add('Item')
-            .add('Item')
+            .update({id: 'Item', quantity: 2})
             .ready(function() {
                 assert.strictEqual(cart.get('Item').quantity, 2);
             })
@@ -59,12 +77,11 @@ describe("cart().add()", function() {
         ;
     });
 
-    it("updates quantity for mixed item type", function(done) {
+    it("sets quantity for mixed item type", function(done) {
         cart
-            .add('Item')
-            .add({id: 'Item', quantity: 2})
+            .update({id: 'Item', quantity: 2})
             .ready(function() {
-                assert.strictEqual(cart.get('Item').quantity, 3);
+                assert.strictEqual(cart.get('Item').quantity, 2);
             })
             .ready(function() {
                 done();
@@ -74,12 +91,24 @@ describe("cart().add()", function() {
 
     it("updates item attributes", function(done) {
         cart
-            .add({id: 'Item', price: 0, foo: 'bar'})
-            .add({id: 'Item', price: 5, foo: 'baz', bar: 'baz'})
+            .update({id: 'Item', price: 5, foo: 'bar', bar: 'baz'})
             .ready(function() {
                 assert.strictEqual(cart.get('Item').price, 5);
-                assert.strictEqual(cart.get('Item').foo, 'baz');
+                assert.strictEqual(cart.get('Item').foo, 'bar');
                 assert.strictEqual(cart.get('Item').bar, 'baz');
+            })
+            .ready(function() {
+                done();
+            })
+        ;
+    });
+
+    it("updates custom item attributes", function(done) {
+        cart
+            .update({id: 'Item', custom: 'foo'})
+            .update({id: 'Item', custom: 'bar'})
+            .ready(function() {
+                assert.strictEqual(cart.get('Item').custom, 'bar');
             })
             .ready(function() {
                 done();
@@ -89,12 +118,11 @@ describe("cart().add()", function() {
 
     it("removes existing item if quantity lower 0", function(done) {
         cart
-            .add({id: 'Item'})
-            .ready(function() {
+            .ready(function(cart) {
                 assert.strictEqual(cart.size(), 1);
             })
-            .add({id: 'Item', quantity: -1})
-            .ready(function() {
+            .update({id: 'Item', quantity: 0})
+            .ready(function(cart) {
                 assert.strictEqual(cart.size(), 0);
             })
             .ready(function() {
@@ -103,25 +131,13 @@ describe("cart().add()", function() {
         ;
     });
 
-    it("does nothing if item quantity lower 0", function(done) {
-        cart
-            .add({id: 'Nonexisting Item', quantity: -1})
-            .ready(function() {
-                assert.strictEqual(cart.size(), 0);
-            })
-            .ready(function() {
-                done();
-            })
-        ;
-    });
-
-    it("emits add event", function(done) {
+    it("emits update event", function(done) {
         var spy = sinon.spy();
 
-        cart.on('add', spy);
+        cart.on('update', spy);
 
         cart
-            .add('Item')
+            .update('Item')
             .ready(function() {
                 assert.isTrue(spy.called);
                 assert.strictEqual(spy.args[0][0], 'Item');
@@ -132,15 +148,15 @@ describe("cart().add()", function() {
         ;
     });
 
-    it("aborts if add event listener returns false", function(done) {
-        cart.on('add', function() {
+    it("aborts if update event listener returns false", function(done) {
+        cart.on('update', function() {
             return false;
         });
 
         cart
-            .add('Item')
+            .update({id: 'Item', quantity: 2})
             .ready(function() {
-                assert.strictEqual(cart.size(), 0);
+                assert.strictEqual(cart.get('Item').quantity, 1);
             })
             .ready(function() {
                 done();
@@ -148,13 +164,13 @@ describe("cart().add()", function() {
         ;
     });
 
-    it("emits added event", function(done) {
+    it("emits updated event", function(done) {
         var spy = sinon.spy();
 
-        cart.on('added', spy);
+        cart.on('updated', spy);
 
         cart
-            .add('Item')
+            .update('Item')
             .ready(function() {
                 assert.isTrue(spy.called);
                 assert.deepEqual(spy.args[0][0], {
@@ -171,20 +187,20 @@ describe("cart().add()", function() {
         ;
     });
 
-    it("emits addfailed event", function(done) {
+    it("emits updatefailed event", function(done) {
         cart = carty({
             storage: {
-                load: function() { return []; },
-                add: function() { return Promise.reject('error'); }
+                load: function() { return [{id: 'Item'}]; },
+                update: function() { return Promise.reject('error'); }
             }
         });
 
         var spy = sinon.spy();
 
-        cart.on('addfailed', spy);
+        cart.on('updatefailed', spy);
 
         cart
-            .add('Item')
+            .update('Item')
             .error(function() {
                 assert.strictEqual(spy.args[0][0], 'error');
                 assert.deepEqual(spy.args[0][1], {
@@ -210,34 +226,34 @@ describe("cart().add()", function() {
         });
 
         cart
-            .add('Item')
+            .update('Item')
         ;
     });
 
     it("emits changed event", function(done) {
-        cart.on('changed', function(it) {
+        cart.on('changed', function() {
             done();
         });
 
         cart
-            .add('Item')
+            .update('Item')
         ;
     });
 
     it("emits changefailed event", function(done) {
         cart = carty({
             storage: {
-                load: function() { return []; },
-                add: function() { return Promise.reject('error'); }
+                load: function() { return [{id: 'Item'}]; },
+                update: function() { return Promise.reject('error'); }
             }
         });
 
-        cart.on('changefailed', function(error) {
+        cart.on('changefailed', function() {
             done();
         });
 
         cart
-            .add('Item')
+            .update('Item')
         ;
     });
 });

@@ -1,8 +1,8 @@
 var assert = require('chai').assert;
 var sinon = require('sinon');
-var carty = typeof window !== 'undefined' ? window.carty : require('../lib/cart');
+var carty = typeof window !== 'undefined' ? window.carty : require('../lib/carty');
 
-describe("cart().remove()", function() {
+describe("carty().remove()", function() {
     var cart;
 
     beforeEach(function() {
@@ -25,6 +25,12 @@ describe("cart().remove()", function() {
 
     it("removes an item as string", function() {
         cart.remove('Item');
+
+        assert.isFalse(cart.has({id: 'Item'}));
+    });
+
+    it("removes an item as item()", function() {
+        cart.remove(cart.item('Item'));
 
         assert.isFalse(cart.has({id: 'Item'}));
     });

@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
-var carty = typeof window !== 'undefined' ? window.carty : require('../lib/cart');
+var carty = typeof window !== 'undefined' ? window.carty : require('../lib/carty');
 
-describe("cart().has()", function() {
+describe("carty().has()", function() {
     var cart;
 
     beforeEach(function() {
@@ -24,6 +24,17 @@ describe("cart().has()", function() {
         cart
             .ready(function() {
                 assert.isTrue(cart.has('Item'));
+            })
+            .ready(function() {
+                done();
+            })
+        ;
+    });
+
+    it("returns true for existing item passed as item()", function(done) {
+        cart
+            .ready(function() {
+                assert.isTrue(cart.has(cart.item('Item')));
             })
             .ready(function() {
                 done();

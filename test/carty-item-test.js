@@ -1,37 +1,66 @@
 var assert = require('chai').assert;
-var createItem = typeof window !== 'undefined' ? window.carty.item : require('../lib/item');
+var carty = typeof window !== 'undefined' ? window.carty : require('../lib/carty');
 
-describe("item()", function() {
+describe("carty().item()", function() {
+    var cart;
+
+    beforeEach(function() {
+        cart = carty();
+    });
+    
     it("does not create an item from empty object", function() {
         assert.throw(function() {
-            createItem({});
+            cart.item({});
         }.bind(this), undefined, 'Item must be a string or an object with at least an id property.');
     });
 
     it("does not create an item from undefined", function() {
         assert.throw(function() {
-            createItem();
+            cart.item();
         }.bind(this), undefined, 'Item must be a string or an object with at least an id property.');
     });
 
     it("does not create an item from null", function() {
         assert.throw(function() {
-            createItem(null);
+            cart.item(null);
         }.bind(this), undefined, 'Item must be a string or an object with at least an id property.');
     });
 
     it("does not create an item without id property", function() {
         assert.throw(function() {
-            createItem({foo: 'bar'});
+            cart.item({foo: 'bar'});
         }.bind(this), undefined, 'Item must be a string or an object with at least an id property.');
     });
 
-    it("returns default attributes", function() {
+    it("creates an item from string", function() {
+        var item = cart.item('id');
+        var object = item();
+
+        assert.strictEqual(object.id, 'id');
+        assert.strictEqual(object.price, 0);
+        assert.strictEqual(object.quantity, 1);
+        assert.deepEqual(object.variant, {});
+    });
+
+    it("creates an item from object", function() {
         var attr = {
             id: 'id'
         };
 
-        var item = createItem(attr);
+        var item = cart.item(attr);
+        var object = item();
+
+        assert.strictEqual(object.id, 'id');
+        assert.strictEqual(object.price, 0);
+        assert.strictEqual(object.quantity, 1);
+        assert.deepEqual(object.variant, {});
+    });
+
+    it("creates an item from function", function() {
+        var item = cart.item(function() {
+            return 'id';
+        });
+
         var object = item();
 
         assert.strictEqual(object.id, 'id');
@@ -53,7 +82,7 @@ describe("item()", function() {
             variant: 'variant'
         };
 
-        var item = createItem(attr);
+        var item = cart.item(attr);
         var object = item();
 
         assert.strictEqual(object.id, 'id');
@@ -71,22 +100,22 @@ describe("item()", function() {
     });
 
     it("uses id as label if label is undefined", function() {
-        var props = {
+        var attr = {
             id: 'id'
         };
 
-        var item = createItem(props);
+        var item = cart.item(attr);
 
         assert.strictEqual(item().label, 'id');
     });
 
     it("compares items", function() {
-        var props = {
+        var attr = {
             id: 'label',
             foo: 'bar'
         };
 
-        var item = createItem(props);
+        var item = cart.item(attr);
 
         assert.isTrue(item.equals({id: 'label', foo: 'bar'}));
         assert.isTrue(item.equals({id: 'label'}));
@@ -100,12 +129,12 @@ describe("item()", function() {
     });
 
     it("compares items with string variant", function() {
-        var props = {
+        var attr = {
             id: 'label',
             variant: 'variant'
         };
 
-        var item = createItem(props);
+        var item = cart.item(attr);
 
         assert.isTrue(item.equals({id: 'label', variant: 'variant'}));
         assert.isTrue(item.equals({id: 'label', label: 'bar', variant: 'variant'}));
@@ -116,7 +145,7 @@ describe("item()", function() {
     });
 
     it("compares items with object variant", function() {
-        var props = {
+        var attr = {
             id: 'label',
             variant: {
                 variant1: 'variant1',
@@ -124,7 +153,7 @@ describe("item()", function() {
             }
         };
 
-        var item = createItem(props);
+        var item = cart.item(attr);
 
         assert.isTrue(item.equals({id: 'label', variant: {
             variant1: 'variant1',
@@ -144,5 +173,20 @@ describe("item()", function() {
             variant1: 'variant1',
             variant2: 'variant2'
         }}));
+    });
+
+    it("respects cart options", function() {
+        cart = carty({
+            decimalSeparator: '#'
+        });
+
+        var attr = {
+            id: 'label',
+            price: '100#50'
+        };
+
+        var item = cart.item(attr);
+
+        assert.strictEqual(item().price, 100.5);
     });
 });

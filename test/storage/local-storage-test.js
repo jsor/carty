@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
 var sinon = require('sinon');
 var localStorage = require('../../lib/storage/local-storage');
-var createItem = typeof window !== 'undefined' ? window.carty.item : require('../../lib/item');
+var carty = typeof window !== 'undefined' ? window.carty : require('../../lib/carty');
 
 describe("storage/localStorage(null, )", function() {
     var mockLocalStorage = {
@@ -10,8 +10,11 @@ describe("storage/localStorage(null, )", function() {
         removeItem: function (done) { }
     }, mock;
 
+    var cart;
+
     beforeEach(function() {
-        mock = sinon.mock(mockLocalStorage)
+        mock = sinon.mock(mockLocalStorage);
+        cart = carty();
     });
 
     it("works with window.localStorage", function() {
@@ -22,7 +25,7 @@ describe("storage/localStorage(null, )", function() {
 
         var storage = localStorage();
 
-        storage.add(null, function() { return [createItem('Item')]; });
+        storage.add(null, function() { return [cart.item('Item')]; });
 
         mock.verify();
 
@@ -34,7 +37,7 @@ describe("storage/localStorage(null, )", function() {
 
         var storage = localStorage(null, mockLocalStorage);
 
-        storage.add(null, function() { return [createItem('Item')]; });
+        storage.add(null, function() { return [cart.item('Item')]; });
 
         mock.verify();
     });
@@ -44,7 +47,7 @@ describe("storage/localStorage(null, )", function() {
 
         var storage = localStorage(null, mockLocalStorage);
 
-        storage.update(null, function() { return [createItem('Item')]; });
+        storage.update(null, function() { return [cart.item('Item')]; });
 
         mock.verify();
     });
@@ -54,7 +57,7 @@ describe("storage/localStorage(null, )", function() {
 
         var storage = localStorage(null, mockLocalStorage);
 
-        storage.remove(null, function() { return [createItem('Item')]; });
+        storage.remove(null, function() { return [cart.item('Item')]; });
 
         mock.verify();
     });
