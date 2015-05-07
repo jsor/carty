@@ -1,5 +1,5 @@
 /*!
- * Carty - v0.3.1 - 2015-04-29
+ * Carty - v0.3.1 - 2015-05-07
  * http://sorgalla.com/carty/
  * Copyright (c) 2015 Jan Sorgalla; Licensed MIT
  */
@@ -521,7 +521,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        output = number + '',
 	        precision = options.precision,
 	        decSep = options.decimalSeparator || '.',
-	        thouSep = options.thousandsSeparator,
+	        groupSep = options.groupingSeparator,
+	        groupSize = type(options.groupingSize) === 'number' ? options.groupingSize : 3,
 	        decIndex,
 	        newOutput, count, i;
 
@@ -536,8 +537,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        output = output.replace('.', decSep);
 	    }
 
-	    // Add the thousands separator
-	    if (thouSep) {
+	    // Add the grouping separator
+	    if (groupSep) {
 	        // Find the dot or where it would be
 	        decIndex = output.lastIndexOf(decSep);
 	        decIndex = (decIndex > -1) ? decIndex : output.length;
@@ -545,8 +546,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        newOutput = output.substring(decIndex);
 	        // Working left, every third time add a separator, every time add a digit
 	        for (count = 0, i = decIndex; i > 0; i--) {
-	            if ((count % 3 === 0) && (i !== decIndex) && (!isNeg || (i > 1))) {
-	                newOutput = thouSep + newOutput;
+	            if ((count % groupSize === 0) && (i !== decIndex) && (!isNeg || (i > 1))) {
+	                newOutput = groupSep + newOutput;
 	            }
 	            newOutput = output.charAt(i - 1) + newOutput;
 	            count++;

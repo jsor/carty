@@ -8,7 +8,8 @@ var customCurrencies = {
         suffix: ' CUS',
         precision: 4,
         decimalSeparator: '%',
-        thousandsSeparator: '?'
+        groupingSeparator: '?',
+        groupingSize: 2
     }
 };
 
@@ -41,9 +42,9 @@ describe("format/currency()", function() {
         expect(formatCurrency(123456.7891, {currencies: currencies, currency: 'JPY'})).to.equal('¥123457');
 
         // custom currency
-        expect(formatCurrency(123456, {currency: 'CUSTOM', currencies: customCurrencies})).to.equal('CUS 123?456%0000 CUS');
-        expect(formatCurrency(123456.78, {currency: 'CUSTOM', currencies: customCurrencies})).to.equal('CUS 123?456%7800 CUS');
-        expect(formatCurrency(123456.789666, {currency: 'CUSTOM', currencies: customCurrencies})).to.equal('CUS 123?456%7897 CUS');
+        expect(formatCurrency(123456, {currency: 'CUSTOM', currencies: customCurrencies})).to.equal('CUS 12?34?56%0000 CUS');
+        expect(formatCurrency(123456.78, {currency: 'CUSTOM', currencies: customCurrencies})).to.equal('CUS 12?34?56%7800 CUS');
+        expect(formatCurrency(123456.789666, {currency: 'CUSTOM', currencies: customCurrencies})).to.equal('CUS 12?34?56%7897 CUS');
 
         // unknown currency
         expect(formatCurrency(123456, {currencies: currencies, currency: 'FOO'})).to.equal('123456.00 FOO');
