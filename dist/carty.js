@@ -279,104 +279,112 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    function update(attr) {
-	        if (!emit('update', attr)) {
-	            return;
-	        }
+	        return emit('update', attr).then(function() {
+	            var existing = has(attr);
 
-	        var existing = has(attr);
+	            if (!existing) {
+	                return;
+	            }
 
-	        if (!existing) {
-	            return;
-	        }
+	            var item = existing.item.merge(attr);
+	            var state = item();
 
-	        var item = existing.item.merge(attr);
-	        var state = item();
+	            if (state.quantity < 1) {
+	                return remove(state);
+	            }
 
-	        if (state.quantity < 1) {
-	            return remove(state);
-	        }
+	            _items[existing.index] = item;
 
-	        _items[existing.index] = item;
-
-	        return resolve(
-	            _options.storage && _options.storage.update(state, cart)
-	        ).then(emit.bind(cart, 'updated', state), function(e) {
-	            emit('updatefailed', e, state);
-	            return reject(e);
+	            return resolve(
+	                _options.storage && _options.storage.update(state, cart)
+	            ).then(emit.bind(cart, 'updated', state), function(e) {
+	                emit('updatefailed', e, state);
+	                return reject(e);
+	            }, function() {
+	                // Catch updated event listener rejections
+	            });
+	        }, function() {
+	            // Catch update event listener rejections
 	        });
 	    }
 
 	    function add(attr) {
-	        if (!emit('add', attr)) {
-	            return;
-	        }
+	        return emit('add', attr).then(function() {
+	            var item = createItem(attr);
+	            var existing = has(attr);
 
-	        var item = createItem(attr);
-	        var existing = has(attr);
+	            if (existing) {
+	                attr = extend({}, attr, {
+	                    quantity: existing.item().quantity + item().quantity
+	                });
 
-	        if (existing) {
-	            attr = extend({}, attr, {
-	                quantity: existing.item().quantity + item().quantity
+	                item = existing.item.merge(attr);
+	            }
+
+	            var state = item();
+
+	            if (state.quantity < 1) {
+	                return remove(state);
+	            }
+
+	            if (existing) {
+	                _items[existing.index] = item;
+	            } else {
+	                _items.push(item);
+	            }
+
+	            return resolve(
+	                _options.storage && _options.storage.add(state, cart)
+	            ).then(emit.bind(cart, 'added', state), function(e) {
+	                emit('addfailed', e, state);
+	                return reject(e);
+	            }, function() {
+	                // Catch added event listener rejections
 	            });
-
-	            item = existing.item.merge(attr);
-	        }
-
-	        var state = item();
-
-	        if (state.quantity < 1) {
-	            return remove(state);
-	        }
-
-	        if (existing) {
-	            _items[existing.index] = item;
-	        } else {
-	            _items.push(item);
-	        }
-
-	        return resolve(
-	            _options.storage && _options.storage.add(state, cart)
-	        ).then(emit.bind(cart, 'added', state), function(e) {
-	            emit('addfailed', e, state);
-	            return reject(e);
+	        }, function() {
+	            // Catch add event listener rejections
 	        });
 	    }
 
 	    function remove(attr) {
-	        if (!emit('remove', attr)) {
-	            return;
-	        }
+	        return emit('remove', attr).then(function() {
+	            var existing = has(attr);
 
-	        var existing = has(attr);
+	            if (!existing) {
+	                return;
+	            }
 
-	        if (!existing) {
-	            return;
-	        }
+	            _items.splice(existing.index, 1);
 
-	        _items.splice(existing.index, 1);
+	            var state = existing.item();
 
-	        var state = existing.item();
-
-	        return resolve(
-	            _options.storage && _options.storage.remove(state, cart)
-	        ).then(emit.bind(cart, 'removed', state), function(e) {
-	            emit('removefailed', e, state);
-	            return reject(e);
+	            return resolve(
+	                _options.storage && _options.storage.remove(state, cart)
+	            ).then(emit.bind(cart, 'removed', state), function(e) {
+	                emit('removefailed', e, state);
+	                return reject(e);
+	            }, function() {
+	                // Catch removed event listener rejections
+	            });
+	        }, function() {
+	            // Catch remove event listener rejections
 	        });
 	    }
 
 	    function clear() {
-	        if (!emit('clear')) {
-	            return;
-	        }
+	        return emit('clear').then(function() {
+	            _items.length = 0;
 
-	        _items.length = 0;
-
-	        return resolve(
-	            _options.storage && _options.storage.clear()
-	        ).then(emit.bind(cart, 'cleared'), function(e) {
-	            emit('clearfailed', e);
-	            return reject(e);
+	            return resolve(
+	                _options.storage && _options.storage.clear()
+	            ).then(emit.bind(cart, 'cleared'), function(e) {
+	                emit('clearfailed', e);
+	                return reject(e);
+	            }, function() {
+	                // Catch cleared event listener rejections
+	            });
+	        }, function() {
+	            // Catch clear event listener rejections
 	        });
 	    }
 
@@ -912,32 +920,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    return function emit(event) {
-	        var args = [].slice.call(arguments, 1),
-	            passed = true;
+	        var args = [].slice.call(arguments, 1), ret;
 
 	        if (isArray(event)) {
-	            event.forEach(function(evt) {
-	                if (false === emit.apply(object, [evt].concat(args))) {
-	                    passed = false;
-	                }
-	            });
-
-	            return passed;
+	            return Promise.all(event.map(function(evt) {
+	                return emit.apply(object, [evt].concat(args));
+	            }));
 	        }
 
 	        var callbacks = _callbacks['$' + event];
 
-	        if (callbacks) {
-	            callbacks = callbacks.slice(0);
-
-	            for (var i = 0, len = callbacks.length; i < len; ++i) {
-	                if (false === callbacks[i].apply(object, args)) {
-	                    passed = false;
-	                }
-	            }
+	        if (!callbacks) {
+	            return Promise.resolve();
 	        }
 
-	        return passed;
+	        return Promise.all(callbacks.slice(0).map(function(callback) {
+	            ret = callback.apply(object, args);
+
+	            if (false === ret) {
+	                return Promise.reject();
+	            }
+
+	            return ret;
+	        }));
 	    };
 	}
 

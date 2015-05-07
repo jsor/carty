@@ -2,6 +2,10 @@ var should = require('chai').should();
 var assert = require('chai').assert;
 var emitter = require('../../lib/util/emitter');
 
+var throwUncaught = function(e) {
+    setTimeout(function() { throw e; });
+};
+
 // Adapted from component-emitter
 describe("util/emitter()", function() {
     var obj, emit;
@@ -16,21 +20,31 @@ describe("util/emitter()", function() {
     });
 
     describe('emit()', function() {
-        it('returns false if a listener returns false', function() {
-            obj.on('foo', function(val) {
+        it('returns rejected promise if a listener returns false', function(done) {
+            obj.on('foo', function() {
                 return true;
             });
 
-            obj.on('foo', function(val) {
+            obj.on('foo', function() {
                 return false;
             });
 
-            var result = emit('foo', 1);
-
-            result.should.be.false;
+            emit('foo', 1)
+                .then(
+                    function() {
+                        assert.fail();
+                    },
+                    function() {
+                        assert.ok(true);
+                    }
+                )
+                .then(function() {
+                    done();
+                }, throwUncaught)
+            ;
         });
 
-        it('returns false if listeners as array return false', function() {
+        it('returns rejected promise if listeners as array return false', function(done) {
             obj.on('foo', function(val) {
                 return true;
             });
@@ -39,12 +53,22 @@ describe("util/emitter()", function() {
                 return false;
             });
 
-            var result = emit(['foo', 'bar'], 1);
-
-            result.should.be.false;
+            emit(['foo', 'bar'], 1)
+                .then(
+                    function() {
+                        assert.fail();
+                    },
+                    function() {
+                        assert.ok(true);
+                    }
+                )
+                .then(function() {
+                    done();
+                }, throwUncaught)
+            ;
         });
 
-        it('triggers events as array', function() {
+        it('triggers events as array', function(done) {
             var num = 0;
 
             obj.on('foo', function(val) {
@@ -55,14 +79,19 @@ describe("util/emitter()", function() {
                 num += val;
             });
 
-            emit(['foo', 'bar'], 1);
-
-            num.should.eql(2);
+            emit(['foo', 'bar'], 1)
+                .then(function() {
+                    num.should.eql(2);
+                })
+                .then(function() {
+                    done();
+                }, throwUncaught)
+            ;
         });
     });
 
     describe('.on(event, fn)', function() {
-        it('adds listeners', function() {
+        it('adds listeners', function(done) {
             var calls = [];
 
             obj.on('foo', function(val) {
@@ -73,14 +102,22 @@ describe("util/emitter()", function() {
                 calls.push('two', val);
             });
 
-            emit('foo', 1);
-            emit('bar', 1);
-            emit('foo', 2);
-
-            calls.should.eql(['one', 1, 'two', 1, 'one', 2, 'two', 2]);
+            Promise
+                .all([
+                    emit('foo', 1),
+                    emit('bar', 1),
+                    emit('foo', 2)
+                ])
+                .then(function() {
+                    calls.should.eql(['one', 1, 'two', 1, 'one', 2, 'two', 2]);
+                })
+                .then(function() {
+                    done();
+                }, throwUncaught)
+            ;
         });
 
-        it('adds listeners for events which are same names with methods of Object.prototype', function() {
+        it('adds listeners for events which are same names with methods of Object.prototype', function(done) {
             var calls = [];
 
             obj.on('constructor', function(val) {
@@ -91,61 +128,93 @@ describe("util/emitter()", function() {
                 calls.push('two', val);
             });
 
-            emit('constructor', 1);
-            emit('__proto__', 2);
-
-            calls.should.eql(['one', 1, 'two', 2]);
+            Promise
+                .all([
+                    emit('constructor', 1),
+                    emit('__proto__', 2)
+                ])
+                .then(function() {
+                    calls.should.eql(['one', 1, 'two', 2]);
+                })
+                .then(function() {
+                    done();
+                }, throwUncaught)
+            ;
         });
 
-        it('adds listeners as array', function() {
+        it('adds listeners as array', function(done) {
             var num = 0;
 
             obj.on(['foo', 'bar'], function(val) {
                 num += val;
             });
 
-            emit('foo', 1);
-            emit('bar', 1);
-
-            num.should.eql(2);
+            Promise
+                .all([
+                    emit('foo', 1),
+                    emit('bar', 1)
+                ])
+                .then(function() {
+                    num.should.eql(2);
+                })
+                .then(function() {
+                    done();
+                }, throwUncaught)
+            ;
         });
     });
 
     describe('.once(event, fn)', function() {
-        it('adds a single-shot listener', function() {
+        it('adds a single-shot listener', function(done) {
             var calls = [];
 
             obj.once('foo', function(val) {
                 calls.push('one', val);
             });
 
-            emit('foo', 1);
-            emit('foo', 2);
-            emit('foo', 3);
-            emit('bar', 1);
-
-            calls.should.eql(['one', 1]);
+            Promise
+                .all([
+                    emit('foo', 1),
+                    emit('foo', 2),
+                    emit('foo', 3),
+                    emit('bar', 1)
+                ])
+                .then(function() {
+                    calls.should.eql(['one', 1]);
+                })
+                .then(function() {
+                    done();
+                }, throwUncaught)
+            ;
         });
 
-        it('adds a single-shot listeners as array', function() {
+        it('adds a single-shot listeners as array', function(done) {
             var num = 0;
 
             obj.once(['foo', 'bar'], function(val) {
                 num += val;
             });
 
-            emit('foo', 1);
-            emit('bar', 1);
+            Promise
+                .all([
+                    emit('foo', 1),
+                    emit('bar', 1),
 
-            emit('foo', 1);
-            emit('bar', 1);
-
-            num.should.eql(2);
+                    emit('foo', 1),
+                    emit('bar', 1)
+                ])
+                .then(function() {
+                    num.should.eql(2);
+                })
+                .then(function() {
+                    done();
+                }, throwUncaught)
+            ;
         });
     });
 
     describe('.off(event, fn)', function() {
-        it('removes a listener', function() {
+        it('removes a listener', function(done) {
             var calls = [];
 
             function one() {
@@ -160,12 +229,16 @@ describe("util/emitter()", function() {
             obj.on('foo', two);
             obj.off('foo', two);
 
-            emit('foo');
-
-            calls.should.eql(['one']);
+            emit('foo')
+                .then(function() {
+                    calls.should.eql(['one']);
+                })
+                .then(function() {
+                    done();
+                }, throwUncaught);
         });
 
-        it('removes listeners as array', function() {
+        it('removes listeners as array', function(done) {
             var num = 0;
 
             function cb(val) {
@@ -176,13 +249,21 @@ describe("util/emitter()", function() {
             obj.on('bar', cb);
             obj.off(['foo', 'bar'], cb);
 
-            emit('foo', 1);
-            emit('bar', 1);
-
-            num.should.eql(0);
+            Promise
+                .all([
+                    emit('foo', 1),
+                    emit('bar', 1)
+                ])
+                .then(function() {
+                    num.should.eql(0);
+                })
+                .then(function() {
+                    done();
+                }, throwUncaught)
+            ;
         });
 
-        it('works with .once()', function() {
+        it('works with .once()', function(done) {
             var calls = [];
 
             function one() {
@@ -193,12 +274,17 @@ describe("util/emitter()", function() {
             obj.once('fee', one);
             obj.off('foo', one);
 
-            emit('foo');
-
-            calls.should.eql([]);
+            emit('foo')
+                .then(function() {
+                    calls.should.eql([]);
+                })
+                .then(function() {
+                    done();
+                }, throwUncaught)
+            ;
         });
 
-        it('works when called from an event', function() {
+        it('works when called from an event', function(done) {
             var called;
 
             function b() {
@@ -209,11 +295,22 @@ describe("util/emitter()", function() {
                 obj.off('tobi', b);
             });
             obj.on('tobi', b);
-            emit('tobi');
-            called.should.be.true;
-            called = false;
-            emit('tobi');
-            called.should.be.false;
+
+            emit('tobi')
+                .then(function() {
+                    called.should.be.true;
+                })
+                .then(function() {
+                    called = false;
+                    return emit('tobi');
+                })
+                .then(function() {
+                    called.should.be.false;
+                })
+                .then(function() {
+                    done();
+                }, throwUncaught)
+            ;
         });
 
         it('returns with no listeners', function() {
@@ -223,7 +320,7 @@ describe("util/emitter()", function() {
     });
 
     describe('.off(event)', function() {
-        it('removes all listeners for an event', function() {
+        it('removes all listeners for an event', function(done) {
             var calls = [];
 
             function one() {
@@ -238,13 +335,21 @@ describe("util/emitter()", function() {
             obj.on('foo', two);
             obj.off('foo');
 
-            emit('foo');
-            emit('foo');
-
-            calls.should.eql([]);
+            Promise
+                .all([
+                    emit('foo'),
+                    emit('foo')
+                ])
+                .then(function() {
+                    calls.should.eql([]);
+                })
+                .then(function() {
+                    done();
+                }, throwUncaught)
+            ;
         });
 
-        it('removes all listeners as array for an event', function() {
+        it('removes all listeners as array for an event', function(done) {
             var num = 0;
 
             function cb(val) {
@@ -255,15 +360,23 @@ describe("util/emitter()", function() {
             obj.on('bar', cb);
             obj.off(['foo', 'bar']);
 
-            emit('foo', 1);
-            emit('bar', 1);
-
-            num.should.eql(0);
+            Promise
+                .all([
+                    emit('foo', 1),
+                    emit('bar', 1)
+                ])
+                .then(function() {
+                    num.should.eql(0);
+                })
+                .then(function() {
+                    done();
+                }, throwUncaught)
+            ;
         })
     });
 
     describe('.off()', function() {
-        it('removes all listeners', function() {
+        it('removes all listeners', function(done) {
             var calls = [];
 
             function one() {
@@ -277,15 +390,29 @@ describe("util/emitter()", function() {
             obj.on('foo', one);
             obj.on('bar', two);
 
-            emit('foo');
-            emit('bar');
-
-            obj.off();
-
-            emit('foo');
-            emit('bar');
-
-            calls.should.eql(['one', 'two']);
+            Promise
+                .all([
+                    emit('foo'),
+                    emit('bar')
+                ])
+                .then(function() {
+                    obj.off();
+                })
+                .then(function() {
+                    return Promise
+                        .all([
+                            emit('foo'),
+                            emit('bar')
+                        ])
+                    ;
+                })
+                .then(function() {
+                    calls.should.eql(['one', 'two']);
+                })
+                .then(function() {
+                    done();
+                }, throwUncaught)
+            ;
         })
     });
 });
