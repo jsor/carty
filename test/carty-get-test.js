@@ -20,7 +20,8 @@ describe("carty().get()", function() {
                     quantity: 1,
                     variant: {}
                 });
-
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -37,7 +38,8 @@ describe("carty().get()", function() {
                     quantity: 1,
                     variant: {}
                 });
-
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -54,7 +56,8 @@ describe("carty().get()", function() {
                     quantity: 1,
                     variant: {}
                 });
-
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -64,6 +67,8 @@ describe("carty().get()", function() {
         cart
             .ready(function(cart) {
                 assert.isNull(cart.get({id: 'Missing'}));
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -73,6 +78,8 @@ describe("carty().get()", function() {
         cart
             .ready(function(cart) {
                 assert.isNull(cart.get('Missing'));
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -86,7 +93,8 @@ describe("carty().get()", function() {
                 assert.isFalse(cart.has([]));
                 assert.isFalse(cart.has(null));
                 assert.isFalse(cart.has(undefined));
-
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -104,7 +112,8 @@ describe("carty().get()", function() {
                     quantity: 1,
                     variant: {}
                 });
-
+            })
+            .ready(function() {
                 done();
             })
         ;

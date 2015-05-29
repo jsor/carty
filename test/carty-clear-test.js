@@ -31,7 +31,8 @@ describe("carty().clear()", function() {
                 assert.strictEqual(count, 0);
 
                 assert.strictEqual(cart().items.length, 0);
-
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -46,6 +47,8 @@ describe("carty().clear()", function() {
             .clear()
             .ready(function() {
                 assert.isTrue(spy.called);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -60,6 +63,8 @@ describe("carty().clear()", function() {
             .clear()
             .ready(function(cart) {
                 assert.strictEqual(cart.size(), 2);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -74,6 +79,8 @@ describe("carty().clear()", function() {
             .clear()
             .ready(function() {
                 assert.isTrue(spy.called);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -98,6 +105,8 @@ describe("carty().clear()", function() {
             })
             .ready(function() {
                 assert.isTrue(spy.called);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -112,6 +121,8 @@ describe("carty().clear()", function() {
             .clear()
             .ready(function() {
                 assert.isTrue(spy.called);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -126,6 +137,8 @@ describe("carty().clear()", function() {
             .clear()
             .ready(function() {
                 assert.isTrue(spy.called);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -148,6 +161,8 @@ describe("carty().clear()", function() {
             .error(function() {}) // Catch the rejection from storage.add()
             .ready(function() {
                 assert.isTrue(spy.called);
+            })
+            .ready(function() {
                 done();
             })
         ;

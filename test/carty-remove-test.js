@@ -22,6 +22,8 @@ describe("carty().remove()", function() {
             .remove({id: 'Item'})
             .ready(function(cart) {
                 assert.isFalse(cart.has({id: 'Item'}));
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -32,6 +34,8 @@ describe("carty().remove()", function() {
             .remove('Item')
             .ready(function(cart) {
                 assert.isFalse(cart.has({id: 'Item'}));
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -42,6 +46,8 @@ describe("carty().remove()", function() {
             .remove(cart.item('Item'))
             .ready(function(cart) {
                 assert.isFalse(cart.has({id: 'Item'}));
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -58,6 +64,8 @@ describe("carty().remove()", function() {
             .ready(function() {
                 assert.strictEqual(1, spy.callCount);
                 assert.isTrue(spy.calledWith('Foo'));
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -86,6 +94,8 @@ describe("carty().remove()", function() {
             .ready(function() {
                 assert.isTrue(spy.called);
                 assert.strictEqual(spy.args[0][0], 'Item');
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -100,6 +110,8 @@ describe("carty().remove()", function() {
             .remove('Item')
             .ready(function(cart) {
                 assert.strictEqual(cart.size(), 1);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -122,7 +134,8 @@ describe("carty().remove()", function() {
                     quantity: 1,
                     variant: {}
                 });
-
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -154,6 +167,8 @@ describe("carty().remove()", function() {
             })
             .ready(function() {
                 assert.isTrue(spy.called);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -168,6 +183,8 @@ describe("carty().remove()", function() {
             .remove('Item')
             .ready(function() {
                 assert.isTrue(spy.called);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -182,6 +199,8 @@ describe("carty().remove()", function() {
             .remove('Item')
             .ready(function() {
                 assert.isTrue(spy.called);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -204,6 +223,8 @@ describe("carty().remove()", function() {
             .error(function() {}) // Catch the rejection from storage.remove()
             .ready(function() {
                 assert.isTrue(spy.called);
+            })
+            .ready(function() {
                 done();
             })
         ;

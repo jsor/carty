@@ -19,7 +19,8 @@ describe("carty().each()", function() {
                 });
 
                 assert.strictEqual(count, 2);
-
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -35,7 +36,8 @@ describe("carty().each()", function() {
                 });
 
                 assert.strictEqual(count, 1);
-
+            })
+            .ready(function() {
                 done();
             })
         ;

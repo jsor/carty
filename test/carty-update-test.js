@@ -22,6 +22,8 @@ describe("carty().update()", function() {
             .update({id: 'Item', price: 10})
             .ready(function(cart) {
                 assert.deepEqual(cart.get({id: 'Item'}).price, 10);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -32,6 +34,8 @@ describe("carty().update()", function() {
             .update('Item')
             .ready(function(cart) {
                 assert.isTrue(cart.has({id: 'Item'}));
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -42,6 +46,8 @@ describe("carty().update()", function() {
             .update(cart.item({id: 'Item', price: 10}))
             .ready(function(cart) {
                 assert.deepEqual(cart.get({id: 'Item'}).price, 10);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -52,6 +58,8 @@ describe("carty().update()", function() {
             .update({id: 'Item2'})
             .ready(function(cart) {
                 assert.isFalse(cart.has({id: 'Item'}));
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -62,6 +70,8 @@ describe("carty().update()", function() {
             .update({id: 'Item', quantity: 2})
             .ready(function(cart) {
                 assert.strictEqual(cart.get('Item').quantity, 2);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -72,6 +82,8 @@ describe("carty().update()", function() {
             .update({id: 'Item', quantity: 2})
             .ready(function(cart) {
                 assert.strictEqual(cart.get('Item').quantity, 2);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -84,6 +96,8 @@ describe("carty().update()", function() {
                 assert.strictEqual(cart.get('Item').price, 5);
                 assert.strictEqual(cart.get('Item').foo, 'bar');
                 assert.strictEqual(cart.get('Item').bar, 'baz');
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -95,6 +109,8 @@ describe("carty().update()", function() {
             .update({id: 'Item', custom: 'bar'})
             .ready(function(cart) {
                 assert.strictEqual(cart.get('Item').custom, 'bar');
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -108,6 +124,8 @@ describe("carty().update()", function() {
             .update({id: 'Item', quantity: 0})
             .ready(function(cart) {
                 assert.strictEqual(cart.size(), 0);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -123,6 +141,8 @@ describe("carty().update()", function() {
             .ready(function() {
                 assert.isTrue(spy.called);
                 assert.strictEqual(spy.args[0][0], 'Item');
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -137,6 +157,8 @@ describe("carty().update()", function() {
             .update({id: 'Item', quantity: 2})
             .ready(function(cart) {
                 assert.strictEqual(cart.get('Item').quantity, 1);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -158,7 +180,8 @@ describe("carty().update()", function() {
                     quantity: 1,
                     variant: {}
                 });
-
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -190,6 +213,8 @@ describe("carty().update()", function() {
             })
             .ready(function() {
                 assert.isTrue(spy.called);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -204,6 +229,8 @@ describe("carty().update()", function() {
             .update('Item')
             .ready(function() {
                 assert.isTrue(spy.called);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -218,6 +245,8 @@ describe("carty().update()", function() {
             .update('Item')
             .ready(function() {
                 assert.isTrue(spy.called);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -240,6 +269,8 @@ describe("carty().update()", function() {
             .error(function() {}) // Catch the rejection from storage.update()
             .ready(function() {
                 assert.isTrue(spy.called);
+            })
+            .ready(function() {
                 done();
             })
         ;

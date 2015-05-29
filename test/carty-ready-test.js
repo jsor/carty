@@ -27,6 +27,8 @@ describe("carty().error()", function() {
             })
             .error(function(e) {
                 assert.strictEqual(e, "foo");
+            })
+            .ready(function() {
                 done();
             })
         ;

@@ -14,6 +14,8 @@ describe("carty().add()", function() {
             .add({id: 'Item'})
             .ready(function(cart) {
                 assert.isTrue(cart.has({id: 'Item'}));
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -24,6 +26,8 @@ describe("carty().add()", function() {
             .add('Item')
             .ready(function(cart) {
                 assert.isTrue(cart.has({id: 'Item'}));
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -34,6 +38,8 @@ describe("carty().add()", function() {
             .add(cart.item('Item'))
             .ready(function(cart) {
                 assert.isTrue(cart.has({id: 'Item'}));
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -45,6 +51,8 @@ describe("carty().add()", function() {
             .add({id: 'Item', quantity: 2})
             .ready(function(cart) {
                 assert.strictEqual(cart.get('Item').quantity, 3);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -56,6 +64,8 @@ describe("carty().add()", function() {
             .add('Item')
             .ready(function(cart) {
                 assert.strictEqual(cart.get('Item').quantity, 2);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -67,6 +77,8 @@ describe("carty().add()", function() {
             .add({id: 'Item', quantity: 2})
             .ready(function(cart) {
                 assert.strictEqual(cart.get('Item').quantity, 3);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -80,6 +92,8 @@ describe("carty().add()", function() {
                 assert.strictEqual(cart.get('Item').price, 5);
                 assert.strictEqual(cart.get('Item').foo, 'baz');
                 assert.strictEqual(cart.get('Item').bar, 'baz');
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -94,6 +108,8 @@ describe("carty().add()", function() {
             .add({id: 'Item', quantity: -1})
             .ready(function(cart) {
                 assert.strictEqual(cart.size(), 0);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -104,6 +120,8 @@ describe("carty().add()", function() {
             .add({id: 'Nonexisting Item', quantity: -1})
             .ready(function(cart) {
                 assert.strictEqual(cart.size(), 0);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -119,6 +137,8 @@ describe("carty().add()", function() {
             .ready(function() {
                 assert.isTrue(spy.called);
                 assert.strictEqual(spy.args[0][0], 'Item');
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -133,6 +153,8 @@ describe("carty().add()", function() {
             .add('Item')
             .ready(function(cart) {
                 assert.strictEqual(cart.size(), 0);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -154,6 +176,8 @@ describe("carty().add()", function() {
                     quantity: 1,
                     variant: {}
                 });
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -185,6 +209,8 @@ describe("carty().add()", function() {
             })
             .ready(function() {
                 assert.isTrue(spy.called);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -199,6 +225,8 @@ describe("carty().add()", function() {
             .add('Item')
             .ready(function() {
                 assert.isTrue(spy.called);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -213,6 +241,8 @@ describe("carty().add()", function() {
             .add('Item')
             .ready(function() {
                 assert.isTrue(spy.called);
+            })
+            .ready(function() {
                 done();
             })
         ;
@@ -235,6 +265,8 @@ describe("carty().add()", function() {
             .error(function() {}) // Catch the rejection from storage.add()
             .ready(function() {
                 assert.isTrue(spy.called);
+            })
+            .ready(function() {
                 done();
             })
         ;
