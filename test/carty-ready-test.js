@@ -1,4 +1,5 @@
 var assert = require('chai').assert;
+var sinon = require('sinon');
 var carty = typeof window !== 'undefined' ? window.carty : require('../lib/carty');
 
 describe("carty().ready()", function() {
@@ -27,6 +28,26 @@ describe("carty().error()", function() {
             })
             .error(function(e) {
                 assert.strictEqual(e, "foo");
+            })
+            .ready(function() {
+                done();
+            })
+        ;
+    });
+
+    it("invokes callback if called before ready", function(done) {
+        var cart = carty({
+            storage: {
+                load: function() { return Promise.reject('error'); }
+            }
+        });
+
+        var spy = sinon.spy();
+
+        cart
+            .error(spy)
+            .ready(function() {
+                assert.isTrue(spy.called);
             })
             .ready(function() {
                 done();
