@@ -12,15 +12,14 @@ describe("carty().each()", function() {
 
     it("iterates over all items", function(done) {
         cart
-            .ready(function() {
+            .ready(function(cart) {
                 var count = 0;
                 cart.each(function() {
                     count++;
                 });
 
                 assert.strictEqual(count, 2);
-            })
-            .ready(function() {
+
                 done();
             })
         ;
@@ -28,7 +27,7 @@ describe("carty().each()", function() {
 
     it("aborts iteration if callback returns false", function(done) {
         cart
-            .ready(function() {
+            .ready(function(cart) {
                 var count = 0;
                 cart.each(function() {
                     count++;
@@ -36,8 +35,7 @@ describe("carty().each()", function() {
                 });
 
                 assert.strictEqual(count, 1);
-            })
-            .ready(function() {
+
                 done();
             })
         ;

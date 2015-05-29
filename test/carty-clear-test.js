@@ -1,4 +1,5 @@
 var assert = require('chai').assert;
+var sinon = require('sinon');
 var carty = typeof window !== 'undefined' ? window.carty : require('../lib/carty');
 
 describe("carty().clear()", function() {
@@ -19,7 +20,7 @@ describe("carty().clear()", function() {
     it("removes all items", function(done) {
         cart
             .clear()
-            .ready(function() {
+            .ready(function(cart) {
                 assert.strictEqual(cart.size(), 0);
 
                 var count = 0;
@@ -30,19 +31,24 @@ describe("carty().clear()", function() {
                 assert.strictEqual(count, 0);
 
                 assert.strictEqual(cart().items.length, 0);
-            })
-            .ready(function() {
+
                 done();
             })
         ;
     });
 
     it("emits clear event", function(done) {
-        cart.on('clear', function() {
-            done();
-        });
+        var spy = sinon.spy();
 
-        cart.clear();
+        cart.on('clear', spy);
+
+        cart
+            .clear()
+            .ready(function() {
+                assert.isTrue(spy.called);
+                done();
+            })
+        ;
     });
 
     it("aborts if clear event listener returns false", function(done) {
@@ -52,21 +58,25 @@ describe("carty().clear()", function() {
 
         cart
             .clear()
-            .ready(function() {
+            .ready(function(cart) {
                 assert.strictEqual(cart.size(), 2);
-            })
-            .ready(function() {
                 done();
             })
         ;
     });
 
     it("emits cleared event", function(done) {
-        cart.on('cleared', function() {
-            done();
-        });
+        var spy = sinon.spy();
 
-        cart.clear();
+        cart.on('cleared', spy);
+
+        cart
+            .clear()
+            .ready(function() {
+                assert.isTrue(spy.called);
+                done();
+            })
+        ;
     });
 
     it("emits clearfailed event", function(done) {
@@ -77,28 +87,48 @@ describe("carty().clear()", function() {
             }
         });
 
-        cart.on('clearfailed', function(error) {
-            assert.strictEqual(error, 'error')
-            done();
-        });
+        var spy = sinon.spy();
 
-        cart.clear();
+        cart.on('clearfailed', spy);
+
+        cart
+            .clear()
+            .error(function() {
+                assert.strictEqual(spy.args[0][0], 'error');
+            })
+            .ready(function() {
+                assert.isTrue(spy.called);
+                done();
+            })
+        ;
     });
 
     it("emits change event", function(done) {
-        cart.on('change', function() {
-            done();
-        });
+        var spy = sinon.spy();
 
-        cart.clear();
+        cart.on('change', spy);
+
+        cart
+            .clear()
+            .ready(function() {
+                assert.isTrue(spy.called);
+                done();
+            })
+        ;
     });
 
     it("emits changed event", function(done) {
-        cart.on('changed', function() {
-            done();
-        });
+        var spy = sinon.spy();
 
-        cart.clear();
+        cart.on('changed', spy);
+
+        cart
+            .clear()
+            .ready(function() {
+                assert.isTrue(spy.called);
+                done();
+            })
+        ;
     });
 
     it("emits changefailed event", function(done) {
@@ -109,10 +139,17 @@ describe("carty().clear()", function() {
             }
         });
 
-        cart.on('changefailed', function() {
-            done();
-        });
+        var spy = sinon.spy();
 
-        cart.clear();
+        cart.on('changefailed', spy);
+
+        cart
+            .clear()
+            .error(function() {}) // Catch the rejection from storage.add()
+            .ready(function() {
+                assert.isTrue(spy.called);
+                done();
+            })
+        ;
     });
 });

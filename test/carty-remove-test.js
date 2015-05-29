@@ -17,46 +17,63 @@ describe("carty().remove()", function() {
         });
     });
 
-    it("removes an item", function() {
-        cart.remove({id: 'Item'});
-
-        assert.isFalse(cart.has({id: 'Item'}));
+    it("removes an item", function(done) {
+        cart
+            .remove({id: 'Item'})
+            .ready(function(cart) {
+                assert.isFalse(cart.has({id: 'Item'}));
+                done();
+            })
+        ;
     });
 
-    it("removes an item as string", function() {
-        cart.remove('Item');
-
-        assert.isFalse(cart.has({id: 'Item'}));
+    it("removes an item as string", function(done) {
+        cart
+            .remove('Item')
+            .ready(function(cart) {
+                assert.isFalse(cart.has({id: 'Item'}));
+                done();
+            })
+        ;
     });
 
-    it("removes an item as item()", function() {
-        cart.remove(cart.item('Item'));
-
-        assert.isFalse(cart.has({id: 'Item'}));
+    it("removes an item as item()", function(done) {
+        cart
+            .remove(cart.item('Item'))
+            .ready(function(cart) {
+                assert.isFalse(cart.has({id: 'Item'}));
+                done();
+            })
+        ;
     });
 
-    it("ignores unknown item", function() {
-        cart.on('remove', function(item) {
-            assert.strictEqual('Foo', item);
-        });
+    it("ignores unknown item", function(done) {
+        var spy = sinon.spy();
 
-        cart.on('removed', function(item) {
-            assert.isNull(item);
-        });
+        cart.on('remove', spy);
+        cart.on('removed', spy);
 
-        cart.remove('Foo');
+        cart
+            .remove('Foo')
+            .ready(function() {
+                assert.strictEqual(1, spy.callCount);
+                assert.isTrue(spy.calledWith('Foo'));
+                done();
+            })
+        ;
     });
 
     it("silently ignores invalid item", function(done) {
-        cart.remove({});
-        cart.remove({foo: 'bar'});
-        cart.remove([]);
-        cart.remove(null);
-        cart.remove(undefined);
-
-        cart.ready(function() {
-            done();
-        });
+        cart
+            .remove({})
+            .remove({foo: 'bar'})
+            .remove([])
+            .remove(null)
+            .remove(undefined)
+            .ready(function() {
+                done();
+            })
+        ;
     });
 
     it("emits remove event", function(done) {
@@ -69,8 +86,6 @@ describe("carty().remove()", function() {
             .ready(function() {
                 assert.isTrue(spy.called);
                 assert.strictEqual(spy.args[0][0], 'Item');
-            })
-            .ready(function() {
                 done();
             })
         ;
@@ -83,10 +98,8 @@ describe("carty().remove()", function() {
 
         cart
             .remove('Item')
-            .ready(function() {
+            .ready(function(cart) {
                 assert.strictEqual(cart.size(), 1);
-            })
-            .ready(function() {
                 done();
             })
         ;
@@ -109,8 +122,7 @@ describe("carty().remove()", function() {
                     quantity: 1,
                     variant: {}
                 });
-            })
-            .ready(function() {
+
                 done();
             })
         ;
@@ -142,30 +154,36 @@ describe("carty().remove()", function() {
             })
             .ready(function() {
                 assert.isTrue(spy.called);
-            })
-            .ready(function() {
                 done();
             })
         ;
     });
 
     it("emits change event", function(done) {
-        cart.on('change', function() {
-            done();
-        });
+        var spy = sinon.spy();
+
+        cart.on('change', spy);
 
         cart
             .remove('Item')
+            .ready(function() {
+                assert.isTrue(spy.called);
+                done();
+            })
         ;
     });
 
     it("emits changed event", function(done) {
-        cart.on('changed', function() {
-            done();
-        });
+        var spy = sinon.spy();
+
+        cart.on('changed', spy);
 
         cart
             .remove('Item')
+            .ready(function() {
+                assert.isTrue(spy.called);
+                done();
+            })
         ;
     });
 
@@ -177,12 +195,17 @@ describe("carty().remove()", function() {
             }
         });
 
-        cart.on('changefailed', function() {
-            done();
-        });
+        var spy = sinon.spy();
+
+        cart.on('changefailed', spy);
 
         cart
             .remove('Item')
+            .error(function() {}) // Catch the rejection from storage.remove()
+            .ready(function() {
+                assert.isTrue(spy.called);
+                done();
+            })
         ;
     });
 });

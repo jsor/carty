@@ -14,8 +14,6 @@ describe("carty().add()", function() {
             .add({id: 'Item'})
             .ready(function(cart) {
                 assert.isTrue(cart.has({id: 'Item'}));
-            })
-            .ready(function() {
                 done();
             })
         ;
@@ -24,10 +22,8 @@ describe("carty().add()", function() {
     it("adds an item as string", function(done) {
         cart
             .add('Item')
-            .ready(function() {
+            .ready(function(cart) {
                 assert.isTrue(cart.has({id: 'Item'}));
-            })
-            .ready(function() {
                 done();
             })
         ;
@@ -36,10 +32,8 @@ describe("carty().add()", function() {
     it("adds an item as time()", function(done) {
         cart
             .add(cart.item('Item'))
-            .ready(function() {
+            .ready(function(cart) {
                 assert.isTrue(cart.has({id: 'Item'}));
-            })
-            .ready(function() {
                 done();
             })
         ;
@@ -49,10 +43,8 @@ describe("carty().add()", function() {
         cart
             .add({id: 'Item'})
             .add({id: 'Item', quantity: 2})
-            .ready(function() {
+            .ready(function(cart) {
                 assert.strictEqual(cart.get('Item').quantity, 3);
-            })
-            .ready(function() {
                 done();
             })
         ;
@@ -62,10 +54,8 @@ describe("carty().add()", function() {
         cart
             .add('Item')
             .add('Item')
-            .ready(function() {
+            .ready(function(cart) {
                 assert.strictEqual(cart.get('Item').quantity, 2);
-            })
-            .ready(function() {
                 done();
             })
         ;
@@ -75,10 +65,8 @@ describe("carty().add()", function() {
         cart
             .add('Item')
             .add({id: 'Item', quantity: 2})
-            .ready(function() {
+            .ready(function(cart) {
                 assert.strictEqual(cart.get('Item').quantity, 3);
-            })
-            .ready(function() {
                 done();
             })
         ;
@@ -88,12 +76,10 @@ describe("carty().add()", function() {
         cart
             .add({id: 'Item', price: 0, foo: 'bar'})
             .add({id: 'Item', price: 5, foo: 'baz', bar: 'baz'})
-            .ready(function() {
+            .ready(function(cart) {
                 assert.strictEqual(cart.get('Item').price, 5);
                 assert.strictEqual(cart.get('Item').foo, 'baz');
                 assert.strictEqual(cart.get('Item').bar, 'baz');
-            })
-            .ready(function() {
                 done();
             })
         ;
@@ -106,10 +92,8 @@ describe("carty().add()", function() {
                 assert.strictEqual(cart.size(), 1);
             })
             .add({id: 'Item', quantity: -1})
-            .ready(function() {
+            .ready(function(cart) {
                 assert.strictEqual(cart.size(), 0);
-            })
-            .ready(function() {
                 done();
             })
         ;
@@ -118,10 +102,8 @@ describe("carty().add()", function() {
     it("does nothing if item quantity lower 0", function(done) {
         cart
             .add({id: 'Nonexisting Item', quantity: -1})
-            .ready(function() {
+            .ready(function(cart) {
                 assert.strictEqual(cart.size(), 0);
-            })
-            .ready(function() {
                 done();
             })
         ;
@@ -137,8 +119,6 @@ describe("carty().add()", function() {
             .ready(function() {
                 assert.isTrue(spy.called);
                 assert.strictEqual(spy.args[0][0], 'Item');
-            })
-            .ready(function() {
                 done();
             })
         ;
@@ -151,10 +131,8 @@ describe("carty().add()", function() {
 
         cart
             .add('Item')
-            .ready(function() {
+            .ready(function(cart) {
                 assert.strictEqual(cart.size(), 0);
-            })
-            .ready(function() {
                 done();
             })
         ;
@@ -176,8 +154,6 @@ describe("carty().add()", function() {
                     quantity: 1,
                     variant: {}
                 });
-            })
-            .ready(function() {
                 done();
             })
         ;
@@ -209,30 +185,36 @@ describe("carty().add()", function() {
             })
             .ready(function() {
                 assert.isTrue(spy.called);
-            })
-            .ready(function() {
                 done();
             })
         ;
     });
 
     it("emits change event", function(done) {
-        cart.on('change', function() {
-            done();
-        });
+        var spy = sinon.spy();
+
+        cart.on('change', spy);
 
         cart
             .add('Item')
+            .ready(function() {
+                assert.isTrue(spy.called);
+                done();
+            })
         ;
     });
 
     it("emits changed event", function(done) {
-        cart.on('changed', function(it) {
-            done();
-        });
+        var spy = sinon.spy();
+
+        cart.on('changed', spy);
 
         cart
             .add('Item')
+            .ready(function() {
+                assert.isTrue(spy.called);
+                done();
+            })
         ;
     });
 
@@ -244,12 +226,17 @@ describe("carty().add()", function() {
             }
         });
 
-        cart.on('changefailed', function(error) {
-            done();
-        });
+        var spy = sinon.spy();
+
+        cart.on('changefailed', spy);
 
         cart
             .add('Item')
+            .error(function() {}) // Catch the rejection from storage.add()
+            .ready(function() {
+                assert.isTrue(spy.called);
+                done();
+            })
         ;
     });
 });

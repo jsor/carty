@@ -26,8 +26,7 @@ describe("carty().options('storage')", function() {
                 assert.strictEqual(cart().items.length, 0);
 
                 mock.verify();
-            })
-            .ready(function() {
+
                 done();
             })
         ;
@@ -42,8 +41,7 @@ describe("carty().options('storage')", function() {
                 assert.strictEqual(cart().items.length, 1);
 
                 mock.verify();
-            })
-            .ready(function() {
+
                 done();
             })
         ;
@@ -57,8 +55,6 @@ describe("carty().options('storage')", function() {
             .add('Item2')
             .ready(function() {
                 mock.verify();
-            })
-            .ready(function() {
                 done();
             })
         ;
@@ -72,8 +68,6 @@ describe("carty().options('storage')", function() {
             .update('Item')
             .ready(function() {
                 mock.verify();
-            })
-            .ready(function() {
                 done();
             })
         ;
@@ -115,8 +109,6 @@ describe("carty().options('storage')", function() {
             .remove('Existing Item')
             .ready(function() {
                 mock.verify();
-            })
-            .ready(function() {
                 done();
             })
         ;
@@ -188,8 +180,6 @@ describe("carty().options('storage')", function() {
             .clear()
             .ready(function() {
                 mock.verify();
-            })
-            .ready(function() {
                 done();
             })
         ;

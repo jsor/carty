@@ -26,7 +26,7 @@ describe("carty().error()", function() {
                 throw "foo";
             })
             .error(function(e) {
-                assert.strictEqual(e, "foo")
+                assert.strictEqual(e, "foo");
                 done();
             })
         ;

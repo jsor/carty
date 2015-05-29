@@ -11,7 +11,7 @@ describe("carty().get()", function() {
 
     it("returns existing item", function(done) {
         cart
-            .ready(function() {
+            .ready(function(cart) {
                 var item = cart.get({id: 'Item'});
                 assert.deepEqual(item, {
                     id: 'Item',
@@ -20,8 +20,7 @@ describe("carty().get()", function() {
                     quantity: 1,
                     variant: {}
                 });
-            })
-            .ready(function() {
+
                 done();
             })
         ;
@@ -29,7 +28,7 @@ describe("carty().get()", function() {
 
     it("returns existing item passed as string", function(done) {
         cart
-            .ready(function() {
+            .ready(function(cart) {
                 var item = cart.get('Item');
                 assert.deepEqual(item, {
                     id: 'Item',
@@ -38,8 +37,7 @@ describe("carty().get()", function() {
                     quantity: 1,
                     variant: {}
                 });
-            })
-            .ready(function() {
+
                 done();
             })
         ;
@@ -47,7 +45,7 @@ describe("carty().get()", function() {
 
     it("returns existing item passed as item()", function(done) {
         cart
-            .ready(function() {
+            .ready(function(cart) {
                 var item = cart.get(cart.item('Item'));
                 assert.deepEqual(item, {
                     id: 'Item',
@@ -56,8 +54,7 @@ describe("carty().get()", function() {
                     quantity: 1,
                     variant: {}
                 });
-            })
-            .ready(function() {
+
                 done();
             })
         ;
@@ -65,10 +62,8 @@ describe("carty().get()", function() {
 
     it("returns null for missing item", function(done) {
         cart
-            .ready(function() {
+            .ready(function(cart) {
                 assert.isNull(cart.get({id: 'Missing'}));
-            })
-            .ready(function() {
                 done();
             })
         ;
@@ -76,10 +71,8 @@ describe("carty().get()", function() {
 
     it("returns null for missing item passed as string", function(done) {
         cart
-            .ready(function() {
+            .ready(function(cart) {
                 assert.isNull(cart.get('Missing'));
-            })
-            .ready(function() {
                 done();
             })
         ;
@@ -87,14 +80,13 @@ describe("carty().get()", function() {
 
     it("returns null for invalid item", function(done) {
         cart
-            .ready(function() {
+            .ready(function(cart) {
                 assert.isFalse(cart.has({}));
                 assert.isFalse(cart.has({foo: 'bar'}));
                 assert.isFalse(cart.has([]));
                 assert.isFalse(cart.has(null));
                 assert.isFalse(cart.has(undefined));
-            })
-            .ready(function() {
+
                 done();
             })
         ;
@@ -103,7 +95,7 @@ describe("carty().get()", function() {
     it("ignores quantity", function(done) {
         cart
             .add({id: 'Item with quantity', quantity: 1})
-            .ready(function() {
+            .ready(function(cart) {
                 var item = cart.get({id: 'Item with quantity', quantity: 2});
                 assert.deepEqual(item, {
                     id: 'Item with quantity',
@@ -112,8 +104,7 @@ describe("carty().get()", function() {
                     quantity: 1,
                     variant: {}
                 });
-            })
-            .ready(function() {
+
                 done();
             })
         ;
