@@ -31,7 +31,7 @@ var config = {
             new Date().getFullYear() + '-' + _.padLeft(new Date().getMonth() + 1, 2, 0) + '-' + _.padLeft(new Date().getDate(), 2, 0) + '\n' +
             pkg.homepage + '\n' +
             'Copyright (c) ' + new Date().getFullYear() + ' ' + pkg.author.name + ';' +
-            ' Licensed ' + _.pluck(pkg.licenses, "type").join(", ")
+            ' Licensed ' + pkg.license
         )
     ]
 };

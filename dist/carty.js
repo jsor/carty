@@ -88,11 +88,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = carty;
 
 	var extend = __webpack_require__(14);
-	var emitter = __webpack_require__(8);
-	var toNumber = __webpack_require__(9);
-	var options = __webpack_require__(10);
-	var value = __webpack_require__(11);
-	var type = __webpack_require__(12);
+	var emitter = __webpack_require__(7);
+	var toNumber = __webpack_require__(8);
+	var options = __webpack_require__(9);
+	var value = __webpack_require__(10);
+	var type = __webpack_require__(11);
 
 	var resolve = Promise.resolve.bind(Promise);
 	var reject = Promise.reject.bind(Promise);
@@ -497,7 +497,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = formatCurrency;
 
 	var extend = __webpack_require__(14);
-	var defaultCurrencies = __webpack_require__(7);
+	var defaultCurrencies = __webpack_require__(12);
 	var formatNumber = __webpack_require__(3);
 
 	function formatCurrency(value, options) {
@@ -533,9 +533,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = formatNumber;
 
-	var toNumber = __webpack_require__(9);
+	var toNumber = __webpack_require__(8);
 	var toFixed = __webpack_require__(13);
-	var type = __webpack_require__(12);
+	var type = __webpack_require__(11);
 
 	function formatNumber(value, options) {
 	    return _formatNumber(options, value);
@@ -861,81 +861,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	module.exports = {
-	    AED: { prefix: '\u062c' },
-	    ANG: { prefix: '\u0192' },
-	    ARS: { prefix: '$', suffix: ' ARS' },
-	    AUD: { prefix: '$', suffix: ' AUD' },
-	    AWG: { prefix: '\u0192' },
-	    BBD: { prefix: '$', suffix: ' BBD' },
-	    BGN: { prefix: '\u043b\u0432' },
-	    BTC: { suffix: ' BTC', precision: 4 },
-	    BMD: { prefix: '$', suffix: ' BMD' },
-	    BND: { prefix: '$', suffix: ' BND' },
-	    BRL: { prefix: 'R$' },
-	    BSD: { prefix: '$', suffix: ' BSD' },
-	    CAD: { prefix: '$', suffix: ' CAD' },
-	    CHF: { suffix: ' CHF' },
-	    CLP: { prefix: '$', suffix: ' CLP' },
-	    CNY: { prefix: '\u00A5' },
-	    COP: { prefix: '$', suffix: ' COP' },
-	    CRC: { prefix: '\u20A1' },
-	    CZK: { prefix: 'Kc' },
-	    DKK: { prefix: 'kr' },
-	    DOP: { prefix: '$', suffix: ' DOP' },
-	    EEK: { prefix: 'kr' },
-	    EUR: { prefix: '\u20AC' },
-	    GBP: { prefix: '\u00A3' },
-	    GTQ: { prefix: 'Q' },
-	    HKD: { prefix: '$', suffix: ' HKD' },
-	    HRK: { prefix: 'kn' },
-	    HUF: { prefix: 'Ft' },
-	    IDR: { prefix: 'Rp' },
-	    ILS: { prefix: '\u20AA' },
-	    INR: { prefix: 'Rs.' },
-	    ISK: { prefix: 'kr' },
-	    JMD: { prefix: 'J$' },
-	    JPY: { prefix: '\u00A5', precision: 0 },
-	    KRW: { prefix: '\u20A9' },
-	    KYD: { prefix: '$', suffix: ' KYD' },
-	    LTL: { prefix: 'Lt' },
-	    LVL: { prefix: 'Ls' },
-	    MXN: { prefix: '$', suffix: ' MXN' },
-	    MYR: { prefix: 'RM' },
-	    NOK: { prefix: 'kr' },
-	    NZD: { prefix: '$', suffix: ' NZD' },
-	    PEN: { prefix: 'S/' },
-	    PHP: { prefix: 'Php' },
-	    PLN: { prefix: 'z' },
-	    QAR: { prefix: '\ufdfc' },
-	    RON: { prefix: 'lei' },
-	    RUB: { prefix: '\u0440\u0443\u0431' },
-	    SAR: { prefix: '\ufdfc' },
-	    SEK: { prefix: 'kr' },
-	    SGD: { prefix: '$', suffix: ' SGD' },
-	    THB: { prefix: '\u0E3F' },
-	    TRY: { prefix: 'TL' },
-	    TTD: { prefix: 'TT$' },
-	    TWD: { prefix: 'NT$' },
-	    UAH: { prefix: '\u20b4' },
-	    USD: { prefix: '$' },
-	    UYU: { prefix: '$U' },
-	    VEF: { prefix: 'Bs' },
-	    VND: { prefix: '\u20ab' },
-	    XCD: { prefix: '$', suffix: ' XCD' },
-	    ZAR: { prefix: 'R' }
-	};
-
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
 	module.exports = emitter;
 
-	var type = __webpack_require__(12);
+	var type = __webpack_require__(11);
 
 	function isArray(value) {
 	    return type(value) === 'array';
@@ -1045,7 +973,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 9 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1105,7 +1033,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 10 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1113,7 +1041,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = options;
 
 	var extend = __webpack_require__(14);
-	var type = __webpack_require__(12);
+	var type = __webpack_require__(11);
 
 	function options(options, key, value) {
 	    if (arguments.length === 1) {
@@ -1135,14 +1063,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 11 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	module.exports = value;
 
-	var type = __webpack_require__(12);
+	var type = __webpack_require__(11);
 
 	function value(value, context, args) {
 	    if (type(value) === 'function') {
@@ -1154,7 +1082,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1192,6 +1120,78 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    return typeof obj;
 	}
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = {
+	    AED: { prefix: '\u062c' },
+	    ANG: { prefix: '\u0192' },
+	    ARS: { prefix: '$', suffix: ' ARS' },
+	    AUD: { prefix: '$', suffix: ' AUD' },
+	    AWG: { prefix: '\u0192' },
+	    BBD: { prefix: '$', suffix: ' BBD' },
+	    BGN: { prefix: '\u043b\u0432' },
+	    BTC: { suffix: ' BTC', precision: 4 },
+	    BMD: { prefix: '$', suffix: ' BMD' },
+	    BND: { prefix: '$', suffix: ' BND' },
+	    BRL: { prefix: 'R$' },
+	    BSD: { prefix: '$', suffix: ' BSD' },
+	    CAD: { prefix: '$', suffix: ' CAD' },
+	    CHF: { suffix: ' CHF' },
+	    CLP: { prefix: '$', suffix: ' CLP' },
+	    CNY: { prefix: '\u00A5' },
+	    COP: { prefix: '$', suffix: ' COP' },
+	    CRC: { prefix: '\u20A1' },
+	    CZK: { prefix: 'Kc' },
+	    DKK: { prefix: 'kr' },
+	    DOP: { prefix: '$', suffix: ' DOP' },
+	    EEK: { prefix: 'kr' },
+	    EUR: { prefix: '\u20AC' },
+	    GBP: { prefix: '\u00A3' },
+	    GTQ: { prefix: 'Q' },
+	    HKD: { prefix: '$', suffix: ' HKD' },
+	    HRK: { prefix: 'kn' },
+	    HUF: { prefix: 'Ft' },
+	    IDR: { prefix: 'Rp' },
+	    ILS: { prefix: '\u20AA' },
+	    INR: { prefix: 'Rs.' },
+	    ISK: { prefix: 'kr' },
+	    JMD: { prefix: 'J$' },
+	    JPY: { prefix: '\u00A5', precision: 0 },
+	    KRW: { prefix: '\u20A9' },
+	    KYD: { prefix: '$', suffix: ' KYD' },
+	    LTL: { prefix: 'Lt' },
+	    LVL: { prefix: 'Ls' },
+	    MXN: { prefix: '$', suffix: ' MXN' },
+	    MYR: { prefix: 'RM' },
+	    NOK: { prefix: 'kr' },
+	    NZD: { prefix: '$', suffix: ' NZD' },
+	    PEN: { prefix: 'S/' },
+	    PHP: { prefix: 'Php' },
+	    PLN: { prefix: 'z' },
+	    QAR: { prefix: '\ufdfc' },
+	    RON: { prefix: 'lei' },
+	    RUB: { prefix: '\u0440\u0443\u0431' },
+	    SAR: { prefix: '\ufdfc' },
+	    SEK: { prefix: 'kr' },
+	    SGD: { prefix: '$', suffix: ' SGD' },
+	    THB: { prefix: '\u0E3F' },
+	    TRY: { prefix: 'TL' },
+	    TTD: { prefix: 'TT$' },
+	    TWD: { prefix: 'NT$' },
+	    UAH: { prefix: '\u20b4' },
+	    USD: { prefix: '$' },
+	    UYU: { prefix: '$U' },
+	    VEF: { prefix: 'Bs' },
+	    VND: { prefix: '\u20ab' },
+	    XCD: { prefix: '$', suffix: ' XCD' },
+	    ZAR: { prefix: 'R' }
+	};
 
 
 /***/ },
