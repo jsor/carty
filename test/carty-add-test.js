@@ -29,7 +29,7 @@ describe("carty().add()", function() {
         ;
     });
 
-    it("adds an item as time()", function(done) {
+    it("adds an item as item()", function(done) {
         cart
             .add(cart.item('Item'))
             .ready(function(cart) {
