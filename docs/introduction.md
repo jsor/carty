@@ -1,7 +1,7 @@
 Introduction
 ============
 
-Carty is a lightweight shopping cart system implemented in JavaScript which can
+Carty is a lightweight shopping cart library implemented in JavaScript which can
 be used either in the browser with jQuery or with Node.js.
 
 Creating a cart

@@ -3,7 +3,7 @@
   "authors": [
     "Jan Sorgalla <jsorgalla@gmail.com>"
   ],
-  "description": "A lightweight and simple to use shopping cart system.",
+  "description": "A lightweight and simple to use shopping cart library.",
   "main": "dist/carty.min.js",
   "moduleType": [
     "amd",

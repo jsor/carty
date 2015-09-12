@@ -1,7 +1,7 @@
 {
   "name": "carty",
   "title": "Carty",
-  "description": "A lightweight and simple to use shopping cart system.",
+  "description": "A lightweight and simple to use shopping cart library.",
   "author": {
     "name": "Jan Sorgalla",
     "email": "jsorgalla@gmail.com",
