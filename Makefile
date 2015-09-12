@@ -20,7 +20,9 @@ test-cov:
 travis:
 	@echo TRAVIS_JOB_ID $(TRAVIS_JOB_ID)
 	@NODE_ENV=test ./node_modules/.bin/istanbul cover \
-		./node_modules/mocha/bin/_mocha --report lcovonly -- --reporter spec --require es6-promise "$(MOCHA_FILES)" && \
-		cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+		./node_modules/mocha/bin/_mocha --report lcovonly -- --reporter spec --require es6-promise "$(MOCHA_FILES)"
+
+coveralls:
+	cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
 
 .PHONY: dist watch test test-no-polyfills test-cov travis

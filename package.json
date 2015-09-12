@@ -24,7 +24,8 @@
     "dist": "make dist",
     "test": "make test",
     "test-cov": "make test-cov",
-    "travis": "make travis"
+    "travis": "make travis",
+    "coveralls": "make coveralls"
   },
   "repository": {
     "type": "git",
