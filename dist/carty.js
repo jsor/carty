@@ -1,5 +1,5 @@
 /*!
- * Carty - v0.4.1 - 2015-05-29
+ * Carty - v0.4.2 - 2015-09-29
  * http://sorgalla.com/carty/
  * Copyright (c) 2015 Jan Sorgalla; Licensed MIT
  */
@@ -194,6 +194,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return cart;
 	    };
 
+	    cart.changed = function() {
+	        if (!_ready) {
+	            _ready = emit('changed');
+	        } else {
+	            ready(emit.bind(undefined, 'changed'));
+	        }
+
+	        return cart;
+	    };
+
 	    cart.each = function(callback, context) {
 	        _items.every(function(item, index) {
 	            return false !== callback.call(context, item(), index, cart);
@@ -265,17 +275,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    function load() {
 	        return emit('load').then(function() {
-	        return resolve(
-	            _options.storage && _options.storage.load()
-	        ).then(function(items) {
-	            if (type(items) === 'array') {
-	                _items = items.map(function(attr) {
-	                    return createItem(attr);
-	                });
-	            }
+	            return resolve(
+	                _options.storage && _options.storage.load()
+	            ).then(function(items) {
+	                if (type(items) === 'array') {
+	                    _items = items.map(function(attr) {
+	                        return createItem(attr);
+	                    });
+	                }
 	            }).then(emit.bind(cart, 'loaded'), function(e) {
-	                emit('loadfailed', e);
-	                return reject(e);
+	                    emit('loadfailed', e);
+	                    return reject(e);
 	            });
 	        }, function() {
 	            // Catch load event listener rejections

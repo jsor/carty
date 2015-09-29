@@ -7,7 +7,7 @@
     "email": "jsorgalla@gmail.com",
     "url": "http://sorgalla.com"
   },
-  "version": "0.4.1",
+  "version": "0.4.2",
   "dependencies": {
     "extend": "^2.0.0"
   },
