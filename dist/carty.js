@@ -1,5 +1,5 @@
 /*!
- * Carty - v0.4.2 - 2015-09-29
+ * Carty - v0.4.3 - 2015-09-29
  * http://sorgalla.com/carty/
  * Copyright (c) 2015 Jan Sorgalla; Licensed MIT
  */
@@ -12,7 +12,7 @@
 		exports["carty"] = factory(require("jquery"));
 	else
 		root["carty"] = factory(root["jQuery"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_6__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_14__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -64,16 +64,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	var carty = __webpack_require__(1);
 
 	carty.format = {
-	    currency: __webpack_require__(2),
-	    number: __webpack_require__(3)
+	    currency: __webpack_require__(8),
+	    number: __webpack_require__(10)
 	};
 
 	carty.storage = {
-	    localStorage: __webpack_require__(4)
+	    localStorage: __webpack_require__(12)
 	};
 
 	carty.ui = {
-	    jquery: __webpack_require__(5)
+	    jquery: __webpack_require__(13)
 	};
 
 	module.exports = carty;
@@ -87,12 +87,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = carty;
 
-	var extend = __webpack_require__(14);
-	var emitter = __webpack_require__(7);
-	var toNumber = __webpack_require__(8);
-	var options = __webpack_require__(9);
-	var value = __webpack_require__(10);
-	var type = __webpack_require__(11);
+	var extend = __webpack_require__(2);
+	var emitter = __webpack_require__(3);
+	var toNumber = __webpack_require__(5);
+	var options = __webpack_require__(6);
+	var value = __webpack_require__(7);
+	var type = __webpack_require__(4);
 
 	var resolve = Promise.resolve.bind(Promise);
 	var reject = Promise.reject.bind(Promise);
@@ -500,15 +500,374 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 2 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var hasOwn = Object.prototype.hasOwnProperty;
+	var toStr = Object.prototype.toString;
+
+	var isArray = function isArray(arr) {
+		if (typeof Array.isArray === 'function') {
+			return Array.isArray(arr);
+		}
+
+		return toStr.call(arr) === '[object Array]';
+	};
+
+	var isPlainObject = function isPlainObject(obj) {
+		if (!obj || toStr.call(obj) !== '[object Object]') {
+			return false;
+		}
+
+		var hasOwnConstructor = hasOwn.call(obj, 'constructor');
+		var hasIsPrototypeOf = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
+		// Not own constructor property must be Object
+		if (obj.constructor && !hasOwnConstructor && !hasIsPrototypeOf) {
+			return false;
+		}
+
+		// Own properties are enumerated firstly, so to speed up,
+		// if last one is own, then all properties are own.
+		var key;
+		for (key in obj) {/**/}
+
+		return typeof key === 'undefined' || hasOwn.call(obj, key);
+	};
+
+	module.exports = function extend() {
+		var options, name, src, copy, copyIsArray, clone,
+			target = arguments[0],
+			i = 1,
+			length = arguments.length,
+			deep = false;
+
+		// Handle a deep copy situation
+		if (typeof target === 'boolean') {
+			deep = target;
+			target = arguments[1] || {};
+			// skip the boolean and the target
+			i = 2;
+		} else if ((typeof target !== 'object' && typeof target !== 'function') || target == null) {
+			target = {};
+		}
+
+		for (; i < length; ++i) {
+			options = arguments[i];
+			// Only deal with non-null/undefined values
+			if (options != null) {
+				// Extend the base object
+				for (name in options) {
+					src = target[name];
+					copy = options[name];
+
+					// Prevent never-ending loop
+					if (target !== copy) {
+						// Recurse if we're merging plain objects or arrays
+						if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
+							if (copyIsArray) {
+								copyIsArray = false;
+								clone = src && isArray(src) ? src : [];
+							} else {
+								clone = src && isPlainObject(src) ? src : {};
+							}
+
+							// Never move original objects, clone them
+							target[name] = extend(deep, clone, copy);
+
+						// Don't bring in undefined values
+						} else if (typeof copy !== 'undefined') {
+							target[name] = copy;
+						}
+					}
+				}
+			}
+		}
+
+		// Return the modified object
+		return target;
+	};
+
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = emitter;
+
+	var type = __webpack_require__(4);
+
+	function isArray(value) {
+	    return type(value) === 'array';
+	}
+
+	// Adapted from component-emitter
+	function emitter(object) {
+	    var _callbacks = {};
+
+	    object.on = function(event, fn) {
+	        if (isArray(event)) {
+	            event.forEach(function(evt) {
+	                object.on(evt, fn);
+	            });
+	        } else {
+	            (_callbacks['$' + event] = _callbacks['$' + event] || [])
+	                .push(fn);
+	        }
+
+	        return object;
+	    };
+
+	    object.once = function(event, fn) {
+	        if (isArray(event)) {
+	            event.forEach(function(evt) {
+	                object.once(evt, fn);
+	            });
+
+	            return object;
+	        }
+
+	        function on() {
+	            object.off(event, on);
+	            fn.apply(object, arguments);
+	        }
+
+	        on.fn = fn;
+	        object.on(event, on);
+
+	        return object;
+	    };
+
+	    object.off = function(event, fn) {
+	        if (0 == arguments.length) {
+	            _callbacks = {};
+	            return object;
+	        }
+
+	        if (isArray(event)) {
+	            event.forEach(function(evt) {
+	                object.off(evt, fn);
+	            });
+
+	            return object;
+	        }
+
+	        var callbacks = _callbacks['$' + event];
+
+	        if (!callbacks) {
+	            return object;
+	        }
+
+	        if (1 == arguments.length) {
+	            delete _callbacks['$' + event];
+	            return object;
+	        }
+
+	        var cb;
+
+	        for (var i = 0; i < callbacks.length; i++) {
+	            cb = callbacks[i];
+	            if (cb === fn || cb.fn === fn) {
+	                callbacks.splice(i, 1);
+	                break;
+	            }
+	        }
+
+	        return object;
+	    };
+
+	    return function emit(event) {
+	        var args = [].slice.call(arguments, 1), ret;
+
+	        if (isArray(event)) {
+	            return Promise.all(event.map(function(evt) {
+	                return emit.apply(object, [evt].concat(args));
+	            }));
+	        }
+
+	        var callbacks = _callbacks['$' + event];
+
+	        if (!callbacks) {
+	            return Promise.resolve();
+	        }
+
+	        return Promise.all(callbacks.slice(0).map(function(callback) {
+	            ret = callback.apply(object, args);
+
+	            if (false === ret) {
+	                return Promise.reject();
+	            }
+
+	            return ret;
+	        }));
+	    };
+	}
+
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	module.exports = type;
+
+	var natives = {
+	    '[object Arguments]': 'arguments',
+	    '[object Array]': 'array',
+	    '[object Date]': 'date',
+	    '[object Function]': 'function',
+	    '[object Number]': 'number',
+	    '[object RegExp]': 'regexp',
+	    '[object String]': 'string'
+	};
+
+	function type(obj) {
+	    var str = Object.prototype.toString.call(obj);
+
+	    if (natives[str]) {
+	        return natives[str];
+	    }
+
+	    if (obj === null) {
+	        return 'null';
+	    }
+
+	    if (obj === undefined) {
+	        return 'undefined';
+	    }
+
+	    if (obj === Object(obj)) {
+	        return 'object';
+	    }
+
+	    return typeof obj;
+	}
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	module.exports = toNumber;
+
+	var numIsFinite = Number.isFinite || function(value) {
+	    return typeof value === 'number' && isFinite(value);
+	};
+
+	function toNumber(value, options) {
+	    return _toNumber(options, value);
+	}
+
+	toNumber.configure = function(options) {
+	    return _toNumber.bind(undefined, options);
+	};
+
+	function _toNumber(options, value) {
+	    if (numIsFinite(value)) {
+	        return value;
+	    }
+
+	    var decimalSeparator = options && options.decimalSeparator || '.';
+
+	    var string = '' + value;
+
+	    var dotPos = string.indexOf('.');
+	    var commaPos = string.indexOf(',');
+
+	    if (commaPos > -1) {
+	        if (dotPos > -1 && commaPos > dotPos) {
+	            decimalSeparator = ',';
+	        } else if (dotPos === -1) {
+	            var decimalLength = string.substr(commaPos + 1).length;
+	            if (decimalLength > 0 && decimalLength < 3) {
+	                decimalSeparator = ',';
+	            }
+	        }
+	    }
+
+	    if (dotPos > -1 && commaPos > -1 && commaPos > dotPos) {
+	        decimalSeparator = ',';
+	    } else if (dotPos === -1 && commaPos > -1 && string.substr(commaPos + 1).length < 3) {
+	        decimalSeparator = ',';
+	    }
+
+	    var regex = new RegExp("[^0-9-" + decimalSeparator + "]", ["g"]);
+
+	    return parseFloat(
+	        string
+	            .replace(/\(([^-]+)\)/, "-$1") // replace bracketed values with negatives
+	            .replace(regex, '') // strip out any cruft
+	            .replace(decimalSeparator, '.') // make sure decimal separator is standard
+	    ) || 0;
+	}
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = options;
+
+	var extend = __webpack_require__(2);
+	var type = __webpack_require__(4);
+
+	function options(options, key, value) {
+	    if (arguments.length === 1) {
+	        return extend(true, {}, options);
+	    }
+
+	    if (type(key) === 'string') {
+	        if (type(value) === 'undefined') {
+	            return type(options[key]) === 'undefined' ? null : options[key];
+	        }
+
+	        options[key] = value;
+	    } else {
+	        extend(options, key);
+	    }
+
+	    return this;
+	}
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = value;
+
+	var type = __webpack_require__(4);
+
+	function value(value, context, args) {
+	    if (type(value) === 'function') {
+	        return value.apply(context, args || []);
+	    }
+
+	    return value;
+	}
+
+
+/***/ },
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	module.exports = formatCurrency;
 
-	var extend = __webpack_require__(14);
-	var defaultCurrencies = __webpack_require__(12);
-	var formatNumber = __webpack_require__(3);
+	var extend = __webpack_require__(2);
+	var defaultCurrencies = __webpack_require__(9);
+	var formatNumber = __webpack_require__(10);
 
 	function formatCurrency(value, options) {
 	    return _formatCurrency(options, value);
@@ -536,16 +895,88 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 3 */
+/* 9 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	module.exports = {
+	    AED: { prefix: '\u062c' },
+	    ANG: { prefix: '\u0192' },
+	    ARS: { prefix: '$', suffix: ' ARS' },
+	    AUD: { prefix: '$', suffix: ' AUD' },
+	    AWG: { prefix: '\u0192' },
+	    BBD: { prefix: '$', suffix: ' BBD' },
+	    BGN: { prefix: '\u043b\u0432' },
+	    BTC: { suffix: ' BTC', precision: 4 },
+	    BMD: { prefix: '$', suffix: ' BMD' },
+	    BND: { prefix: '$', suffix: ' BND' },
+	    BRL: { prefix: 'R$' },
+	    BSD: { prefix: '$', suffix: ' BSD' },
+	    CAD: { prefix: '$', suffix: ' CAD' },
+	    CHF: { suffix: ' CHF' },
+	    CLP: { prefix: '$', suffix: ' CLP' },
+	    CNY: { prefix: '\u00A5' },
+	    COP: { prefix: '$', suffix: ' COP' },
+	    CRC: { prefix: '\u20A1' },
+	    CZK: { prefix: 'Kc' },
+	    DKK: { prefix: 'kr' },
+	    DOP: { prefix: '$', suffix: ' DOP' },
+	    EEK: { prefix: 'kr' },
+	    EUR: { prefix: '\u20AC' },
+	    GBP: { prefix: '\u00A3' },
+	    GTQ: { prefix: 'Q' },
+	    HKD: { prefix: '$', suffix: ' HKD' },
+	    HRK: { prefix: 'kn' },
+	    HUF: { prefix: 'Ft' },
+	    IDR: { prefix: 'Rp' },
+	    ILS: { prefix: '\u20AA' },
+	    INR: { prefix: 'Rs.' },
+	    ISK: { prefix: 'kr' },
+	    JMD: { prefix: 'J$' },
+	    JPY: { prefix: '\u00A5', precision: 0 },
+	    KRW: { prefix: '\u20A9' },
+	    KYD: { prefix: '$', suffix: ' KYD' },
+	    LTL: { prefix: 'Lt' },
+	    LVL: { prefix: 'Ls' },
+	    MXN: { prefix: '$', suffix: ' MXN' },
+	    MYR: { prefix: 'RM' },
+	    NOK: { prefix: 'kr' },
+	    NZD: { prefix: '$', suffix: ' NZD' },
+	    PEN: { prefix: 'S/' },
+	    PHP: { prefix: 'Php' },
+	    PLN: { prefix: 'z' },
+	    QAR: { prefix: '\ufdfc' },
+	    RON: { prefix: 'lei' },
+	    RUB: { prefix: '\u0440\u0443\u0431' },
+	    SAR: { prefix: '\ufdfc' },
+	    SEK: { prefix: 'kr' },
+	    SGD: { prefix: '$', suffix: ' SGD' },
+	    THB: { prefix: '\u0E3F' },
+	    TRY: { prefix: 'TL' },
+	    TTD: { prefix: 'TT$' },
+	    TWD: { prefix: 'NT$' },
+	    UAH: { prefix: '\u20b4' },
+	    USD: { prefix: '$' },
+	    UYU: { prefix: '$U' },
+	    VEF: { prefix: 'Bs' },
+	    VND: { prefix: '\u20ab' },
+	    XCD: { prefix: '$', suffix: ' XCD' },
+	    ZAR: { prefix: 'R' }
+	};
+
+
+/***/ },
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	module.exports = formatNumber;
 
-	var toNumber = __webpack_require__(8);
-	var toFixed = __webpack_require__(13);
-	var type = __webpack_require__(11);
+	var toNumber = __webpack_require__(5);
+	var toFixed = __webpack_require__(11);
+	var type = __webpack_require__(4);
 
 	function formatNumber(value, options) {
 	    return _formatNumber(options, value);
@@ -603,8 +1034,32 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/* 11 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	module.exports = toFixed;
+
+	function toFixed(value, precision, options) {
+	    return _toFixed(options, value, precision);
+	}
+
+	toFixed.configure = function(options) {
+	    return _toFixed.bind(undefined, options);
+	};
+
+	function _toFixed(options, value, precision) {
+	    var roundingFunction = options && options.roundingFunction || Math.round;
+	    var power = Math.pow(10, precision || 0);
+
+	    return (roundingFunction(value * power) / power).toFixed(precision);
+	}
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
 
 	'use strict';
 
@@ -637,14 +1092,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 5 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	module.exports = uiJquery;
 
-	var $ = __webpack_require__(6);
+	var $ = __webpack_require__(14);
 
 	var _defaultOptions = {
 	    namespace: 'carty',
@@ -860,468 +1315,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_6__;
-
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	module.exports = emitter;
-
-	var type = __webpack_require__(11);
-
-	function isArray(value) {
-	    return type(value) === 'array';
-	}
-
-	// Adapted from component-emitter
-	function emitter(object) {
-	    var _callbacks = {};
-
-	    object.on = function(event, fn) {
-	        if (isArray(event)) {
-	            event.forEach(function(evt) {
-	                object.on(evt, fn);
-	            });
-	        } else {
-	            (_callbacks['$' + event] = _callbacks['$' + event] || [])
-	                .push(fn);
-	        }
-
-	        return object;
-	    };
-
-	    object.once = function(event, fn) {
-	        if (isArray(event)) {
-	            event.forEach(function(evt) {
-	                object.once(evt, fn);
-	            });
-
-	            return object;
-	        }
-
-	        function on() {
-	            object.off(event, on);
-	            fn.apply(object, arguments);
-	        }
-
-	        on.fn = fn;
-	        object.on(event, on);
-
-	        return object;
-	    };
-
-	    object.off = function(event, fn) {
-	        if (0 == arguments.length) {
-	            _callbacks = {};
-	            return object;
-	        }
-
-	        if (isArray(event)) {
-	            event.forEach(function(evt) {
-	                object.off(evt, fn);
-	            });
-
-	            return object;
-	        }
-
-	        var callbacks = _callbacks['$' + event];
-
-	        if (!callbacks) {
-	            return object;
-	        }
-
-	        if (1 == arguments.length) {
-	            delete _callbacks['$' + event];
-	            return object;
-	        }
-
-	        var cb;
-
-	        for (var i = 0; i < callbacks.length; i++) {
-	            cb = callbacks[i];
-	            if (cb === fn || cb.fn === fn) {
-	                callbacks.splice(i, 1);
-	                break;
-	            }
-	        }
-
-	        return object;
-	    };
-
-	    return function emit(event) {
-	        var args = [].slice.call(arguments, 1), ret;
-
-	        if (isArray(event)) {
-	            return Promise.all(event.map(function(evt) {
-	                return emit.apply(object, [evt].concat(args));
-	            }));
-	        }
-
-	        var callbacks = _callbacks['$' + event];
-
-	        if (!callbacks) {
-	            return Promise.resolve();
-	        }
-
-	        return Promise.all(callbacks.slice(0).map(function(callback) {
-	            ret = callback.apply(object, args);
-
-	            if (false === ret) {
-	                return Promise.reject();
-	            }
-
-	            return ret;
-	        }));
-	    };
-	}
-
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	module.exports = toNumber;
-
-	var numIsFinite = Number.isFinite || function(value) {
-	    return typeof value === 'number' && isFinite(value);
-	};
-
-	function toNumber(value, options) {
-	    return _toNumber(options, value);
-	}
-
-	toNumber.configure = function(options) {
-	    return _toNumber.bind(undefined, options);
-	};
-
-	function _toNumber(options, value) {
-	    if (numIsFinite(value)) {
-	        return value;
-	    }
-
-	    var decimalSeparator = options && options.decimalSeparator || '.';
-
-	    var string = '' + value;
-
-	    var dotPos = string.indexOf('.');
-	    var commaPos = string.indexOf(',');
-
-	    if (commaPos > -1) {
-	        if (dotPos > -1 && commaPos > dotPos) {
-	            decimalSeparator = ',';
-	        } else if (dotPos === -1) {
-	            var decimalLength = string.substr(commaPos + 1).length;
-	            if (decimalLength > 0 && decimalLength < 3) {
-	                decimalSeparator = ',';
-	            }
-	        }
-	    }
-
-	    if (dotPos > -1 && commaPos > -1 && commaPos > dotPos) {
-	        decimalSeparator = ',';
-	    } else if (dotPos === -1 && commaPos > -1 && string.substr(commaPos + 1).length < 3) {
-	        decimalSeparator = ',';
-	    }
-
-	    var regex = new RegExp("[^0-9-" + decimalSeparator + "]", ["g"]);
-
-	    return parseFloat(
-	        string
-	            .replace(/\(([^-]+)\)/, "-$1") // replace bracketed values with negatives
-	            .replace(regex, '') // strip out any cruft
-	            .replace(decimalSeparator, '.') // make sure decimal separator is standard
-	    ) || 0;
-	}
-
-
-/***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	module.exports = options;
-
-	var extend = __webpack_require__(14);
-	var type = __webpack_require__(11);
-
-	function options(options, key, value) {
-	    if (arguments.length === 1) {
-	        return extend(true, {}, options);
-	    }
-
-	    if (type(key) === 'string') {
-	        if (type(value) === 'undefined') {
-	            return type(options[key]) === 'undefined' ? null : options[key];
-	        }
-
-	        options[key] = value;
-	    } else {
-	        extend(options, key);
-	    }
-
-	    return this;
-	}
-
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	module.exports = value;
-
-	var type = __webpack_require__(11);
-
-	function value(value, context, args) {
-	    if (type(value) === 'function') {
-	        return value.apply(context, args || []);
-	    }
-
-	    return value;
-	}
-
-
-/***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	module.exports = type;
-
-	var natives = {
-	    '[object Arguments]': 'arguments',
-	    '[object Array]': 'array',
-	    '[object Date]': 'date',
-	    '[object Function]': 'function',
-	    '[object Number]': 'number',
-	    '[object RegExp]': 'regexp',
-	    '[object String]': 'string'
-	};
-
-	function type(obj) {
-	    var str = Object.prototype.toString.call(obj);
-
-	    if (natives[str]) {
-	        return natives[str];
-	    }
-
-	    if (obj === null) {
-	        return 'null';
-	    }
-
-	    if (obj === undefined) {
-	        return 'undefined';
-	    }
-
-	    if (obj === Object(obj)) {
-	        return 'object';
-	    }
-
-	    return typeof obj;
-	}
-
-
-/***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	module.exports = {
-	    AED: { prefix: '\u062c' },
-	    ANG: { prefix: '\u0192' },
-	    ARS: { prefix: '$', suffix: ' ARS' },
-	    AUD: { prefix: '$', suffix: ' AUD' },
-	    AWG: { prefix: '\u0192' },
-	    BBD: { prefix: '$', suffix: ' BBD' },
-	    BGN: { prefix: '\u043b\u0432' },
-	    BTC: { suffix: ' BTC', precision: 4 },
-	    BMD: { prefix: '$', suffix: ' BMD' },
-	    BND: { prefix: '$', suffix: ' BND' },
-	    BRL: { prefix: 'R$' },
-	    BSD: { prefix: '$', suffix: ' BSD' },
-	    CAD: { prefix: '$', suffix: ' CAD' },
-	    CHF: { suffix: ' CHF' },
-	    CLP: { prefix: '$', suffix: ' CLP' },
-	    CNY: { prefix: '\u00A5' },
-	    COP: { prefix: '$', suffix: ' COP' },
-	    CRC: { prefix: '\u20A1' },
-	    CZK: { prefix: 'Kc' },
-	    DKK: { prefix: 'kr' },
-	    DOP: { prefix: '$', suffix: ' DOP' },
-	    EEK: { prefix: 'kr' },
-	    EUR: { prefix: '\u20AC' },
-	    GBP: { prefix: '\u00A3' },
-	    GTQ: { prefix: 'Q' },
-	    HKD: { prefix: '$', suffix: ' HKD' },
-	    HRK: { prefix: 'kn' },
-	    HUF: { prefix: 'Ft' },
-	    IDR: { prefix: 'Rp' },
-	    ILS: { prefix: '\u20AA' },
-	    INR: { prefix: 'Rs.' },
-	    ISK: { prefix: 'kr' },
-	    JMD: { prefix: 'J$' },
-	    JPY: { prefix: '\u00A5', precision: 0 },
-	    KRW: { prefix: '\u20A9' },
-	    KYD: { prefix: '$', suffix: ' KYD' },
-	    LTL: { prefix: 'Lt' },
-	    LVL: { prefix: 'Ls' },
-	    MXN: { prefix: '$', suffix: ' MXN' },
-	    MYR: { prefix: 'RM' },
-	    NOK: { prefix: 'kr' },
-	    NZD: { prefix: '$', suffix: ' NZD' },
-	    PEN: { prefix: 'S/' },
-	    PHP: { prefix: 'Php' },
-	    PLN: { prefix: 'z' },
-	    QAR: { prefix: '\ufdfc' },
-	    RON: { prefix: 'lei' },
-	    RUB: { prefix: '\u0440\u0443\u0431' },
-	    SAR: { prefix: '\ufdfc' },
-	    SEK: { prefix: 'kr' },
-	    SGD: { prefix: '$', suffix: ' SGD' },
-	    THB: { prefix: '\u0E3F' },
-	    TRY: { prefix: 'TL' },
-	    TTD: { prefix: 'TT$' },
-	    TWD: { prefix: 'NT$' },
-	    UAH: { prefix: '\u20b4' },
-	    USD: { prefix: '$' },
-	    UYU: { prefix: '$U' },
-	    VEF: { prefix: 'Bs' },
-	    VND: { prefix: '\u20ab' },
-	    XCD: { prefix: '$', suffix: ' XCD' },
-	    ZAR: { prefix: 'R' }
-	};
-
-
-/***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	module.exports = toFixed;
-
-	function toFixed(value, precision, options) {
-	    return _toFixed(options, value, precision);
-	}
-
-	toFixed.configure = function(options) {
-	    return _toFixed.bind(undefined, options);
-	};
-
-	function _toFixed(options, value, precision) {
-	    var roundingFunction = options && options.roundingFunction || Math.round;
-	    var power = Math.pow(10, precision || 0);
-
-	    return (roundingFunction(value * power) / power).toFixed(precision);
-	}
-
-
-/***/ },
 /* 14 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	var hasOwn = Object.prototype.hasOwnProperty;
-	var toStr = Object.prototype.toString;
-	var undefined;
-
-	var isArray = function isArray(arr) {
-		if (typeof Array.isArray === 'function') {
-			return Array.isArray(arr);
-		}
-
-		return toStr.call(arr) === '[object Array]';
-	};
-
-	var isPlainObject = function isPlainObject(obj) {
-		'use strict';
-		if (!obj || toStr.call(obj) !== '[object Object]') {
-			return false;
-		}
-
-		var has_own_constructor = hasOwn.call(obj, 'constructor');
-		var has_is_property_of_method = obj.constructor && obj.constructor.prototype && hasOwn.call(obj.constructor.prototype, 'isPrototypeOf');
-		// Not own constructor property must be Object
-		if (obj.constructor && !has_own_constructor && !has_is_property_of_method) {
-			return false;
-		}
-
-		// Own properties are enumerated firstly, so to speed up,
-		// if last one is own, then all properties are own.
-		var key;
-		for (key in obj) {}
-
-		return key === undefined || hasOwn.call(obj, key);
-	};
-
-	module.exports = function extend() {
-		'use strict';
-		var options, name, src, copy, copyIsArray, clone,
-			target = arguments[0],
-			i = 1,
-			length = arguments.length,
-			deep = false;
-
-		// Handle a deep copy situation
-		if (typeof target === 'boolean') {
-			deep = target;
-			target = arguments[1] || {};
-			// skip the boolean and the target
-			i = 2;
-		} else if ((typeof target !== 'object' && typeof target !== 'function') || target == null) {
-			target = {};
-		}
-
-		for (; i < length; ++i) {
-			options = arguments[i];
-			// Only deal with non-null/undefined values
-			if (options != null) {
-				// Extend the base object
-				for (name in options) {
-					src = target[name];
-					copy = options[name];
-
-					// Prevent never-ending loop
-					if (target === copy) {
-						continue;
-					}
-
-					// Recurse if we're merging plain objects or arrays
-					if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
-						if (copyIsArray) {
-							copyIsArray = false;
-							clone = src && isArray(src) ? src : [];
-						} else {
-							clone = src && isPlainObject(src) ? src : {};
-						}
-
-						// Never move original objects, clone them
-						target[name] = extend(deep, clone, copy);
-
-					// Don't bring in undefined values
-					} else if (copy !== undefined) {
-						target[name] = copy;
-					}
-				}
-			}
-		}
-
-		// Return the modified object
-		return target;
-	};
-
-
+	module.exports = __WEBPACK_EXTERNAL_MODULE_14__;
 
 /***/ }
 /******/ ])
