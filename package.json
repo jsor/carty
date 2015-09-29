@@ -9,7 +9,7 @@
   },
   "version": "0.4.2",
   "dependencies": {
-    "extend": "^2.0.0"
+    "extend": "^3.0.0"
   },
   "devDependencies": {
     "chai": "^2.1.1",
