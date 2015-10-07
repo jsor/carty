@@ -78,6 +78,23 @@ describe("carty().subtotal()", function() {
             })
         ;
     });
+
+    it("calculates subtotal with custome subtotal calculator", function(done) {
+        cart.options('subtotal', function(items) {
+            return '' + items.length;
+        });
+
+        cart
+            .add({id: 'Item', quantity: 2, price: 10})
+            .add({id: 'Item2', quantity: 10, price: .5})
+            .ready(function() {
+                assert.strictEqual(cart.subtotal(), 2);
+            })
+            .ready(function() {
+                done();
+            })
+        ;
+    });
 });
 
 describe("carty().shipping()", function() {
