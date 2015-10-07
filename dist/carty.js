@@ -1,5 +1,5 @@
 /*!
- * Carty - v0.4.3 - 2015-09-29
+ * Carty - v0.4.3 - 2015-10-07
  * http://sorgalla.com/carty/
  * Copyright (c) 2015 Jan Sorgalla; Licensed MIT
  */
@@ -99,6 +99,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _defaultOptions = {
 	    storage: null,
+	    subtotal: function(items) {
+	        return items.reduce(function(previous, item) {
+	            return previous + (item.price * item.quantity);
+	        }, 0);
+	    },
 	    shipping: null,
 	    tax: null
 	};
@@ -219,10 +224,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    cart.subtotal = function() {
-	        return _items.reduce(function(previous, item) {
-	            var state = item();
-	            return previous + (state.price * state.quantity);
-	        }, 0);
+	        var items = _items.map(function(item) {
+	            return item();
+	        });
+
+	        return toNumber(value(_options.subtotal, undefined, [items, cart]), _options);
 	    };
 
 	    cart.shipping = function() {
