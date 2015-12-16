@@ -43,7 +43,7 @@ You may use ES6 polyfills for the following features:
 [ES6 Promises](http://people.mozilla.org/%7Ejorendorff/es6-draft.html#sec-promise-constructor)
 are supported in Node since version 0.11.13.
 
-For browser support, check [caniuse](http://caniuse.com/#search=promise)
+For browser support, check [caniuse](http://caniuse.com/#search=promise).
 
 You can use [es6-promise](https://github.com/jakearchibald/es6-promise) to
 polyfill both Node and browsers.
