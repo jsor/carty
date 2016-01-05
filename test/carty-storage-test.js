@@ -8,8 +8,7 @@ describe("carty().options('storage')", function() {
     beforeEach(function() {
         storage = {
             load: function () { return [{id: 'Existing Item'}]; },
-            add: function (item, items) { },
-            update: function (item, items) { },
+            put: function (item, items) { },
             remove: function (item, items) { },
             clear: function () {}
         };
@@ -49,23 +48,8 @@ describe("carty().options('storage')", function() {
         ;
     });
 
-    it("adds items to storage", function(done) {
-        mock.expects('add').twice();
-
-        carty({storage: storage})
-            .add('Item')
-            .add('Item2')
-            .ready(function() {
-                mock.verify();
-            })
-            .ready(function() {
-                done();
-            })
-        ;
-    });
-
-    it("adds items to storage", function(done) {
-        mock.expects('update').once();
+    it("puts items to storage", function(done) {
+        mock.expects('put').twice();
 
         carty({storage: storage})
             .add('Item')
@@ -80,7 +64,7 @@ describe("carty().options('storage')", function() {
     });
 
     it("propagates add error", function(done) {
-        mock.expects('add').once().returns(Promise.reject('error'));
+        mock.expects('put').once().returns(Promise.reject('error'));
 
         carty({storage: storage})
             .add('Item')

@@ -10,8 +10,7 @@ describe("carty().load()", function() {
         cart = carty({
             storage: {
                 load: function() { return storedItems; },
-                add: function (item, items) { },
-                update: function (item, items) { },
+                put: function (item, items) { },
                 remove: function (item, items) { },
                 clear: function () {}
             }

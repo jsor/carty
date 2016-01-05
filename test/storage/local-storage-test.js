@@ -25,29 +25,19 @@ describe("storage/localStorage(null, )", function() {
 
         var storage = localStorage();
 
-        storage.add(null, function() { return [cart.item('Item')]; });
+        storage.put(null, function() { return [cart.item('Item')]; });
 
         mock.verify();
 
         delete global.window;
     });
 
-    it("adds data", function() {
+    it("puts data", function() {
         mock.expects('setItem').once();
 
         var storage = localStorage(null, mockLocalStorage);
 
-        storage.add(null, function() { return [cart.item('Item')]; });
-
-        mock.verify();
-    });
-
-    it("updates data", function() {
-        mock.expects('setItem').once();
-
-        var storage = localStorage(null, mockLocalStorage);
-
-        storage.update(null, function() { return [cart.item('Item')]; });
+        storage.put(null, function() { return [cart.item('Item')]; });
 
         mock.verify();
     });

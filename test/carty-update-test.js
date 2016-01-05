@@ -9,8 +9,7 @@ describe("carty().update()", function() {
         cart = carty({
             storage: {
                 load: function() { return [{id: 'Item'}]; },
-                add: function (item, items) { },
-                update: function (item, items) { },
+                put: function (item, items) { },
                 remove: function (item, items) { },
                 clear: function () {}
             }
@@ -191,7 +190,7 @@ describe("carty().update()", function() {
         cart = carty({
             storage: {
                 load: function() { return [{id: 'Item'}]; },
-                update: function() { return Promise.reject('error'); }
+                put: function() { return Promise.reject('error'); }
             }
         });
 
@@ -256,7 +255,7 @@ describe("carty().update()", function() {
         cart = carty({
             storage: {
                 load: function() { return [{id: 'Item'}]; },
-                update: function() { return Promise.reject('error'); }
+                put: function() { return Promise.reject('error'); }
             }
         });
 
@@ -266,7 +265,7 @@ describe("carty().update()", function() {
 
         cart
             .update('Item')
-            .error(function() {}) // Catch the rejection from storage.update()
+            .error(function() {}) // Catch the rejection from storage.put()
             .ready(function() {
                 assert.isTrue(spy.called);
             })

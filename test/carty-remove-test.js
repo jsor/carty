@@ -9,8 +9,7 @@ describe("carty().remove()", function() {
         cart = carty({
             storage: {
                 load: function() { return [{id: 'Item'}]; },
-                add: function (item, items) { },
-                update: function (item, items) { },
+                put: function (item, items) { },
                 remove: function (item, items) { },
                 clear: function () {}
             }

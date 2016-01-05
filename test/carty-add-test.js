@@ -187,7 +187,7 @@ describe("carty().add()", function() {
         cart = carty({
             storage: {
                 load: function() { return []; },
-                add: function() { return Promise.reject('error'); }
+                put: function() { return Promise.reject('error'); }
             }
         });
 
@@ -252,7 +252,7 @@ describe("carty().add()", function() {
         cart = carty({
             storage: {
                 load: function() { return []; },
-                add: function() { return Promise.reject('error'); }
+                put: function() { return Promise.reject('error'); }
             }
         });
 
@@ -262,7 +262,7 @@ describe("carty().add()", function() {
 
         cart
             .add('Item')
-            .error(function() {}) // Catch the rejection from storage.add()
+            .error(function() {}) // Catch the rejection from storage.put()
             .ready(function() {
                 assert.isTrue(spy.called);
             })

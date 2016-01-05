@@ -9,8 +9,7 @@ describe("carty().clear()", function() {
         cart = carty({
             storage: {
                 load: function() { return [{id: 'Item'}, {id: 'Item2'}]; },
-                add: function (item, items) { },
-                update: function (item, items) { },
+                put: function (item, items) { },
                 remove: function (item, items) { },
                 clear: function () {}
             }
@@ -158,7 +157,7 @@ describe("carty().clear()", function() {
 
         cart
             .clear()
-            .error(function() {}) // Catch the rejection from storage.add()
+            .error(function() {}) // Catch the rejection from storage.put()
             .ready(function() {
                 assert.isTrue(spy.called);
             })
