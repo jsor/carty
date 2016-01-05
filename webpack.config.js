@@ -30,7 +30,7 @@ var config = {
             pkg.title + ' - v' + pkg.version + ' - ' +
             new Date().getFullYear() + '-' + _.padLeft(new Date().getMonth() + 1, 2, 0) + '-' + _.padLeft(new Date().getDate(), 2, 0) + '\n' +
             pkg.homepage + '\n' +
-            'Copyright (c) ' + new Date().getFullYear() + ' ' + pkg.author.name + ';' +
+            'Copyright (c) 2015-' + new Date().getFullYear() + ' ' + pkg.author.name + ';' +
             ' Licensed ' + pkg.license
         )
     ]
@@ -42,7 +42,9 @@ var configMin = extend(true, {}, config, {
     },
     plugins: [].concat([
         new webpack.optimize.UglifyJsPlugin({
-            comments: /(?!x)x/
+            output: {
+                comments: false
+            }
         })
     ], config.plugins)
 });

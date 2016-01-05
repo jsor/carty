@@ -1,7 +1,7 @@
 /*!
- * Carty - v0.4.3 - 2015-10-07
+ * Carty - v0.5.0 - 2016-01-05
  * http://sorgalla.com/carty/
- * Copyright (c) 2015 Jan Sorgalla; Licensed MIT
+ * Copyright (c) 2015-2016 Jan Sorgalla; Licensed MIT
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -337,7 +337,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _items[existing.index] = item;
 
 	            return resolve(
-	                _options.storage && _options.storage.update(state, cart)
+	                _options.storage && _options.storage.put(state, cart)
 	            ).then(emit.bind(cart, 'updated', state), function(e) {
 	                emit('updatefailed', e, state);
 	                return reject(e);
@@ -375,7 +375,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 
 	            return resolve(
-	                _options.storage && _options.storage.add(state, cart)
+	                _options.storage && _options.storage.put(state, cart)
 	            ).then(emit.bind(cart, 'added', state), function(e) {
 	                emit('addfailed', e, state);
 	                return reject(e);
@@ -1087,8 +1087,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return []
 	            }
 	        },
-	        add: save,
-	        update: save,
+	        put: save,
 	        remove: save,
 	        clear: function() {
 	            localStorage.removeItem(namespace);
