@@ -1,5 +1,5 @@
 /*!
- * Carty - v0.5.0 - 2016-01-05
+ * Carty - v0.5.1 - 2016-01-07
  * http://sorgalla.com/carty/
  * Copyright (c) 2015-2016 Jan Sorgalla; Licensed MIT
  */
@@ -133,9 +133,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var _items = [];
 	    var _ready;
 
-	    cart.on(['load', 'add', 'update', 'remove', 'clear'], emit.bind(undefined, 'change'));
-	    cart.on(['loaded', 'added', 'updated', 'removed', 'cleared'], emit.bind(undefined, 'changed'));
-	    cart.on(['loadfailed', 'addfailed', 'updatefailed', 'removefailed', 'clearfailed'], emit.bind(undefined, 'changefailed'));
+	    cart.on(['load', 'add', 'update', 'remove', 'clear', 'checkout'], emit.bind(undefined, 'change'));
+	    cart.on(['loaded', 'added', 'updated', 'removed', 'cleared', 'checkedout'], emit.bind(undefined, 'changed'));
+	    cart.on(['loadfailed', 'addfailed', 'updatefailed', 'removefailed', 'clearfailed', 'checkoutfailed'], emit.bind(undefined, 'changefailed'));
 
 	    cart.options = options.bind(cart, _options);
 
@@ -185,6 +185,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    cart.clear = function() {
 	        ready(clear);
+
+	        return cart;
+	    };
+
+	    cart.checkout = function(data) {
+	        ready(checkout.bind(cart, data));
 
 	        return cart;
 	    };
@@ -426,6 +432,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	        }, function() {
 	            // Catch clear event listener rejections
+	        });
+	    }
+
+	    function checkout(data) {
+	        return emit('checkout').then(function() {
+	            return resolve(
+	                _options.storage && _options.storage.checkout && _options.storage.checkout(data, cart)
+	            ).then(emit.bind(cart, 'checkedout'), function(e) {
+	                emit('checkoutfailed', e);
+	                return reject(e);
+	            })['catch'](function() {
+	                // Catch checkedout event listener rejections
+	            });
+	        }, function() {
+	            // Catch checkout event listener rejections
 	        });
 	    }
 
