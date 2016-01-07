@@ -10,7 +10,8 @@ describe("carty().options('storage')", function() {
             load: function () { return [{id: 'Existing Item'}]; },
             put: function (item, items) { },
             remove: function (item, items) { },
-            clear: function () {}
+            clear: function () { },
+            checkout: function () { }
         };
 
         mock = sinon.mock(storage)
@@ -170,6 +171,22 @@ describe("carty().options('storage')", function() {
 
         carty({storage: storage})
             .clear()
+            .ready(function() {
+                mock.verify();
+            })
+            .ready(function() {
+                done();
+            })
+        ;
+    });
+
+    it("calls checkout with data", function(done) {
+        var data = {key: 'value'};
+
+        mock.expects('checkout').once().withArgs(data);
+
+        carty({storage: storage})
+            .checkout(data)
             .ready(function() {
                 mock.verify();
             })
