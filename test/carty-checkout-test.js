@@ -17,6 +17,27 @@ describe("carty().checkout()", function() {
         });
     });
 
+    it("removes all items", function(done) {
+        cart
+            .checkout()
+            .ready(function(cart) {
+                assert.strictEqual(cart.size(), 0);
+
+                var count = 0;
+                cart.each(function() {
+                    count++;
+                });
+
+                assert.strictEqual(count, 0);
+
+                assert.strictEqual(cart().items.length, 0);
+            })
+            .ready(function() {
+                done();
+            })
+        ;
+    });
+
     it("emits checkout event", function(done) {
         var spy = sinon.spy();
 

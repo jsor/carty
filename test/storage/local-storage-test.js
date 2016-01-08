@@ -85,12 +85,22 @@ describe("storage/localStorage(null, )", function() {
         mock.verify();
     });
 
-    it("clears storage", function() {
+    it("empties storage on clear", function() {
         mock.expects('removeItem').once();
 
         var storage = localStorage(null, mockLocalStorage);
 
         storage.clear();
+
+        mock.verify();
+    });
+
+    it("empties storage on checkout", function() {
+        mock.expects('removeItem').once();
+
+        var storage = localStorage(null, mockLocalStorage);
+
+        storage.checkout();
 
         mock.verify();
     });
