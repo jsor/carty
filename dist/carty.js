@@ -1,5 +1,5 @@
 /*!
- * Carty - v0.5.1 - 2016-01-07
+ * Carty - v0.6.0 - 2016-01-08
  * http://sorgalla.com/carty/
  * Copyright (c) 2015-2016 Jan Sorgalla; Licensed MIT
  */
@@ -438,8 +438,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function checkout(data) {
 	        return emit('checkout').then(function() {
 	            return resolve(
-	                _options.storage && _options.storage.checkout && _options.storage.checkout(data, cart)
-	            ).then(emit.bind(cart, 'checkedout'), function(e) {
+	                _options.storage && _options.storage.checkout(data, cart)
+	            )
+	            .then(function(value) {
+	                _items.length = 0;
+
+	                return value;
+	            })
+	            .then(emit.bind(cart, 'checkedout'), function(e) {
 	                emit('checkoutfailed', e);
 	                return reject(e);
 	            })['catch'](function() {
@@ -502,7 +508,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return false;
 	            }
 
-	            if (otherItem.id !== _attributes.id) {
+	            function compareValue(value1, value2) {
+	                if ('number' === type(value1)) {
+	                    value1 = '' + value1;
+	                }
+
+	                if ('number' === type(value2)) {
+	                    value2 = '' + value2;
+	                }
+
+	                return value1 === value2;
+	            }
+
+	            if (!compareValue(otherItem.id, _attributes.id)) {
 	                return false;
 	            }
 
@@ -510,7 +528,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var otherVariant = otherItem.variant;
 
 	            function compare(key) {
-	                return otherVariant[key] === itemVariant[key];
+	                return compareValue(otherVariant[key], itemVariant[key]);
 	            }
 
 	            return Object.keys(itemVariant).every(compare) && Object.keys(otherVariant).every(compare);
@@ -1100,6 +1118,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        localStorage.setItem(namespace, JSON.stringify(cart().items));
 	    }
 
+	    function empty() {
+	        localStorage.removeItem(namespace);
+	    }
+
 	    return {
 	        load: function() {
 	            try {
@@ -1110,9 +1132,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        },
 	        put: save,
 	        remove: save,
-	        clear: function() {
-	            localStorage.removeItem(namespace);
-	        }
+	        clear: empty,
+	        checkout: empty
 	    };
 	}
 
