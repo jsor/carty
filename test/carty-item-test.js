@@ -128,6 +128,26 @@ describe("carty().item()", function() {
         assert.isFalse(item.equals(undefined));
     });
 
+    it("compares items with mixed string/number ids", function() {
+        var attr = {
+            id: 123,
+            foo: 'bar'
+        };
+
+        var item = cart.item(attr);
+
+        assert.isTrue(item.equals({id: 123, foo: 'bar'}));
+        assert.isTrue(item.equals({id: 123}));
+        assert.isTrue(item.equals({id: 123, label: 'bar'}));
+
+        assert.isTrue(item.equals({id: '123', foo: 'bar'}));
+        assert.isTrue(item.equals({id: '123'}));
+        assert.isTrue(item.equals({id: '123', label: 'bar'}));
+
+        assert.isFalse(item.equals({id: '1234'}));
+        assert.isFalse(item.equals({id: 1234}));
+    });
+
     it("compares items with string variant", function() {
         var attr = {
             id: 'label',
