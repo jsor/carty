@@ -8,7 +8,7 @@ describe("carty().clear()", function() {
     beforeEach(function() {
         cart = carty({
             storage: {
-                load: function() { return [{id: 'Item'}, {id: 'Item2'}]; },
+                load: function() { return {items: [{id: 'Item'}, {id: 'Item2'}] }; },
                 put: function (item, items) { },
                 remove: function (item, items) { },
                 clear: function () {}
@@ -30,6 +30,37 @@ describe("carty().clear()", function() {
                 assert.strictEqual(count, 0);
 
                 assert.strictEqual(cart().items.length, 0);
+            })
+            .ready(function() {
+                done();
+            })
+        ;
+    });
+
+    it("populates data", function(done) {
+        var cart = carty({
+            storage: {
+                load: function() {
+                },
+                put: function (item, items) { },
+                remove: function (item, items) { },
+                clear: function () {
+                    return {
+                        items: [],
+                        subtotal: 10,
+                        shipping: 20,
+                        tax: 30
+                    };
+                }
+            }
+        });
+
+        cart
+            .clear()
+            .ready(function(cart) {
+                assert.strictEqual(cart.subtotal(), 10);
+                assert.strictEqual(cart.shipping(), 20);
+                assert.strictEqual(cart.tax(), 30);
             })
             .ready(function() {
                 done();

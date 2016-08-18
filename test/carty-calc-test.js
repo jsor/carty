@@ -9,7 +9,8 @@ describe("carty().quantity()", function() {
     });
 
     it("calculates quantity", function(done) {
-        cart.add({id: 'Item'})
+        cart
+            .add({id: 'Item'})
             .add({id: 'Item', quantity: 2})
             .add({id: 'Item2', quantity: 10})
             .ready(function() {
@@ -79,7 +80,7 @@ describe("carty().subtotal()", function() {
         ;
     });
 
-    it("calculates subtotal with custome subtotal calculator", function(done) {
+    it("calculates subtotal with custom calculator", function(done) {
         cart.options('subtotal', function(items) {
             return '' + items.length;
         });
@@ -95,28 +96,43 @@ describe("carty().subtotal()", function() {
             })
         ;
     });
+
+    it("calculates subtotal from storage", function(done) {
+        var cart = carty({
+            storage: {
+                load: function() {
+                    return {
+                        items: [{id: 'Item'}, {id: 'Item2'}],
+                        subtotal: 2
+                    };
+                },
+                put: function (item, items) { },
+                remove: function (item, items) { },
+                clear: function () {}
+            }
+        });
+
+        cart
+            .ready(function() {
+                assert.strictEqual(cart.subtotal(), 2);
+            })
+            .ready(function() {
+                done();
+            })
+        ;
+    });
 });
 
 describe("carty().shipping()", function() {
     var cart;
 
-    it("calculates no shipping for empty cart", function() {
-        cart = carty({
-            shipping: 10
-        });
-
-        assert.strictEqual(cart.shipping(), 0);
-    });
-
-    it("calculates shipping", function(done) {
-        cart = carty({
-            shipping: 10
-        });
+    it("calculates no shipping by default", function(done) {
+        cart = carty();
 
         cart
             .add('Item')
             .ready(function() {
-                assert.strictEqual(cart.shipping(), 10);
+                assert.strictEqual(cart.shipping(), 0);
             })
             .ready(function() {
                 done();
@@ -124,7 +140,7 @@ describe("carty().shipping()", function() {
         ;
     });
 
-    it("calculates shipping with function", function(done) {
+    it("calculates shipping with custom calculator", function(done) {
         cart = carty({
             shipping: function() { return 10; }
         });
@@ -140,15 +156,24 @@ describe("carty().shipping()", function() {
         ;
     });
 
-    it("calculates shipping with string", function(done) {
-        cart = carty({
-            shipping: ".5"
+    it("calculates shipping from storage", function(done) {
+        var cart = carty({
+            storage: {
+                load: function() {
+                    return {
+                        items: [{id: 'Item'}, {id: 'Item2'}],
+                        shipping: 10
+                    };
+                },
+                put: function (item, items) { },
+                remove: function (item, items) { },
+                clear: function () {}
+            }
         });
 
         cart
-            .add('Item')
             .ready(function() {
-                assert.strictEqual(cart.shipping(), .5);
+                assert.strictEqual(cart.shipping(), 10);
             })
             .ready(function() {
                 done();
@@ -160,23 +185,13 @@ describe("carty().shipping()", function() {
 describe("carty().tax()", function() {
     var cart;
 
-    it("calculates no tax for empty cart", function() {
-        cart = carty({
-            tax: 10
-        });
-
-        assert.strictEqual(cart.tax(), 0);
-    });
-
-    it("calculates tax", function(done) {
-        cart = carty({
-            tax: 10
-        });
+    it("calculates no tax by default", function(done) {
+        cart = carty();
 
         cart
             .add('Item')
             .ready(function() {
-                assert.strictEqual(cart.tax(), 10);
+                assert.strictEqual(cart.tax(), 0);
             })
             .ready(function() {
                 done();
@@ -184,7 +199,7 @@ describe("carty().tax()", function() {
         ;
     });
 
-    it("calculates tax with function", function(done) {
+    it("calculates tax with custom calculator", function(done) {
         cart = carty({
             tax: function() { return 10; }
         });
@@ -200,15 +215,24 @@ describe("carty().tax()", function() {
         ;
     });
 
-    it("calculates tax from with string", function(done) {
-        cart = carty({
-            tax: ".5"
+    it("calculates tax from storage", function(done) {
+        var cart = carty({
+            storage: {
+                load: function() {
+                    return {
+                        items: [{id: 'Item'}, {id: 'Item2'}],
+                        tax: 10
+                    };
+                },
+                put: function (item, items) { },
+                remove: function (item, items) { },
+                clear: function () {}
+            }
         });
 
         cart
-            .add('Item')
             .ready(function() {
-                assert.strictEqual(cart.tax(), .5);
+                assert.strictEqual(cart.tax(), 10);
             })
             .ready(function() {
                 done();
@@ -221,16 +245,13 @@ describe("carty().total()", function() {
     var cart;
 
     it("calculates total", function(done) {
-        cart = carty({
-            tax: 10,
-            shipping: 10
-        });
+        cart = carty();
 
         cart.add({id: 'Item', price: 10})
             .add({id: 'Item2', price: "10"})
             .add({id: 'Item3'})
             .ready(function() {
-                assert.strictEqual(cart.total(), 40);
+                assert.strictEqual(cart.total(), 20);
             })
             .ready(function() {
                 done();

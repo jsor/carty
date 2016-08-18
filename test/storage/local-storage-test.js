@@ -3,7 +3,7 @@ var sinon = require('sinon');
 var localStorage = require('../../lib/storage/local-storage');
 var carty = typeof window !== 'undefined' ? window.carty : require('../../lib/carty');
 
-describe("storage/localStorage(null, )", function() {
+describe("storage/localStorage()", function() {
     var mockLocalStorage = {
         setItem: function (data, done) { },
         getItem: function (done) { },
@@ -59,8 +59,8 @@ describe("storage/localStorage(null, )", function() {
 
         var data = storage.load();
 
-        assert.isArray(data);
-        assert.deepEqual(data, ['test']);
+        assert.isObject(data);
+        assert.deepEqual(data, {items: ['test'] });
 
         mock.verify();
     });
