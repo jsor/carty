@@ -3,7 +3,7 @@ var sinon = require('sinon');
 var localStorage = require('../../lib/storage/local-storage');
 var carty = typeof window !== 'undefined' ? window.carty : require('../../lib/carty');
 
-describe("storage/localStorage(null, )", function() {
+describe("storage/localStorage()", function() {
     var mockLocalStorage = {
         setItem: function (data, done) { },
         getItem: function (done) { },
@@ -14,7 +14,7 @@ describe("storage/localStorage(null, )", function() {
 
     beforeEach(function() {
         mock = sinon.mock(mockLocalStorage);
-        cart = carty();
+        cart = carty().add('Item');
     });
 
     it("works with window.localStorage", function() {
@@ -25,7 +25,7 @@ describe("storage/localStorage(null, )", function() {
 
         var storage = localStorage();
 
-        storage.put(null, function() { return [cart.item('Item')]; });
+        storage.put(null, cart);
 
         mock.verify();
 
@@ -37,7 +37,7 @@ describe("storage/localStorage(null, )", function() {
 
         var storage = localStorage(null, mockLocalStorage);
 
-        storage.put(null, function() { return [cart.item('Item')]; });
+        storage.put(null, cart);
 
         mock.verify();
     });
@@ -47,7 +47,7 @@ describe("storage/localStorage(null, )", function() {
 
         var storage = localStorage(null, mockLocalStorage);
 
-        storage.remove(null, function() { return [cart.item('Item')]; });
+        storage.remove(null, cart);
 
         mock.verify();
     });
