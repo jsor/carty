@@ -1,5 +1,5 @@
 /*!
- * Carty - v0.7.0 - 2016-08-19
+ * Carty - v0.8.0 - 2016-08-19
  * http://sorgalla.com/carty/
  * Copyright (c) 2015-2016 Jan Sorgalla; Licensed MIT
  */
@@ -99,8 +99,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _defaultOptions = {
 	    storage: null,
-	    subtotal: function(items) {
-	        return items.reduce(function(previous, item) {
+	    subtotal: function(cart) {
+	        return cart.items().reduce(function(previous, item) {
 	            return previous + (item.price * item.quantity);
 	        }, 0);
 	    },
@@ -223,6 +223,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return cart;
 	    };
 
+	    cart.items = function() {
+	        return _items.map(function(item) {
+	            return item();
+	        });
+	    };
+
 	    cart.quantity = function() {
 	        return _items.reduce(function(previous, item) {
 	            return previous + item().quantity;
@@ -230,11 +236,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    cart.subtotal = function() {
-	        var items = _items.map(function(item) {
-	            return item();
-	        });
-
-	        return toNumber(value(_options.subtotal, undefined, [items, cart]), _options);
+	        return toNumber(value(_options.subtotal, undefined, [cart]), _options);
 	    };
 
 	    cart.shipping = function() {
@@ -288,7 +290,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function load() {
 	        return emit('load').then(function() {
 	            return resolve(
-	                _options.storage && _options.storage.load()
+	                _options.storage && _options.storage.load(cart)
 	            ).then(function(items) {
 	                if (type(items) === 'array') {
 	                    _items = items.map(function(attr) {
@@ -423,7 +425,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _items.length = 0;
 
 	            return resolve(
-	                _options.storage && _options.storage.clear()
+	                _options.storage && _options.storage.clear(cart)
 	            ).then(emit.bind(cart, 'cleared'), function(e) {
 	                emit('clearfailed', e);
 	                return reject(e);
@@ -1115,7 +1117,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    localStorage = localStorage || window.localStorage;
 
 	    function save(item, cart) {
-	        localStorage.setItem(namespace, JSON.stringify(cart().items));
+	        console.log(cart.items)
+	        localStorage.setItem(namespace, JSON.stringify(cart.items()));
 	    }
 
 	    function empty() {
