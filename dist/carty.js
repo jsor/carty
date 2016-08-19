@@ -1,5 +1,5 @@
 /*!
- * Carty - v0.7.0 - 2016-08-18
+ * Carty - v0.7.0 - 2016-08-19
  * http://sorgalla.com/carty/
  * Copyright (c) 2015-2016 Jan Sorgalla; Licensed MIT
  */
@@ -12,7 +12,7 @@
 		exports["carty"] = factory(require("jquery"));
 	else
 		root["carty"] = factory(root["jQuery"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_13__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_14__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -64,16 +64,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	var carty = __webpack_require__(1);
 
 	carty.format = {
-	    currency: __webpack_require__(7),
-	    number: __webpack_require__(9)
+	    currency: __webpack_require__(8),
+	    number: __webpack_require__(10)
 	};
 
 	carty.storage = {
-	    localStorage: __webpack_require__(11)
+	    localStorage: __webpack_require__(12)
 	};
 
 	carty.ui = {
-	    jquery: __webpack_require__(12)
+	    jquery: __webpack_require__(13)
 	};
 
 	module.exports = carty;
@@ -91,6 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var emitter = __webpack_require__(3);
 	var toNumber = __webpack_require__(5);
 	var options = __webpack_require__(6);
+	var value = __webpack_require__(7);
 	var type = __webpack_require__(4);
 
 	var resolve = Promise.resolve.bind(Promise);
@@ -103,12 +104,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return previous + (item.price * item.quantity);
 	        }, 0);
 	    },
-	    shipping: function() {
-	        return 0;
-	    },
-	    tax: function() {
-	        return 0;
-	    }
+	    shipping: null,
+	    tax: null
 	};
 
 	var _defaultItemAttributes = {
@@ -119,22 +116,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function cart() {
 	        return {
 	            size: cart.size(),
+	            quantity: cart.quantity(),
 	            subtotal: cart.subtotal(),
 	            shipping: cart.shipping(),
 	            tax: cart.tax(),
-	            quantity: cart.quantity(),
 	            total: cart.total(),
-	            items: items()
+	            items: _items.map(function(item) {
+	                return item();
+	            })
 	        };
 	    }
 
 	    var emit = emitter(cart);
 
-	    var _options  = extend({}, _defaultOptions, opts);
-	    var _items    = [];
-	    var _subtotal = undefined;
-	    var _shipping = undefined;
-	    var _tax      = undefined;
+	    var _options = extend({}, _defaultOptions, opts);
+	    var _items = [];
 	    var _ready;
 
 	    cart.on(['load', 'add', 'update', 'remove', 'clear', 'checkout'], emit.bind(undefined, 'change'));
@@ -227,34 +223,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return cart;
 	    };
 
-	    cart.subtotal = function() {
-	        if (type(_subtotal) !== 'undefined') {
-	            return _subtotal;
-	        }
-
-	        return toNumber(_options.subtotal.call(undefined, items(), cart));
-	    };
-
-	    cart.shipping = function() {
-	        if (type(_shipping) !== 'undefined') {
-	            return _shipping;
-	        }
-
-	        return toNumber(_options.shipping.call(undefined, cart));
-	    };
-
-	    cart.tax = function() {
-	        if (type(_tax) !== 'undefined') {
-	            return _tax;
-	        }
-
-	        return toNumber(_options.tax.call(undefined, cart));
-	    };
-
 	    cart.quantity = function() {
 	        return _items.reduce(function(previous, item) {
 	            return previous + item().quantity;
 	        }, 0);
+	    };
+
+	    cart.subtotal = function() {
+	        var items = _items.map(function(item) {
+	            return item();
+	        });
+
+	        return toNumber(value(_options.subtotal, undefined, [items, cart]), _options);
+	    };
+
+	    cart.shipping = function() {
+	        if (!cart.size()) {
+	            return 0;
+	        }
+
+	        return toNumber(value(_options.shipping, undefined, [cart]), _options);
+	    };
+
+	    cart.tax = function() {
+	        if (!cart.size()) {
+	            return 0;
+	        }
+
+	        return toNumber(value(_options.tax, undefined, [cart]), _options);
 	    };
 
 	    cart.total = function() {
@@ -289,56 +285,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	    }
 
-	    function populate(data) {
-	        if (type(data) !== 'object') {
-	            return;
-	        }
-
-	        if (type(data.items) === 'array') {
-	            _items = data.items.map(function(attr) {
-	                return createItem(attr);
-	            });
-	        }
-
-	        if (type(data.subtotal) !== 'undefined') {
-	            _subtotal = toNumber(data.subtotal);
-	        }
-
-	        if (type(data.shipping) !== 'undefined') {
-	            _shipping = toNumber(data.shipping);
-	        }
-
-	        if (type(data.tax) !== 'undefined') {
-	            _tax = toNumber(data.tax);
-	        }
-	    }
-
-	    function reset() {
-	        _items.length = 0;
-	        _subtotal = undefined;
-	        _shipping = undefined;
-	        _tax      = undefined;
-	    }
-
 	    function load() {
 	        return emit('load').then(function() {
 	            return resolve(
 	                _options.storage && _options.storage.load()
-	            ).then(function(data) {
-	                populate(data);
+	            ).then(function(items) {
+	                if (type(items) === 'array') {
+	                    _items = items.map(function(attr) {
+	                        return createItem(attr);
+	                    });
+	                }
 	            }).then(emit.bind(cart, 'loaded'), function(e) {
-	                emit('loadfailed', e);
-	                return reject(e);
+	                    emit('loadfailed', e);
+	                    return reject(e);
 	            });
 	        }, function() {
 	            // Catch load event listener rejections
 	        });
-	    }
-
-	    function items() {
-	        return _items.map(function(item) {
-	            return item();
-	        })
 	    }
 
 	    function has(attr) {
@@ -381,9 +344,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            return resolve(
 	                _options.storage && _options.storage.put(state, cart)
-	            ).then(function(data) {
-	                populate(data);
-	            }).then(emit.bind(cart, 'updated', state), function(e) {
+	            ).then(emit.bind(cart, 'updated', state), function(e) {
 	                emit('updatefailed', e, state);
 	                return reject(e);
 	            })['catch'](function() {
@@ -421,9 +382,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            return resolve(
 	                _options.storage && _options.storage.put(state, cart)
-	            ).then(function(data) {
-	                populate(data);
-	            }).then(emit.bind(cart, 'added', state), function(e) {
+	            ).then(emit.bind(cart, 'added', state), function(e) {
 	                emit('addfailed', e, state);
 	                return reject(e);
 	            })['catch'](function() {
@@ -448,9 +407,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            return resolve(
 	                _options.storage && _options.storage.remove(state, cart)
-	            ).then(function(data) {
-	                populate(data);
-	            }).then(emit.bind(cart, 'removed', state), function(e) {
+	            ).then(emit.bind(cart, 'removed', state), function(e) {
 	                emit('removefailed', e, state);
 	                return reject(e);
 	            })['catch'](function() {
@@ -463,15 +420,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    function clear() {
 	        return emit('clear').then(function() {
+	            _items.length = 0;
+
 	            return resolve(
 	                _options.storage && _options.storage.clear()
-	            ).then(function(data) {
-	                if (type(data) !== 'undefined') {
-	                    populate(data);
-	                } else {
-	                    reset();
-	                }
-	            }).then(emit.bind(cart, 'cleared'), function(e) {
+	            ).then(emit.bind(cart, 'cleared'), function(e) {
 	                emit('clearfailed', e);
 	                return reject(e);
 	            })['catch'](function() {
@@ -488,7 +441,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                _options.storage && _options.storage.checkout(data, cart)
 	            )
 	            .then(function(value) {
-	                reset();
+	                _items.length = 0;
 
 	                return value;
 	            })
@@ -936,11 +889,30 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
+	module.exports = value;
+
+	var type = __webpack_require__(4);
+
+	function value(value, context, args) {
+	    if (type(value) === 'function') {
+	        return value.apply(context, args || []);
+	    }
+
+	    return value;
+	}
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
 	module.exports = formatCurrency;
 
 	var extend = __webpack_require__(2);
-	var defaultCurrencies = __webpack_require__(8);
-	var formatNumber = __webpack_require__(9);
+	var defaultCurrencies = __webpack_require__(9);
+	var formatNumber = __webpack_require__(10);
 
 	function formatCurrency(value, options) {
 	    return _formatCurrency(options, value);
@@ -968,7 +940,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1040,7 +1012,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1048,7 +1020,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = formatNumber;
 
 	var toNumber = __webpack_require__(5);
-	var toFixed = __webpack_require__(10);
+	var toFixed = __webpack_require__(11);
 	var type = __webpack_require__(4);
 
 	function formatNumber(value, options) {
@@ -1107,7 +1079,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1131,7 +1103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1153,11 +1125,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return {
 	        load: function() {
 	            try {
-	                return {
-	                    items: JSON.parse(localStorage.getItem(namespace))
-	                };
+	                return JSON.parse(localStorage.getItem(namespace));
 	            } catch (e) {
-	                return {}
+	                return []
 	            }
 	        },
 	        put: save,
@@ -1169,14 +1139,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	module.exports = uiJquery;
 
-	var $ = __webpack_require__(13);
+	var $ = __webpack_require__(14);
 
 	var _defaultOptions = {
 	    namespace: 'carty',
@@ -1392,10 +1362,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_13__;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_14__;
 
 /***/ }
 /******/ ])

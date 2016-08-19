@@ -8,7 +8,7 @@ describe("carty().checkout()", function() {
     beforeEach(function() {
         cart = carty({
             storage: {
-                load: function() { return {items: [{id: 'Item'}, {id: 'Item2'}] }; },
+                load: function() { return [{id: 'Item'}, {id: 'Item2'}]; },
                 put: function (item, items) { },
                 remove: function (item, items) { },
                 clear: function () {},

@@ -8,7 +8,7 @@ describe("carty().update()", function() {
     beforeEach(function() {
         cart = carty({
             storage: {
-                load: function() { return {items: [{id: 'Item'}] }; },
+                load: function() { return [{id: 'Item'}]; },
                 put: function (item, items) { },
                 remove: function (item, items) { },
                 clear: function () {}
@@ -189,7 +189,7 @@ describe("carty().update()", function() {
     it("emits updatefailed event", function(done) {
         cart = carty({
             storage: {
-                load: function() { return {items: [{id: 'Item'}] }; },
+                load: function() { return [{id: 'Item'}]; },
                 put: function() { return Promise.reject('error'); }
             }
         });
@@ -254,7 +254,7 @@ describe("carty().update()", function() {
     it("emits changefailed event", function(done) {
         cart = carty({
             storage: {
-                load: function() { return {items: [{id: 'Item'}] }; },
+                load: function() { return [{id: 'Item'}]; },
                 put: function() { return Promise.reject('error'); }
             }
         });

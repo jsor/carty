@@ -7,7 +7,7 @@ describe("carty().options('storage')", function() {
 
     beforeEach(function() {
         storage = {
-            load: function () { return {items: [{id: 'Existing Item'}] }; },
+            load: function () { return [{id: 'Existing Item'}]; },
             put: function (item, items) { },
             remove: function (item, items) { },
             clear: function () { },
@@ -34,7 +34,7 @@ describe("carty().options('storage')", function() {
     });
 
     it("loads items from storage", function(done) {
-        mock.expects('load').once().returns({items: [{id: 'id'}] });
+        mock.expects('load').once().returns([{id: 'id'}]);
 
         carty({storage: storage})
             .ready(function(cart) {

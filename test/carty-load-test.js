@@ -9,7 +9,7 @@ describe("carty().load()", function() {
         storedItems = [{id: 'Item'}, {id: 'Item2'}];
         cart = carty({
             storage: {
-                load: function() { return {items: storedItems }; },
+                load: function() { return storedItems; },
                 put: function (item, items) { },
                 remove: function (item, items) { },
                 clear: function () {}
@@ -35,44 +35,6 @@ describe("carty().load()", function() {
 
                 assert.strictEqual(cart().items.length, 3);
 
-                done();
-            })
-        ;
-    });
-
-    it("ignores undefined data", function(done) {
-        cart = carty({
-            storage: {
-                load: function() { },
-                put: function (item, items) { },
-                remove: function (item, items) { },
-                clear: function () {}
-            }
-        });
-
-        cart
-            .load()
-            .ready(function(cart) {
-                assert.strictEqual(cart.size(), 0);
-                done();
-            })
-        ;
-    });
-
-    it("ignores undefined items", function(done) {
-        cart = carty({
-            storage: {
-                load: function() { return {items: undefined }; },
-                put: function (item, items) { },
-                remove: function (item, items) { },
-                clear: function () {}
-            }
-        });
-
-        cart
-            .load()
-            .ready(function(cart) {
-                assert.strictEqual(cart.size(), 0);
                 done();
             })
         ;
