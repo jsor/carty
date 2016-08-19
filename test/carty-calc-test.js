@@ -79,9 +79,9 @@ describe("carty().subtotal()", function() {
         ;
     });
 
-    it("calculates subtotal with custome subtotal calculator", function(done) {
-        cart.options('subtotal', function(items) {
-            return '' + items.length;
+    it("calculates subtotal with custom subtotal calculator", function(done) {
+        cart.options('subtotal', function(cart) {
+            return '' + cart.size();
         });
 
         cart
