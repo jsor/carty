@@ -1,7 +1,7 @@
 /*!
- * Carty - v0.8.0 - 2016-08-19
+ * Carty - v0.8.1 - 2017-06-28
  * http://sorgalla.com/carty/
- * Copyright (c) 2015-2016 Jan Sorgalla; Licensed MIT
+ * Copyright (c) 2015-2017 Jan Sorgalla; Licensed MIT
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -1295,19 +1295,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // ---
 
 	    var addHandler = function(e) {
-	        var el = $(e.target);
+	        var el = $(this);
 
-	        if (el.is(_addSelector)) {
-	            cart.add(collectItemData(el, el.data(_addDataKey)));
-	        }
+	        cart.add(collectItemData(el, el.data(_addDataKey)));
 	    };
 
 	    var updateHandler = function(e) {
-	        var el = $(e.target);
+	        var el = $(this);
 
-	        if (el.is(_updateSelector)) {
-	            cart.update(collectItemData(el, el.data(_updateDataKey)));
-	        }
+	        cart.update(collectItemData(el, el.data(_updateDataKey)));
 	    };
 
 	    $(document)
@@ -1316,11 +1312,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        .on('click', _updateButtonSelector, updateHandler)
 	        .on('change', _updateInputSelector, updateHandler)
 	        .on('click', _removeSelector, function(e) {
-	            var el = $(e.target);
+	            var el = $(this);
 
-	            if (el.is(_removeSelector)) {
-	                cart.remove(collectItemData(el, el.data(_removeDataKey)));
-	            }
+	            cart.remove(collectItemData(el, el.data(_removeDataKey)));
 	        })
 	        .on('click', _clearSelector, function() {
 	            cart.clear()
