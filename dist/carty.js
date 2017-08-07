@@ -1,5 +1,5 @@
 /*!
- * Carty - v0.8.1 - 2017-06-28
+ * Carty - v0.8.1 - 2017-08-07
  * http://sorgalla.com/carty/
  * Copyright (c) 2015-2017 Jan Sorgalla; Licensed MIT
  */
@@ -1117,7 +1117,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    localStorage = localStorage || window.localStorage;
 
 	    function save(item, cart) {
-	        console.log(cart.items)
 	        localStorage.setItem(namespace, JSON.stringify(cart.items()));
 	    }
 
