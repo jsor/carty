@@ -1,5 +1,5 @@
 /*!
- * Carty - v0.8.1 - 2017-08-07
+ * Carty - v0.8.2 - 2017-08-07
  * http://sorgalla.com/carty/
  * Copyright (c) 2015-2017 Jan Sorgalla; Licensed MIT
  */
