@@ -97,6 +97,58 @@ describe("carty().subtotal()", function() {
     });
 });
 
+describe("carty().discount()", function() {
+    var cart;
+
+    it("calculates discount", function(done) {
+        cart = carty({
+            discount: 10
+        });
+
+        cart
+            .add('Item')
+            .ready(function() {
+                assert.strictEqual(cart.discount(), 10);
+            })
+            .ready(function() {
+                done();
+            })
+        ;
+    });
+
+    it("calculates discount with function", function(done) {
+        cart = carty({
+            discount: function() { return 10; }
+        });
+
+        cart
+            .add('Item')
+            .ready(function() {
+                assert.strictEqual(cart.discount(), 10);
+            })
+            .ready(function() {
+                done();
+            })
+        ;
+    });
+
+    it("calculates discount from with string", function(done) {
+        cart = carty({
+            discount: ".5"
+        });
+
+        cart
+            .add('Item')
+            .ready(function() {
+                assert.strictEqual(cart.discount(), .5);
+            })
+            .ready(function() {
+                done();
+            })
+        ;
+    });
+});
+
 describe("carty().shipping()", function() {
     var cart;
 
