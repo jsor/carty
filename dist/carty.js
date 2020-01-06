@@ -1,7 +1,7 @@
 /*!
- * Carty - v0.8.2 - 2017-08-07
+ * Carty - v0.8.3 - 2020-01-06
  * http://sorgalla.com/carty/
- * Copyright (c) 2015-2017 Jan Sorgalla; Licensed MIT
+ * Copyright (c) 2015-2020 Jan Sorgalla; Licensed MIT
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -57,7 +57,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -79,9 +79,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = carty;
 
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -104,6 +104,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return previous + (item.price * item.quantity);
 	        }, 0);
 	    },
+	    discount: null,
 	    shipping: null,
 	    tax: null
 	};
@@ -118,6 +119,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            size: cart.size(),
 	            quantity: cart.quantity(),
 	            subtotal: cart.subtotal(),
+	            discount: cart.discount(),
 	            shipping: cart.shipping(),
 	            tax: cart.tax(),
 	            total: cart.total(),
@@ -239,6 +241,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return toNumber(value(_options.subtotal, undefined, [cart]), _options);
 	    };
 
+	    cart.discount = function() {
+	        return toNumber(value(_options.discount, undefined, [cart]), _options);
+	    };
+
 	    cart.shipping = function() {
 	        if (!cart.size()) {
 	            return 0;
@@ -256,7 +262,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    cart.total = function() {
-	        return cart.subtotal() + cart.tax() + cart.shipping();
+	        return cart.subtotal() - cart.discount() + cart.tax() + cart.shipping();
 	    };
 
 	    cart.item = function(attr) {
@@ -545,14 +551,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	carty.options = options.bind(carty, _defaultOptions);
 
 
-/***/ },
+/***/ }),
 /* 2 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
 	var hasOwn = Object.prototype.hasOwnProperty;
 	var toStr = Object.prototype.toString;
+	var defineProperty = Object.defineProperty;
+	var gOPD = Object.getOwnPropertyDescriptor;
 
 	var isArray = function isArray(arr) {
 		if (typeof Array.isArray === 'function') {
@@ -577,17 +585,46 @@ return /******/ (function(modules) { // webpackBootstrap
 		// Own properties are enumerated firstly, so to speed up,
 		// if last one is own, then all properties are own.
 		var key;
-		for (key in obj) {/**/}
+		for (key in obj) { /**/ }
 
 		return typeof key === 'undefined' || hasOwn.call(obj, key);
 	};
 
+	// If name is '__proto__', and Object.defineProperty is available, define __proto__ as an own property on target
+	var setProperty = function setProperty(target, options) {
+		if (defineProperty && options.name === '__proto__') {
+			defineProperty(target, options.name, {
+				enumerable: true,
+				configurable: true,
+				value: options.newValue,
+				writable: true
+			});
+		} else {
+			target[options.name] = options.newValue;
+		}
+	};
+
+	// Return undefined instead of __proto__ if '__proto__' is not an own property
+	var getProperty = function getProperty(obj, name) {
+		if (name === '__proto__') {
+			if (!hasOwn.call(obj, name)) {
+				return void 0;
+			} else if (gOPD) {
+				// In early versions of node, obj['__proto__'] is buggy when obj has
+				// __proto__ as an own property. Object.getOwnPropertyDescriptor() works.
+				return gOPD(obj, name).value;
+			}
+		}
+
+		return obj[name];
+	};
+
 	module.exports = function extend() {
-		var options, name, src, copy, copyIsArray, clone,
-			target = arguments[0],
-			i = 1,
-			length = arguments.length,
-			deep = false;
+		var options, name, src, copy, copyIsArray, clone;
+		var target = arguments[0];
+		var i = 1;
+		var length = arguments.length;
+		var deep = false;
 
 		// Handle a deep copy situation
 		if (typeof target === 'boolean') {
@@ -595,7 +632,8 @@ return /******/ (function(modules) { // webpackBootstrap
 			target = arguments[1] || {};
 			// skip the boolean and the target
 			i = 2;
-		} else if ((typeof target !== 'object' && typeof target !== 'function') || target == null) {
+		}
+		if (target == null || (typeof target !== 'object' && typeof target !== 'function')) {
 			target = {};
 		}
 
@@ -605,8 +643,8 @@ return /******/ (function(modules) { // webpackBootstrap
 			if (options != null) {
 				// Extend the base object
 				for (name in options) {
-					src = target[name];
-					copy = options[name];
+					src = getProperty(target, name);
+					copy = getProperty(options, name);
 
 					// Prevent never-ending loop
 					if (target !== copy) {
@@ -620,11 +658,11 @@ return /******/ (function(modules) { // webpackBootstrap
 							}
 
 							// Never move original objects, clone them
-							target[name] = extend(deep, clone, copy);
+							setProperty(target, { name: name, newValue: extend(deep, clone, copy) });
 
 						// Don't bring in undefined values
 						} else if (typeof copy !== 'undefined') {
-							target[name] = copy;
+							setProperty(target, { name: name, newValue: copy });
 						}
 					}
 				}
@@ -636,10 +674,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 
-
-/***/ },
+/***/ }),
 /* 3 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -754,9 +791,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 
-/***/ },
+/***/ }),
 /* 4 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -795,9 +832,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 
-/***/ },
+/***/ }),
 /* 5 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -855,9 +892,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 
-/***/ },
+/***/ }),
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -885,9 +922,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 
-/***/ },
+/***/ }),
 /* 7 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -904,9 +941,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 
-/***/ },
+/***/ }),
 /* 8 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -941,9 +978,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 
-/***/ },
+/***/ }),
 /* 9 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -1013,9 +1050,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 
-/***/ },
+/***/ }),
 /* 10 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -1080,9 +1117,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 
-/***/ },
+/***/ }),
 /* 11 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -1104,9 +1141,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 
-/***/ },
+/***/ }),
 /* 12 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 
@@ -1140,9 +1177,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 
-/***/ },
+/***/ }),
 /* 13 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -1335,6 +1372,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        $.each([
 	            'subtotal',
+	            'discount',
 	            'shipping',
 	            'tax',
 	            'total'
@@ -1357,13 +1395,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 
-/***/ },
+/***/ }),
 /* 14 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = __WEBPACK_EXTERNAL_MODULE_14__;
 
-/***/ }
+/***/ })
 /******/ ])
 });
 ;
