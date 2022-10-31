@@ -25,7 +25,8 @@
     "test": "make test",
     "test-cov": "make test-cov",
     "travis": "make travis",
-    "coveralls": "make coveralls"
+    "coveralls": "make coveralls",
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
